@@ -1,0 +1,21 @@
+﻿  enemyBoar.cpp
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\enemyBoar.cpp(30,43): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\enemyBoar.cpp(31,41): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\enemyBoar.cpp(32,44): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\src\enemyBoar.cpp(33,33): warning C4305: '=': truncation from 'double' to 'float'
+  SpaceShooterAssignment.vcxproj -> C:\Work\SDLProjects\Temp\214-design-patterns-assignment-mw\bin\Game_Debug.exe

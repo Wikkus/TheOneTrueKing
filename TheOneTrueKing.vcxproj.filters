@@ -1,0 +1,554 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\enemyBase.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enemyBoar.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enemyHuman.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enemyManager.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\example.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collision.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dataStructuresAndMethods.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\debugDrawer.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameEngine.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_impl_sdl.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_impl_sdlrenderer.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_sdl.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ImGui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imGuiManager.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\projectile.cpp">
+      <Filter>Projectiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\projectileManager.cpp">
+      <Filter>Projectiles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\playerCharacter.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objectBase.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obstacleManager.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obstacleWall.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objectPool.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\quadTree.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rayCast.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sprite.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spriteSheet.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stateStack.cpp">
+      <Filter>StateStack</Filter>
+    </ClCompile>
+    <ClCompile Include="src\weaponComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timerManager.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textSprite.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vector2.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\steeringBehavior.cpp">
+      <Filter>SteeringBehavior</Filter>
+    </ClCompile>
+    <ClCompile Include="src\formationManager.cpp">
+      <Filter>FormationManager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\SDL2\begin_code.h" />
+    <ClInclude Include="include\SDL2\close_code.h" />
+    <ClInclude Include="include\SDL2\SDL_vulkan.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_assert.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_atomic.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_audio.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_bits.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_blendmode.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_clipboard.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_android.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_emscripten.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_iphoneos.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_macosx.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_minimal.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_ngage.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_os2.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_pandora.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_windows.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_wingdk.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_winrt.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_config_xbox.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_copying.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_cpuinfo.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_egl.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_endian.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_error.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_events.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_filesystem.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_gamecontroller.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_gesture.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_guid.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_haptic.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_hidapi.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_hints.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_image.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_joystick.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_keyboard.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_keycode.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_loadso.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_locale.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_log.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_main.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_messagebox.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_metal.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_misc.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_mouse.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_mutex.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_name.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengl.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengl_glext.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles2.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles2_gl2.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles2_gl2ext.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles2_gl2platform.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_opengles2_khrplatform.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_pixels.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_platform.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_power.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_quit.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_rect.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_render.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_revision.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_rwops.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_scancode.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_sensor.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_shape.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_stdinc.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_surface.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_system.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_syswm.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_assert.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_common.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_compare.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_crc32.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_font.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_fuzzer.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_harness.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_images.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_log.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_md5.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_memory.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_test_random.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_thread.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_timer.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_touch.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_ttf.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_types.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_version.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\SDL_video.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemyManager.h">
+      <Filter>Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemyBase.h">
+      <Filter>Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemyBoar.h">
+      <Filter>Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemyHuman.h">
+      <Filter>Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collision.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dataStructuresAndMethods.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\debugDrawer.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameEngine.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imgui_impl_sdl.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imgui_impl_sdlrenderer.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imgui_sdl.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imGuiManager.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectileManager.h">
+      <Filter>Projectiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectile.h">
+      <Filter>Projectiles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\playerCharacter.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objectBase.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obstacleWall.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obstacleManager.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objectPool.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\quadTree.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rayCast.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sprite.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\spriteSheet.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stateStack.h">
+      <Filter>StateStack</Filter>
+    </ClInclude>
+    <ClInclude Include="src\weaponComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\timer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\timerManager.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vector2.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textSprite.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\steeringBehavior.h">
+      <Filter>SteeringBehavior</Filter>
+    </ClInclude>
+    <ClInclude Include="src\formationManager.h">
+      <Filter>FormationManager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\SDL2\SDL_config.h.cmake">
+      <Filter>SDLIncludes</Filter>
+    </None>
+    <None Include="include\SDL2\SDL_config.h.in">
+      <Filter>SDLIncludes</Filter>
+    </None>
+    <None Include="include\SDL2\SDL_revision.h.cmake">
+      <Filter>SDLIncludes</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SDLIncludes">
+      <UniqueIdentifier>{8001d7cc-a988-4c25-8861-6bce781fd57d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemies">
+      <UniqueIdentifier>{5c4547c6-6bf5-4e01-b62a-e158957c3bf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameEngine">
+      <UniqueIdentifier>{37f265f8-68a3-46b7-b194-6ddbe2ea2768}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{96872763-036f-4743-9c44-214dc3048132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projectiles">
+      <UniqueIdentifier>{b8819732-f97a-48fe-be27-f9bd703e90e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{eebacf11-a5fe-4959-826e-281a727f8f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{3855943f-9e21-4d1a-9e26-da7b2d478879}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StateStack">
+      <UniqueIdentifier>{554dff81-8a24-4de2-864a-c7db50bb2046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{df601023-7bd0-4237-a3df-32e75381e9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{6c5a5325-9274-434a-a45d-bb46d8e0bfe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SteeringBehavior">
+      <UniqueIdentifier>{5a407342-0b5b-410d-8eb8-617539f50aaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FormationManager">
+      <UniqueIdentifier>{a570b2ee-a21a-46fd-977c-bb412b77d7e1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

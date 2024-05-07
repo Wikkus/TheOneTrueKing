@@ -1,0 +1,473 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (build\Debug\) contains files shared from another project (SpaceShooterAssignment.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  example.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_sdl.cpp
+  imgui_impl_sdlrenderer.cpp
+  imgui_sdl.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  main.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'main.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'main.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'main.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'main.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\main.cpp(40,97): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\main.cpp(40,84): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  collision.cpp
+  dataStructuresAndMethods.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/dataStructuresAndMethods.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,64): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,64): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,64): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,64): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,64): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,48): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,48): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,48): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,48): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\dataStructuresAndMethods.cpp(23,48): warning C4244:         ]
+  debugDrawer.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(60,30): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(61,30): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(62,25): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(63,25): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(74,35): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(75,35): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(76,30): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(77,30): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(89,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(106,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(105,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(104,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\debugDrawer.cpp(103,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  enemyBase.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/enemyBase.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+  enemyManager.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/enemyManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(178,38): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(180,61): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(213,42): warning C4018: '<': signed/unsigned mismatch
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(227,40): warning C4018: '<=': signed/unsigned mismatch
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(239,43): warning C4018: '<=': signed/unsigned mismatch
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyManager.cpp(243,43): warning C4018: '>': signed/unsigned mismatch
+  enemyHuman.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/enemyHuman.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyHuman.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyHuman.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyHuman.cpp(28,43): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyHuman.cpp(29,41): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyHuman.cpp(30,44): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyHuman.cpp(31,33): warning C4305: '=': truncation from 'double' to 'float'
+  formationManager.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/formationManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/formationManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/formationManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(30,29): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(34,52): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(170,93): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(174,41): warning C4244: 'argument': conversion from 'unsigned __int64' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(174,41): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(174,41): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(174,41): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(174,41): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(180,26): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(181,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(186,58): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(186,54): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(223,29): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(229,93): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(233,41): warning C4244: 'argument': conversion from 'unsigned __int64' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(233,41): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(233,41): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(233,41): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(233,41): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(242,59): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(242,55): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(304,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(309,59): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(364,29): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(370,93): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(374,41): warning C4244: 'argument': conversion from 'unsigned __int64' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(374,41): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(374,41): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(374,41): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(374,41): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(383,59): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(383,55): warning C4305: 'argument': truncation from 'double' to 'float'
+  gameEngine.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'src/gameEngine.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/gameEngine.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/gameEngine.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/gameEngine.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+  imGuiManager.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\imGuiManager.cpp(10,46): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\imGuiManager.cpp(10,33): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  enemyBoar.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/enemyBoar.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyBoar.cpp(30,43): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyBoar.cpp(31,41): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyBoar.cpp(32,44): warning C4305: '=': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\enemyBoar.cpp(33,33): warning C4305: '=': truncation from 'double' to 'float'
+  Generating Code...
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(287,1): warning C4715: 'SlotRolePattern::GetSlotCost': not all control paths return a value
+C:\Work\SDLProjects\TheOneTrueKing\src\formationManager.cpp(428,1): warning C4715: 'VShapePattern::GetSlotCost': not all control paths return a value
+C:\Work\SDLProjects\TheOneTrueKing\src\objectPool.h(49,1): warning C4715: 'ObjectPool<std::shared_ptr<EnemyBase> >::SpawnObject': not all control paths return a value
+C:\Work\SDLProjects\TheOneTrueKing\src\quadTree.h(90,1): warning C4715: 'QuadTree<std::shared_ptr<ObjectBase> >::Insert': not all control paths return a value
+  Compiling...
+  objectBase.cpp
+  objectPool.cpp
+  obstacleManager.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'src/obstacleManager.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.cpp(9,49): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  obstacleWall.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(20,19): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(21,19): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(22,22): warning C4244:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4838: conversion from 'T' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4838:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4838:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4838:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4838:         ]
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleWall.cpp(23,22): warning C4244:         ]
+  playerCharacter.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/playerCharacter.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/playerCharacter.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\weaponComponent.h(6,7): warning C4099: 'Sprite': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/playerCharacter.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'src/playerCharacter.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\playerCharacter.cpp(84,133): warning C4244: 'argument': conversion from 'const float' to 'unsigned int', possible loss of data
+  projectile.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\weaponComponent.h(6,7): warning C4099: 'Sprite': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/projectile.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+  projectileManager.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\weaponComponent.h(6,7): warning C4099: 'Sprite': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/projectileManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/projectileManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/projectileManager.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\projectileManager.cpp(122,42): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\projectileManager.cpp(123,70): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\projectileManager.cpp(148,46): warning C4018: '<': signed/unsigned mismatch
+  quadTree.cpp
+  rayCast.cpp
+  sprite.cpp
+  spriteSheet.cpp
+  stateStack.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/stateStack.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'src/stateStack.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/stateStack.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/stateStack.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\stateStack.cpp(19,62): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\stateStack.cpp(19,54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  steeringBehavior.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/steeringBehavior.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\obstacleManager.h(19,43): warning C4114: same type qualifier used more than once
+  (compiling source file 'src/steeringBehavior.cpp')
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\steeringBehavior.cpp(14,41): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\steeringBehavior.cpp(14,37): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\steeringBehavior.cpp(161,41): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Work\SDLProjects\TheOneTrueKing\src\steeringBehavior.cpp(165,40): warning C4305: 'argument': truncation from 'double' to 'float'
+  textSprite.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/textSprite.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/textSprite.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(28,23): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(28,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(28,30): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(28,30): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(33,66): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.cpp(33,66): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  timer.cpp
+  timerManager.cpp
+  vector2.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12): warning C4244: 'initializing': conversion from 'double' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12): warning C4244:         ]
+  C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(65,12):
+  the template instantiation context (the oldest one first) is
+  	C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(121,30):
+  	see reference to class template instantiation 'Vector2<float>' being compiled
+  	C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(63,29):
+  	while compiling class template member function 'void Vector2<float>::normalize(void)'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12): warning C4244: 'initializing': conversion from 'double' to 'T', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12): warning C4244:         with
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12): warning C4244:         [
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12): warning C4244:             T=float
+C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12): warning C4244:         ]
+  C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(86,12):
+  the template instantiation context (the oldest one first) is
+  	C:\Work\SDLProjects\TheOneTrueKing\src\vector2.cpp(84,42):
+  	while compiling class template member function 'Vector2<float> Vector2<float>::normalized(void) const'
+  
+  weaponComponent.cpp
+C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8): warning C4099: 'Sprite': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'src/weaponComponent.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\src\sprite.h(6,8):
+  see declaration of 'Sprite'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(7,7): warning C4099: 'SDL_Surface': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/weaponComponent.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_surface.h(72,16):
+  see declaration of 'SDL_Surface'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\textSprite.h(8,7): warning C4099: 'SDL_Texture': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'src/weaponComponent.cpp')
+  C:\Work\SDLProjects\TheOneTrueKing\include\SDL2\SDL_render.h(147,8):
+  see declaration of 'SDL_Texture'
+  
+C:\Work\SDLProjects\TheOneTrueKing\src\weaponComponent.cpp(47,9): warning C4244: 'return': conversion from 'const int' to 'const float', possible loss of data
+C:\Work\SDLProjects\TheOneTrueKing\src\weaponComponent.cpp(96,9): warning C4244: 'return': conversion from 'const int' to 'const float', possible loss of data
+  Generating Code...
+C:\Work\SDLProjects\TheOneTrueKing\src\objectPool.h(49,1): warning C4715: 'ObjectPool<std::shared_ptr<Projectile> >::SpawnObject': not all control paths return a value
+C:\Work\SDLProjects\TheOneTrueKing\src\quadTree.h(90,1): warning C4715: 'QuadTree<std::shared_ptr<ObjectBase> >::Insert': not all control paths return a value
+  TheOneTrueKing.vcxproj -> C:\Work\SDLProjects\TheOneTrueKing\bin\Game_Debug.exe
