@@ -21,11 +21,13 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
 	_circleCollider.radius = 16.f;
 	_circleCollider.position = _position;
 
-	_maxHealth = 20;
+	_maxHealth = 150;
 	_currentHealth = _maxHealth;
 
-	_attackDamage = 10;
-	_attackRange = 100;
+	_attackDamage = 20;
+	_attackRange = 150;
+	_attackRadius.radius = 150.f;
+	_attackRadius.position = _position;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = PI * 0.005f;
@@ -46,11 +48,7 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
 	_prioritySteering = std::make_shared<PrioritySteering>();
 	_blendSteering = std::make_shared<BlendSteering>();
 
-	_blendSteering->ClearBehaviours();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-	_prioritySteering->AddGroup(*_blendSteering);
-
-	_blendSteering->ClearBehaviours();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f));
 	_prioritySteering->AddGroup(*_blendSteering);
@@ -69,12 +67,17 @@ void EnemyBoar::Init() {
 
 void EnemyBoar::Update() {
 	_queriedObjects = objectBaseQuadTree->Query(_circleCollider);
+	if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius.radius)) {
+		_collidedWithPlayer = true;
+	}
 	if(!_isAttacking) {
 		SetTargetPosition(playerCharacter->GetPosition());
 		UpdateMovement();
 	}
 	HandleAttack();
 	_circleCollider.position = _position;
+	_attackRadius.position = _position;
+	_collidedWithPlayer = false;
 }
 
 void EnemyBoar::Render() {
@@ -148,6 +151,9 @@ void EnemyBoar::DeactivateEnemy() {
 	_direction = Vector2<float>(0.f, 0.f);
 	_position = Vector2<float>(-10000.f, -10000.f);
 	_circleCollider.position = _position;
+	_isAttacking = false;
+	_damagedPlayer = false;
+	_playerInRange = false;
 }
 
 bool EnemyBoar::TakeDamage(unsigned int damageAmount) {
@@ -162,18 +168,22 @@ void EnemyBoar::HandleAttack() {
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
+	if (!_playerInRange) {
+		if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius.radius)) {
+			_playerInRange = true;
+		}
+	}
 	if (_isAttacking) {
 		_position += _dashDirection * _dashSpeed * deltaTime;
-		if (!_damagedPlayer) {	
-			if (CircleIntersect(_circleCollider, playerCharacter->GetCircleCollider())) {
-				playerCharacter->TakeDamage(_attackDamage);
-				_damagedPlayer = true;
-			}
+		if (!_damagedPlayer && _collidedWithPlayer) {
+			playerCharacter->TakeDamage(_attackDamage);
+			_damagedPlayer = true;
 		}
 		if ((_dashStartPosition - _position).absolute() > _dashDistance) {
 			_attackCooldownTimer->ResetTimer();
 			_isAttacking = false;
 			_damagedPlayer = false;
+			_playerInRange = false;
 		}
 	} else if (_chargeAttackTimer->GetTimerFinished()) {
 		_isAttacking = true;
@@ -181,8 +191,8 @@ void EnemyBoar::HandleAttack() {
 		_dashDirection = (playerCharacter->GetPosition() - _position).normalized();
 		_dashStartPosition = _position;
 
-	} else if (IsInDistance(playerCharacter->GetPosition(), _position, _attackRange) && !_chargeAttackTimer->GetTimerActive() && !_isAttacking) {
-		_dashDistance = (playerCharacter->GetPosition() - _position).absolute() * 2.f;
+	} else if (_playerInRange && !_chargeAttackTimer->GetTimerActive() && !_isAttacking) {
+		_dashDistance = (playerCharacter->GetPosition() - _position).absolute() * 1.75f;
 		_chargeAttackTimer->ResetTimer();
 	}
 }

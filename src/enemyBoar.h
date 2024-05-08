@@ -56,6 +56,8 @@ private:
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
 	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
 
+	Circle _attackRadius;
+
 	Vector2<float> _dashDirection;
 	Vector2<float> _dashStartPosition;
 

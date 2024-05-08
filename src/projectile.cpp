@@ -5,12 +5,11 @@
 #include "enemyManager.h"
 #include "gameEngine.h"
 
-Projectile::Projectile(ProjectileType projectileType, const char* spritePath, unsigned int projectileDamage, unsigned int objectID) : 
+Projectile::Projectile(ProjectileType projectileType, const char* spritePath, unsigned int objectID) :
 	ObjectBase(objectID, ObjectType::Projectile) {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(spritePath);
 	_projectileType = projectileType;
-	_projectileDamage = projectileDamage;
 
 	_circleCollider.radius = 8.f;
 	_circleCollider.position = _position;
@@ -76,8 +75,10 @@ void Projectile::SetTargetPosition(Vector2<float> position) {
 	_circleCollider.position = _position + _direction * (_sprite->h * 0.25f);
 }
 
-void Projectile::ActivateProjectile(float orientation, Vector2<float> direction, Vector2<float> position) {
+void Projectile::ActivateProjectile(float orientation, unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position) {
 	_orientation = orientation;
+	_projectileDamage = projectileDamage;
+	_projectileSpeed = projectileSpeed;
 	_direction = direction.normalized();
 	_position = position;
 	_circleCollider.position = _position + _direction * (_sprite->h * 0.25f);

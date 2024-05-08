@@ -22,15 +22,18 @@ public:
 	const char* GetEnemyProjectileSprite() const;
 	const char* GetPlayerProjectileSprite() const;
 
-	void CreateNewProjectile(ProjectileType projectileType, const char* spritePath, float orientation, unsigned int projectileDamage,
-		Vector2<float> direction, Vector2<float> position);
+	void CreateNewProjectile(ProjectileType projectileType, const char* spritePath, 
+		float orientation, Vector2<float> direction, Vector2<float> position);
 	
-	void SpawnProjectile(ProjectileType projectileType, const char* spritePath, float orientation, unsigned int projectileDamage, Vector2<float> direction, Vector2<float> position);
+	void SpawnProjectile(ProjectileType projectileType, const char* spritePath, float orientation, 
+		unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position);
 	
 	void QuickSort(int start, int end);
 	
 	void RemoveAllProjectiles();
 	void RemoveProjectile(ProjectileType projectileType, unsigned int projectileIndex);
+
+	void Reset();
 
 	void UpdateQuadTree();
 

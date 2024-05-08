@@ -61,17 +61,21 @@ protected:
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
 	Circle _circleCollider;
+	Circle _attackRadius;
+
 	const EnemyType _enemyType = EnemyType::Count;
 
+	bool _playerInRange = false;
+	bool _collidedWithPlayer = false;
 	
 	int _currentHealth = 0;
 	int _maxHealth = 0;
 
 	float _rotation = 0.f;
-	
 	Vector2<float> _direction = Vector2<float>(0.f, 0.f);
 	Vector2<float> _velocity = Vector2<float>(0.f, 0.f);
 
 	std::vector<std::shared_ptr<ObjectBase>> _queriedObjects;
+	std::vector<std::shared_ptr<ObjectBase>> _objectsInAttackRange;
 };
 

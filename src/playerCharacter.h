@@ -8,7 +8,7 @@
 class Timer;
 class Projectile;
 
-class PlayerCharacter : ObjectBase {
+class PlayerCharacter : public ObjectBase {
 public:
 	PlayerCharacter(float characterOrientation, unsigned int objectID, Vector2<float> characterPosition);
 	~PlayerCharacter();
@@ -47,11 +47,14 @@ private:
 
 	Circle _circleCollider;
 
-	const float _attackDamage = 10;
-	const float _movementSpeed = 100.f;
+	float _attackDamage = 50;
+	float _movementSpeed = 100.f;
+	float _projectileSpeed = 300;
 
-	const int _maxHealth = 1000;
+	float _attackCooldown = 0.05f;
+	float _regenerationTime = 0.1f;
 
+	int _maxHealth = 1000;
 	int _currentHealth = 0;
 
 	std::shared_ptr<Projectile> _collidedProjectile = nullptr;

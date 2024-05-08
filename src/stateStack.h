@@ -83,6 +83,10 @@ public:
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
+
+private:
+	std::shared_ptr<TextSprite> _waveNumberText;
+
 };
 class InGameState : public State {
 public:

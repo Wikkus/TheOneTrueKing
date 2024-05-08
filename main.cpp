@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 	QuadTreeNode quadTreeNode;
 	quadTreeNode.rectangle = AABB::makeFromPositionSize(
 		Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
-	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 10);
+	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 25);
 
 
 

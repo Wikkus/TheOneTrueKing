@@ -13,8 +13,11 @@ SwordComponent::SwordComponent() {
 	_sprite->Load("res/sprites/Sword.png");
 	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
-	_attackDamage = 2;
 	_attackRange = 25.f;
+
+	_attackDamage = 15;
+	_healthModifier = 25;
+
 	_weaponType = WeaponType::Sword;
 }
 
@@ -43,8 +46,12 @@ const bool SwordComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
 
-const float SwordComponent::GetAttackDamage() const {
+const int SwordComponent::GetAttackDamage() const {
 	return _attackDamage;
+}
+
+const int SwordComponent::GetHealthModifier() const {
+	return _healthModifier;
 }
 
 const float SwordComponent::GetAttackRange() const {
@@ -62,8 +69,11 @@ StaffComponent::StaffComponent() {
 	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
 
-	_attackDamage = 1;
 	_attackRange = 300.f;
+
+	_attackDamage = 10;
+	_healthModifier = -25;
+	
 	_weaponType = WeaponType::Staff;
 }
 
@@ -78,7 +88,7 @@ void StaffComponent::Attack(Vector2<float> position, float orientation) {
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
 		Vector2<float> direction = Vector2<float>(playerCharacter->GetPosition() - position).normalized();	
 		projectileManager->SpawnProjectile(ProjectileType::EnemyProjectile, projectileManager->GetEnemyProjectileSprite(), 
-			VectorAsOrientation(direction), _attackDamage, direction, position);
+			VectorAsOrientation(direction), _attackDamage, _projectileSpeed, direction, position);
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
 
@@ -92,12 +102,16 @@ const bool StaffComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
 
-const float StaffComponent::GetAttackDamage() const {
+const float StaffComponent::GetAttackRange() const {
+	return _attackRange;
+}
+
+const int StaffComponent::GetAttackDamage() const {
 	return _attackDamage;
 }
 
-const float StaffComponent::GetAttackRange() const {
-	return _attackRange;
+const int StaffComponent::GetHealthModifier() const {
+	return _healthModifier;
 }
 
 const WeaponType StaffComponent::GetWeaponType() const {

@@ -24,7 +24,7 @@ EnemyManager::~EnemyManager() {
 }
 
 void EnemyManager::Init() {
-	_spawnTimer = timerManager->CreateTimer(2.f);
+	_spawnTimer = timerManager->CreateTimer(3.f);
 	int enemyTypes = (int)EnemyType::Count;
 	//Create all enemies in the object pool at the start of the project
 	for (unsigned i = 0; i < _enemyAmountLimit / enemyTypes; i++) {
@@ -117,9 +117,10 @@ void EnemyManager::TacticalEnemySpawner() {
 
 void EnemyManager::SurvivalEnemySpawner() {
 	std::uniform_int_distribution dist{ 0, 3 };
-	for (unsigned int i = 0; i < _spawnNumberOfEnemies; i++) {
+	unsigned int amountEnemies = _spawnNumberOfEnemies + _waveNumber;
+	for (unsigned int i = 0; i < amountEnemies; i++) {
 		Vector2<float> spawnPosition = { 0.f, 0.f };
-		if (i < _spawnNumberOfEnemies * 0.5f) {
+		if (i < amountEnemies * 0.5f) {
 			float distX = 0.f;
 			std::uniform_real_distribution<float> distY{ 0.f, windowHeight };
 			int temp = dist(randomEngine);
@@ -141,12 +142,14 @@ void EnemyManager::SurvivalEnemySpawner() {
 			}
 			spawnPosition = { distX(randomEngine), distY };
 		}
+		Vector2<float> direction = (playerCharacter->GetPosition() - spawnPosition).normalized();
 		if (i % 3 == 0) {
-			enemyManager->SpawnEnemy(EnemyType::Boar, 0.f, Vector2<float>(0.f, 0.f), spawnPosition);
+			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(direction), direction, spawnPosition);
 		} else {
-			enemyManager->SpawnEnemy(EnemyType::Human, 0.f, Vector2<float>(0.f, 0.f), spawnPosition);
+			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(direction), direction, spawnPosition);
 		}
 	}
+	_waveNumber++;
 	_spawnTimer->ResetTimer();
 }
 
@@ -167,7 +170,6 @@ void EnemyManager::RemoveAllEnemies() {
 		_enemyPools[_activeEnemies.back()->GetEnemyType()]->PoolObject(_activeEnemies.back());
 		_activeEnemies.pop_back();
 	}
-	_spawnTimer->ResetTimer();
 }
 //Using Quicksort and Binary search to locate a specific enemy
 void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
@@ -190,6 +192,12 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 	_activeEnemies.pop_back();
 }
 
+void EnemyManager::Reset() {
+	_waveNumber = 0;
+	RemoveAllEnemies();
+	_spawnTimer->ResetTimer();
+}
+
 void EnemyManager::TakeDamage(unsigned int enemyIndex, unsigned int damageAmount) {
 	if(_activeEnemies[enemyIndex]->TakeDamage(damageAmount)) {
 		RemoveEnemy(_activeEnemies[enemyIndex]->GetEnemyType(), enemyIndex);
@@ -200,6 +208,9 @@ void EnemyManager::UpdateQuadTree() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
 		objectBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
 	}
+}
+const unsigned int EnemyManager::GetWaveNumver() const {
+	return _waveNumber;
 }
 //Binary search based on ID
 int EnemyManager::BinarySearch(int low, int high, int objectID) {

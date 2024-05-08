@@ -12,6 +12,7 @@
 #include "timerManager.h"
 
 #include <vector>
+#include <string>
 
 Button::Button(const char* buttonText, int height, int width, Vector2<float> position) {
 	_position = position;
@@ -95,13 +96,16 @@ void GameStateHandler::RenderStateText() {
 }
 
 InGameState::InGameState() {
+	enemyManager->Reset();
+	projectileManager->Reset();
+
 	playerCharacter->Respawn();
 }
 
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
-	//objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCircleCollider());
+	objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCircleCollider());
 	
 	enemyManager->UpdateQuadTree();
 	projectileManager->UpdateQuadTree();
@@ -111,8 +115,6 @@ void InGameState::Update() {
 	projectileManager->Update();
 	playerCharacter->Update();
 	timerManager->Update();
-
-
 }
 
 void InGameState::Render() {
@@ -164,6 +166,9 @@ void TacticalGameState::Render() {
 void TacticalGameState::RenderText() {}
 
 GameOverState::GameOverState() {
+	_waveNumberText = std::make_shared<TextSprite>();
+	_waveNumberText->Init("res/roboto.ttf", 24, ("Waves survived: " + std::to_string(enemyManager->GetWaveNumver())).c_str(), { 255, 255, 255, 255});
+	_waveNumberText->SetTargetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
 	SetButtonPositions();
 }
 
@@ -181,7 +186,7 @@ void GameOverState::Update() {
 		runningGame = false;
 
 	} else if (_buttons[ButtonType::Restart]->ClickedOn()) {
-		gameStateHandler->ReplaceCurrentState(std::make_shared<InGameState>());
+		gameStateHandler->ReplaceCurrentState(std::make_shared<SurvivalGameState>());
 	}
 }
 
@@ -195,6 +200,7 @@ void GameOverState::RenderText() {
 	_buttons[ButtonType::MainMenu]->RenderText();
 	_buttons[ButtonType::Quit]->RenderText();
 	_buttons[ButtonType::Restart]->RenderText();
+	_waveNumberText->RenderCentered();
 }
 
 MenuState::MenuState() {

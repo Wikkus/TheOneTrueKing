@@ -22,7 +22,7 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_circleCollider.position = _position;
 	_circleCollider.radius = 12.f;
 	
-	_maxHealth = 15;
+	_maxHealth = 75;
 	_currentHealth = _maxHealth;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
@@ -199,6 +199,9 @@ void EnemyHuman::PickWeapon() {
 		_weaponComponent = std::make_shared<SwordComponent>();
 		break;
 	}
+	_maxHealth += _weaponComponent->GetHealthModifier();
+	_currentHealth = _maxHealth;
+
 	std::uniform_real_distribution range{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
 	float attackRange = range(randomEngine);
 

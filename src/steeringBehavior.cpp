@@ -208,7 +208,7 @@ SteeringOutput SeparationBehavior::Steering(BehaviorData behaviorData, EnemyBase
 	_result.linearVelocity = { 0.f, 0.f };
 
 	//Loops through all enemies detected by the quadtree
-	for (unsigned int i = 0; i < enemy.GetQueriedObjects().size(); i++) {
+	for (unsigned int i = 0; i < enemy.GetQueriedObjects().size(); i++) {	
 		if (enemy.GetQueriedObjects()[i]->GetObjectType() == ObjectType::Projectile) {
 			continue;
 		}

@@ -2,14 +2,10 @@
 
 #include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
-#include "enemyManager.h"
 #include "gameEngine.h"
 #include "objectBase.h"
-#include "obstacleManager.h"
-#include "obstacleWall.h"
 #include "projectile.h"
 #include "projectileManager.h"
-#include "quadTree.h"
 #include "stateStack.h"
 #include "timerManager.h"
 
@@ -37,8 +33,8 @@ PlayerCharacter::~PlayerCharacter() {}
 
 void PlayerCharacter::Init() {
 	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
-	_attackTimer = timerManager->CreateTimer(0.05f);
-	_regenerationTimer = timerManager->CreateTimer(0.5f);
+	_attackTimer = timerManager->CreateTimer(_attackCooldown);
+	_regenerationTimer = timerManager->CreateTimer(_regenerationTime);
 }
 
 void PlayerCharacter::Update() {
@@ -80,8 +76,8 @@ void PlayerCharacter::ExecuteDeath() {
 	gameStateHandler->ReplaceCurrentState(std::make_shared<GameOverState>());
 }
 
-void PlayerCharacter::FireProjectile() {	
-	projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), _orientation, _attackDamage, _direction, _position);
+void PlayerCharacter::FireProjectile() {
+	projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), _orientation, _attackDamage, _projectileSpeed, _direction, _position);
 }
 
 void PlayerCharacter::Respawn() {
@@ -91,9 +87,6 @@ void PlayerCharacter::Respawn() {
 
 	_currentHealth = _maxHealth;
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
-
-	enemyManager->RemoveAllEnemies();
-	projectileManager->RemoveAllProjectiles();
 }
 
 void PlayerCharacter::UpdateHealthRegen() {

@@ -12,7 +12,7 @@ enum class ProjectileType {
 
 class Projectile : public ObjectBase {
 public:
-	Projectile(ProjectileType damageType, const char* spritePath, unsigned int projectileDamage, unsigned int objectID);
+	Projectile(ProjectileType damageType, const char* spritePath, unsigned int objectID);
 	~Projectile();
 
 	void Init() override;
@@ -35,18 +35,17 @@ public:
 	void SetTargetOrientation(float orientation);
 	void SetTargetPosition(Vector2<float> position);
 
-	void ActivateProjectile(float orientation, Vector2<float> direction, Vector2<float> position);
+	void ActivateProjectile(float orientation, unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position);
 	void DeactivateProjectile();
 
 private:
 	Circle _circleCollider;
 
-	const float _projectileSpeed = 200.f;
-	const float _spriteCollisionOffset = 8.f;
+	float _projectileSpeed = 200.f;
 
 	ProjectileType _projectileType = ProjectileType::Count;	
 
-	unsigned int _projectileDamage;
+	unsigned int _projectileDamage = 30;
 
 	Vector2<float> _direction = Vector2<float>(0.f, 0.f);
 };

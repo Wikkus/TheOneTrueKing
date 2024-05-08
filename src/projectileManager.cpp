@@ -21,9 +21,9 @@ ProjectileManager::~ProjectileManager() {}
 void ProjectileManager::Init() {
 	for (unsigned int i = 0; i < _projectileAmountLimit; i++) {
 		if (i % 5 == 0) {
-			CreateNewProjectile(ProjectileType::PlayerProjectile, _playerProjectileSprite, 0.f, 30, {0.f, 0.f}, {-10000.f, -10000.f});
+			CreateNewProjectile(ProjectileType::PlayerProjectile, _playerProjectileSprite, 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
 		}
-		CreateNewProjectile(ProjectileType::EnemyProjectile, _enemyProjectileSprite, 0.f, 1, {0.f, 0.f}, {-10000.f, -10000.f});
+		CreateNewProjectile(ProjectileType::EnemyProjectile, _enemyProjectileSprite, 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
 	}
 }
 
@@ -46,40 +46,37 @@ void ProjectileManager::Render() {
 	}
 }
 
-void ProjectileManager::CreateNewProjectile(ProjectileType projectileType, const char* spritePath, float orientation, unsigned int projectileDamage, Vector2<float> direction, Vector2<float> position) {
-	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(projectileType, spritePath, projectileDamage, _lastProjectileID));
+void ProjectileManager::CreateNewProjectile(ProjectileType projectileType, const char* spritePath, float orientation, 
+	Vector2<float> direction, Vector2<float> position) {
+	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(projectileType, spritePath, _lastProjectileID));
 	_lastProjectileID++;
 }
 
-void ProjectileManager::SpawnProjectile(ProjectileType projectileType, const char* spritePath, float orientation, unsigned int projectileDamage, Vector2<float> direction, Vector2<float> position) {
+void ProjectileManager::SpawnProjectile(ProjectileType projectileType, const char* spritePath, float orientation, 
+	unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position) {
 	if (_projectilePools[projectileType]->IsEmpty()) {
-		CreateNewProjectile(projectileType, spritePath, orientation, projectileDamage, direction, position);
-		_activeProjectiles.emplace_back(_projectilePools[projectileType]->SpawnObject());
-		_activeProjectiles.back()->ActivateProjectile(orientation, direction, position);
-	} else {
-		_activeProjectiles.emplace_back(_projectilePools[projectileType]->SpawnObject());
-		_activeProjectiles.back()->ActivateProjectile(orientation,direction, position);
-	}	
+		CreateNewProjectile(projectileType, spritePath, orientation, direction, position);
+	}
+	_activeProjectiles.emplace_back(_projectilePools[projectileType]->SpawnObject());
+	_activeProjectiles.back()->ActivateProjectile(orientation, projectileDamage, projectileSpeed,direction, position);
 }
 
 bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {
-	if (projectileType == ProjectileType::EnemyProjectile) {
-		if (IsInDistance(playerCharacter->GetPosition(), _activeProjectiles[projectileIndex]->GetPosition(),
-			_activeProjectiles[projectileIndex]->GetCollider().radius)) {
-			playerCharacter->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
-			RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
-			return true;
-		}
-		return false;
-	}
 	_objectsHit = objectBaseQuadTree->Query(_activeProjectiles[projectileIndex]->GetCollider());
-	for (unsigned int i = 0; i < _objectsHit.size(); i++) {
-		if (!_objectsHit[i]) {
-			continue;
+	switch (projectileType) {
+	case ProjectileType::EnemyProjectile:
+		if (_objectsHit.size() > 0) {
+			if (_objectsHit[0]->GetObjectID() == playerCharacter->GetObjectID()) {
+				playerCharacter->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
+				RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
+				return true;
+			}
 		}
-		if (projectileType == ProjectileType::PlayerProjectile) {
+		break;
+	case ProjectileType::PlayerProjectile:
+		for (unsigned int i = 0; i < _objectsHit.size(); i++) {
 			if (_objectsHit[i]->GetObjectType() == ObjectType::Enemy) {
-				_enemyHit = std::static_pointer_cast<EnemyBase>(_objectsHit[i]);	
+				_enemyHit = std::static_pointer_cast<EnemyBase>(_objectsHit[i]);
 				//Returns true if the enemy dies
 				if (_enemyHit->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage())) {
 					enemyManager->RemoveEnemy(_enemyHit->GetEnemyType(), _enemyHit->GetObjectID());
@@ -87,15 +84,11 @@ bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned i
 				RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
 				return true;
 			}
-		} /*else if (projectileType == ProjectileType::EnemyProjectile) {
-			if (_objectsHit[i]->GetObjectType() == ObjectType::Player) {
-				playerCharacter->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
-				RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
-				return true;
-			}
-		}*/
+		}
+		break;
+	default:
+		break;
 	}
-
 	return false;
 }
 
@@ -129,6 +122,10 @@ void ProjectileManager::RemoveProjectile(ProjectileType projectileType, unsigned
 		_latestProjectileIndex = -1;
 	}
 	_activeProjectiles.pop_back();
+}
+
+void ProjectileManager::Reset() {
+	RemoveAllProjectiles();
 }
 
 void ProjectileManager::UpdateQuadTree() {

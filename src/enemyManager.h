@@ -105,9 +105,13 @@ public:
 	void RemoveAllEnemies();
 	void RemoveEnemy(EnemyType enemyType, unsigned int objectID);
 
+	void Reset();
+
 	void TakeDamage(unsigned int enemyIndex, unsigned int damageAmount);
 
 	void UpdateQuadTree();
+
+	const unsigned int GetWaveNumver() const;
 
 	int BinarySearch(int low, int high, int objectID);
 
@@ -128,6 +132,8 @@ private:
 
 	unsigned int _enemyAmountLimit = 1000;
 	unsigned int _numberOfEnemyTypes = 0;
-	unsigned int _spawnNumberOfEnemies = 25;
+	unsigned int _spawnNumberOfEnemies = 5;
+	unsigned int _waveNumber = 0;
+
 };
 
