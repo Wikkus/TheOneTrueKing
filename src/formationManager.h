@@ -140,7 +140,7 @@ public:
 	void SetSlotPositionAndType() override;
 
 private:
-	unsigned int _numberOfSlots = 9;
+	unsigned int _numberOfSlots = 7;
 	std::vector<SlotPositionAndType> _slotPositionAndType;
 	float _offset = 15.f;
 

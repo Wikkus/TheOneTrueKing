@@ -83,36 +83,40 @@ void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector
 }
 
 void EnemyManager::TacticalEnemySpawner() {
-	std::uniform_int_distribution dist{ 0, 3 };
+	//std::uniform_int_distribution dist{ 0, 3 };
 	AnchorPoint anchorPoint;
-	switch (dist(randomEngine)) {
-	case 0:
-		anchorPoint.position = { windowWidth * 0.5f, 0 };
-		anchorPoint.borderSide = BorderSide::Top;
-		break;
-	case 1:
-		anchorPoint.position = { windowWidth * 0.5f, windowHeight };
-		anchorPoint.borderSide = BorderSide::Bottom;
-		break;
-	case 2:
-		anchorPoint.position = { 0, windowHeight * 0.5f };
-		anchorPoint.borderSide = BorderSide::Left;
-		break;
-	case 3:
-		anchorPoint.position = { windowWidth, windowHeight * 0.5f };
-		anchorPoint.borderSide = BorderSide::Right;
-		break;
-	default:
-		break;
-	}
-	anchorPoint.orientation = VectorAsOrientation(Vector2<float>(playerCharacter->GetPosition() - anchorPoint.position));
-	_formationManagers.emplace_back(std::make_shared<FormationManager>(FormationType::VShape, 9, anchorPoint));
-	while (_activeEnemies.size() < 9) {
+	//switch (dist(randomEngine)) {
+	//case 0:
+	//	anchorPoint.position = { windowWidth * 0.5f, 0 };
+	//	anchorPoint.borderSide = BorderSide::Top;
+	//	break;
+	//case 1:
+	//	anchorPoint.position = { windowWidth * 0.5f, windowHeight };
+	//	anchorPoint.borderSide = BorderSide::Bottom;
+	//	break;
+	//case 2:
+	//	anchorPoint.position = { 0, windowHeight * 0.5f };
+	//	anchorPoint.borderSide = BorderSide::Left;
+	//	break;
+	//case 3:
+	//	anchorPoint.position = { windowWidth, windowHeight * 0.5f };
+	//	anchorPoint.borderSide = BorderSide::Right;
+	//	break;
+	//default:
+	//	break;
+	//}
+	anchorPoint.position = { windowWidth * 0.5f, windowHeight };
+	anchorPoint.orientation = 0.f;
+	//anchorPoint.orientation = VectorAsOrientation(Vector2<float>(playerCharacter->GetPosition() - anchorPoint.position));
+	_formationManagers.emplace_back(std::make_shared<FormationManager>(FormationType::VShape, 7, anchorPoint));
+
+
+	while (_activeEnemies.size() < 7) {
 		enemyManager->SpawnEnemy(EnemyType::Human, anchorPoint.orientation, Vector2<float>(0.f, 0.f), anchorPoint.position);
 		_formationManagers.back()->AddCharacter(_activeEnemies.back());
 	}
-	//_spawnTimer->DeactivateTimer();
-	_spawnTimer->ResetTimer();
+	_spawnTimer->DeactivateTimer();
+	//_spawnTimer->ResetTimer();
 }
 
 void EnemyManager::SurvivalEnemySpawner() {

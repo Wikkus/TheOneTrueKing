@@ -52,14 +52,13 @@ void FormationManager::UpdateSlots() {
 		unsigned int slotNumber = _slotAssignments[i].slotNumber;
 		AnchorPoint slot = _formationPattern->GetSlotLocation(slotNumber, _numberOfSlots);
 		AnchorPoint location;
-		location.position = _anchorPoint.position + slot.position;
+		location.position = _anchorPoint.position + RotateVector(_anchorPoint.orientation, _anchorPoint.position, _anchorPoint.position + slot.position);
 		location.orientation = _anchorPoint.orientation + slot.orientation;
 
-		location.position -= _driftOffset.position;
+		location.position -= RotateVector(_anchorPoint.orientation, _anchorPoint.position, _anchorPoint.position + _driftOffset.position);
 		location.orientation -= _driftOffset.orientation;
 		_slotAssignments[i].enemyCharacter->SetTargetPosition(location.position);
 		_slotAssignments[i].enemyCharacter->SetTargetOrientation(location.orientation);
-
 		debugDrawer->AddDebugCross(location.position, 25.f, { 75, 255, 175, 255 });
 	}
 }
@@ -312,52 +311,14 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 
 VShapePattern::VShapePattern() {}
 
-void VShapePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {
-	Vector2<float> position1;
-	Vector2<float> position2;
-	
-	switch (anchorPoint.borderSide) {
-	case BorderSide::Top:
-		position1 = { -_offset, -_offset };
-		position2 = { _offset, -_offset };
-		break;
-	case BorderSide::Left:
-		position1 = { -_offset, -_offset };
-		position2 = { -_offset, _offset };
-		break;
-	case BorderSide::Right:
-		position1 = { _offset, -_offset };
-		position2 = { _offset, _offset };
-		break;
-	case BorderSide::Bottom:
-		position1 = { -_offset, _offset };
-		position2 = { _offset, _offset };
-		break;
-	default:
-		break;
-	}
-
-	for (unsigned int i = 0; i < slotCount; i++) {
-		if (i < slotCount / 2) {
-			if (i % 2 == 0) {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(
-					i, AnchorPoint(anchorPoint.borderSide, { i * position1.x, i * position1.y }, 0), SlotAttackType::Melee));
-
-			} else {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(
-					i, AnchorPoint(anchorPoint.borderSide, { i * position2.x, i * position2.y }, 0), SlotAttackType::Melee));
-			}
-		} else {
-			if (i % 2 == 0) {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(
-					i, AnchorPoint(anchorPoint.borderSide, { i * position1.x, i * position1.y }, 0), SlotAttackType::Magic));
-
-			} else {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(
-					i, AnchorPoint(anchorPoint.borderSide, { i * position2.x, i * position2.y }, 0), SlotAttackType::Magic));
-			}
-		}
-	}
+void VShapePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {	
+	_slotPositionAndType.emplace_back(SlotPositionAndType(0, AnchorPoint(anchorPoint.borderSide, Vector2(0.f, -50.f), 0), SlotAttackType::Melee));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(1, AnchorPoint(anchorPoint.borderSide, Vector2(-25.f, -25.f), 0), SlotAttackType::Melee));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(2, AnchorPoint(anchorPoint.borderSide, Vector2(25.f, -25.f), 0), SlotAttackType::Melee));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(3, AnchorPoint(anchorPoint.borderSide, Vector2(50.f, 0.f), 0), SlotAttackType::Magic));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(4, AnchorPoint(anchorPoint.borderSide, Vector2(-50.f, 0.f), 0), SlotAttackType::Magic));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(5, AnchorPoint(anchorPoint.borderSide, Vector2(75.f, 25.f), 0), SlotAttackType::Magic));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(6, AnchorPoint(anchorPoint.borderSide, Vector2(-75.f, 25.f), 0), SlotAttackType::Magic));
 }
 
 unsigned int VShapePattern::CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) {
