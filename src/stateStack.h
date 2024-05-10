@@ -10,10 +10,16 @@
 
 class TextSprite;
 
+enum class GameMode {
+	Formation,
+	Survival,
+	Count
+};
 
 enum class ButtonType {
 	MainMenu,
-	Play,
+	FormationGame,
+	SurvivalGame,
 	Quit,
 	Restart,
 	Resume,
@@ -64,13 +70,19 @@ public:
 	void RenderState();
 	void RenderStateText();
 
+	void SetGameMode(GameMode gameMode);
+
+	const GameMode GetGameMode() const;
+
 private:
 	const char* _mainMenuText = "Main Menu";
-	const char* _playText = "Play";
+	const char* _formationText = "Formation";
+	const char* _survivalText = "Survival";
 	const char* _quitText = "Quit";
 	const char* _restartText = "Restart";
 	const char* _resumeText = "Resume";
 	std::vector<std::shared_ptr<State>> _states;
+	GameMode _currentGameMode = GameMode::Count;
 
 };
 
@@ -88,6 +100,7 @@ private:
 	std::shared_ptr<TextSprite> _waveNumberText;
 
 };
+
 class InGameState : public State {
 public:
 	InGameState();
@@ -97,7 +110,6 @@ public:
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
-
 };
 class SurvivalGameState : public InGameState {
 public:
@@ -110,10 +122,10 @@ public:
 	void RenderText() override;
 
 };
-class TacticalGameState : public InGameState {
+class FormationGameState : public InGameState {
 public:
-	TacticalGameState();
-	~TacticalGameState() {}
+	FormationGameState();
+	~FormationGameState() {}
 
 	void SetButtonPositions() override;
 	void Update() override;

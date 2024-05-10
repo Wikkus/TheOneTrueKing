@@ -52,7 +52,8 @@ void Button::SetTargetPosition(Vector2<float> position) {
 }
 GameStateHandler::GameStateHandler() {
 	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f));
-	_buttons[ButtonType::Play] = std::make_shared<Button>(_playText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.3f));
+	_buttons[ButtonType::FormationGame] = std::make_shared<Button>(_formationText, 64, 128, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
+	_buttons[ButtonType::SurvivalGame] = std::make_shared<Button>(_survivalText, 64, 128, Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f));
 	_buttons[ButtonType::Quit] = std::make_shared<Button>(_quitText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
 	_buttons[ButtonType::Restart] = std::make_shared<Button>(_restartText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f));
 	_buttons[ButtonType::Resume] = std::make_shared<Button>(_resumeText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
@@ -93,6 +94,14 @@ void GameStateHandler::RenderState() {
 
 void GameStateHandler::RenderStateText() {
 	_states.back()->RenderText();
+}
+
+void GameStateHandler::SetGameMode(GameMode gameMode) {
+	_currentGameMode = gameMode;
+}
+
+const GameMode GameStateHandler::GetGameMode() const {
+	return _currentGameMode;
 }
 
 InGameState::InGameState() {
@@ -147,23 +156,23 @@ void SurvivalGameState::RenderText() {
 	InGameState::RenderText();
 }
 
-TacticalGameState::TacticalGameState() {}
+FormationGameState::FormationGameState() {}
 
-void TacticalGameState::SetButtonPositions() {
+void FormationGameState::SetButtonPositions() {
 	InGameState::SetButtonPositions();
 }
 
-void TacticalGameState::Update() {
+void FormationGameState::Update() {
 	InGameState::Update();
 	enemyManager->UpdateTactical();
 
 }
 
-void TacticalGameState::Render() {
+void FormationGameState::Render() {
 	InGameState::Render();
 }
 
-void TacticalGameState::RenderText() {}
+void FormationGameState::RenderText() {}
 
 GameOverState::GameOverState() {
 	_waveNumberText = std::make_shared<TextSprite>();
@@ -186,7 +195,16 @@ void GameOverState::Update() {
 		runningGame = false;
 
 	} else if (_buttons[ButtonType::Restart]->ClickedOn()) {
-		gameStateHandler->ReplaceCurrentState(std::make_shared<SurvivalGameState>());
+		switch (gameStateHandler->GetGameMode()) {
+		case GameMode::Formation:
+			gameStateHandler->ReplaceCurrentState(std::make_shared<FormationGameState>());
+			break;
+		case GameMode::Survival:
+			gameStateHandler->ReplaceCurrentState(std::make_shared<SurvivalGameState>());
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -214,12 +232,18 @@ MenuState::MenuState() {
 }
 
 void MenuState::SetButtonPositions() {
-	_buttons[ButtonType::Play]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.3f));
+	_buttons[ButtonType::FormationGame]->SetTargetPosition(Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
+	_buttons[ButtonType::SurvivalGame]->SetTargetPosition(Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f));
 	_buttons[ButtonType::Quit]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.7f));
 }
 
 void MenuState::Update() {
-	if (_buttons[ButtonType::Play]->ClickedOn()) {
+	if (_buttons[ButtonType::FormationGame]->ClickedOn()) {
+		gameStateHandler->SetGameMode(GameMode::Formation);
+		gameStateHandler->AddState(std::make_shared<FormationGameState>());
+
+	} else if (_buttons[ButtonType::SurvivalGame]->ClickedOn()) {
+		gameStateHandler->SetGameMode(GameMode::Survival);
 		gameStateHandler->AddState(std::make_shared<SurvivalGameState>());
 
 	} else if (_buttons[ButtonType::Quit]->ClickedOn()) {
@@ -228,13 +252,15 @@ void MenuState::Update() {
 }
 
 void MenuState::Render() {
-	_buttons[ButtonType::Play]->Render();
+	_buttons[ButtonType::FormationGame]->Render();
+	_buttons[ButtonType::SurvivalGame]->Render();
 	_buttons[ButtonType::Quit]->Render();
 }
 
 void MenuState::RenderText() {
 	_titleText->RenderCentered();
-	_buttons[ButtonType::Play]->RenderText();
+	_buttons[ButtonType::FormationGame]->RenderText();
+	_buttons[ButtonType::SurvivalGame]->RenderText();
 	_buttons[ButtonType::Quit]->RenderText();
 }
 
@@ -258,12 +284,20 @@ void PauseState::Update() {
 	
 	} else if (_buttons[ButtonType::Restart]->ClickedOn()) {
 		gameStateHandler->BackToFirstState();
-		gameStateHandler->AddState(std::make_shared<InGameState>());
+		switch (gameStateHandler->GetGameMode()) {
+		case GameMode::Formation:
+			gameStateHandler->AddState(std::make_shared<FormationGameState>());
+			break;
+		case GameMode::Survival:
+			gameStateHandler->AddState(std::make_shared<SurvivalGameState>());
+			break;
+		default:
+			break;
+		}
 
 	} else if (_buttons[ButtonType::Resume]->ClickedOn() || GetKeyPressed(SDL_SCANCODE_ESCAPE)) {
 		gameStateHandler->RemoveCurrentState();
 	}
-	
 }
 
 void PauseState::Render() {

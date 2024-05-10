@@ -51,8 +51,8 @@ private:
 	float _movementSpeed = 100.f;
 	float _projectileSpeed = 300;
 
-	float _attackCooldown = 0.05f;
-	float _regenerationTime = 0.1f;
+	float _attackCooldown = 0.1f;
+	float _regenerationTime = 0.05f;
 
 	int _maxHealth = 1000;
 	int _currentHealth = 0;
