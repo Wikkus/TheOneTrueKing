@@ -6,16 +6,7 @@
 struct CostAndSlot;
 struct CharacterAndSlots;
 
-enum class BorderSide {
-	Top,
-	Left,
-	Right,
-	Bottom,
-	Count
-};
-
 struct AnchorPoint {
-	BorderSide borderSide = BorderSide::Count;
 	Vector2<float> position = Vector2<float>(0.f, 0.f);
 	float orientation = 0.f;
 };

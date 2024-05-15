@@ -7,6 +7,7 @@
 #include "objectPool.h"
 #include "playerCharacter.h"
 #include "quadTree.h"
+#include "stateStack.h"
 #include "steeringBehavior.h"
 #include "timerManager.h"
 #include "weaponComponent.h"
@@ -34,24 +35,27 @@ void EnemyManager::Init() {
 	}
 }
 
-void EnemyManager::Update() {
-	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->Update();
-	}
-}
+void EnemyManager::Update() {}
 
 void EnemyManager::UpdateSurvival() {
 	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
 		SurvivalEnemySpawner();
+	}	
+	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
+		_activeEnemies[i]->SetPosition(playerCharacter->GetPosition());
+		_activeEnemies[i]->Update();
 	}
 }
 
-void EnemyManager::UpdateTactical() {
+void EnemyManager::UpdateFormation() {
 	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
 		TacticalEnemySpawner();
 	}	
 	for (unsigned int i = 0; i < _formationManagers.size(); i++) {
 		_formationManagers[i]->UpdateSlots();
+	}
+	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
+		_activeEnemies[i]->Update();
 	}
 }
 
@@ -83,40 +87,17 @@ void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector
 }
 
 void EnemyManager::TacticalEnemySpawner() {
-	//std::uniform_int_distribution dist{ 0, 3 };
 	AnchorPoint anchorPoint;
-	//switch (dist(randomEngine)) {
-	//case 0:
-	//	anchorPoint.position = { windowWidth * 0.5f, 0 };
-	//	anchorPoint.borderSide = BorderSide::Top;
-	//	break;
-	//case 1:
-	//	anchorPoint.position = { windowWidth * 0.5f, windowHeight };
-	//	anchorPoint.borderSide = BorderSide::Bottom;
-	//	break;
-	//case 2:
-	//	anchorPoint.position = { 0, windowHeight * 0.5f };
-	//	anchorPoint.borderSide = BorderSide::Left;
-	//	break;
-	//case 3:
-	//	anchorPoint.position = { windowWidth, windowHeight * 0.5f };
-	//	anchorPoint.borderSide = BorderSide::Right;
-	//	break;
-	//default:
-	//	break;
-	//}
-	anchorPoint.position = { windowWidth * 0.5f, windowHeight };
+	anchorPoint.position = { windowWidth, windowHeight * 0.5f };
 	anchorPoint.orientation = 0.f;
-	//anchorPoint.orientation = VectorAsOrientation(Vector2<float>(playerCharacter->GetPosition() - anchorPoint.position));
-	_formationManagers.emplace_back(std::make_shared<FormationManager>(FormationType::VShape, 7, anchorPoint));
+	_formationManagers.emplace_back(std::make_shared<FormationManager>(FormationType::VShape, _enemiesInFormation + (_waveNumber * 3), anchorPoint));
 
-
-	while (_activeEnemies.size() < 7) {
+	while (_activeEnemies.size() < _enemiesInFormation + (_waveNumber * 3)) {
 		enemyManager->SpawnEnemy(EnemyType::Human, anchorPoint.orientation, Vector2<float>(0.f, 0.f), anchorPoint.position);
+		_activeEnemies.back()->SetFormationIndex(_formationManagers.size() - 1);
 		_formationManagers.back()->AddCharacter(_activeEnemies.back());
 	}
 	_spawnTimer->DeactivateTimer();
-	//_spawnTimer->ResetTimer();
 }
 
 void EnemyManager::SurvivalEnemySpawner() {
@@ -179,21 +160,31 @@ void EnemyManager::RemoveAllEnemies() {
 void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 	if (_activeEnemies.empty()) {
 		return;
-	} else if (_activeEnemies.size() > 1) {
+	} else if (_activeEnemies.size() >= 1) {
 		//Sorts the active enemies vector based on their ID from lowest to highest
 		QuickSort(0, _activeEnemies.size() - 1);
 		//Search through the sorted vector to find the enemy with a specific ID
 		_latestEnemyIndex = BinarySearch(0, _activeEnemies.size() - 1, objectID);
 		if (_latestEnemyIndex >= 0) {
+			_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->RemoveCharacter(_activeEnemies[_latestEnemyIndex]);				
+			if (_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->GetNumberOfSlots() <= 0) {
+				_formationManagers.erase(_formationManagers.begin() + _activeEnemies[_latestEnemyIndex]->GetFormationIndex());
+			}	
 			//Deactivate the enemy by setting its position to a far away place
 			_activeEnemies[_latestEnemyIndex]->DeactivateEnemy();
 			//Adds the enemy to the object pool and place it at the back of the vector
 			_enemyPools[enemyType]->PoolObject(_activeEnemies[_latestEnemyIndex]);
-			std::swap(_activeEnemies[_latestEnemyIndex], _activeEnemies.back());
+			std::swap(_activeEnemies[_latestEnemyIndex], _activeEnemies.back());		
 		}
 	}
 	//Removes the enemy from active enemies
 	_activeEnemies.pop_back();
+	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
+		if (_activeEnemies.size() <= 0) {
+			_waveNumber++;
+			_spawnTimer->ResetTimer();
+		}
+	}
 }
 
 void EnemyManager::Reset() {
@@ -213,7 +204,7 @@ void EnemyManager::UpdateQuadTree() {
 		objectBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
 	}
 }
-const unsigned int EnemyManager::GetWaveNumver() const {
+const unsigned int EnemyManager::GetWaveNumber() const {
 	return _waveNumber;
 }
 //Binary search based on ID

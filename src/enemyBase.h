@@ -23,7 +23,7 @@ public:
 	virtual const ObjectType GetObjectType() const override = 0;
 	virtual const std::shared_ptr<Sprite> GetSprite() const override = 0;
 	virtual const unsigned int GetObjectID() const override = 0;
-	virtual const Vector2<float> GetPosition() const = 0;
+	virtual const Vector2<float> GetPosition() const override = 0;
 
 	virtual bool TakeDamage(unsigned int damageAmount) = 0;
 
@@ -35,6 +35,8 @@ public:
 	virtual const float GetRotation() const = 0;
 
 	virtual const int GetCurrentHealth() const = 0;
+
+	virtual const int GetFormationIndex() const = 0;
 
 	virtual const BehaviorData GetBehaviorData() const = 0;
 	
@@ -48,10 +50,12 @@ public:
 	virtual void DeactivateEnemy() = 0;
 	virtual void HandleAttack() = 0;
 	
+	virtual void SetFormationIndex(int formationIndex) = 0;
 	virtual void SetPosition(Vector2<float> position) = 0;
 	virtual void SetTargetPosition(Vector2<float> targetPosition) = 0;
 	virtual void SetTargetOrientation(float targetOrientation) = 0;
 	virtual void SetVelocity(Vector2<float> velocity) = 0;
+
 
 protected:
 	BehaviorData _behaviorData;
@@ -70,6 +74,8 @@ protected:
 	
 	int _currentHealth = 0;
 	int _maxHealth = 0;
+
+	int _formationIndex = -1;
 
 	float _rotation = 0.f;
 	Vector2<float> _direction = Vector2<float>(0.f, 0.f);

@@ -164,19 +164,20 @@ void FormationGameState::SetButtonPositions() {
 
 void FormationGameState::Update() {
 	InGameState::Update();
-	enemyManager->UpdateTactical();
-
+	enemyManager->UpdateFormation();
 }
 
 void FormationGameState::Render() {
 	InGameState::Render();
 }
 
-void FormationGameState::RenderText() {}
+void FormationGameState::RenderText() {
+	InGameState::RenderText();
+}
 
 GameOverState::GameOverState() {
 	_waveNumberText = std::make_shared<TextSprite>();
-	_waveNumberText->Init("res/roboto.ttf", 24, ("Waves survived: " + std::to_string(enemyManager->GetWaveNumver())).c_str(), { 255, 255, 255, 255});
+	_waveNumberText->Init("res/roboto.ttf", 24, ("Waves survived: " + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
 	_waveNumberText->SetTargetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
 	SetButtonPositions();
 }

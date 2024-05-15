@@ -30,6 +30,7 @@ public:
 
 	const int GetCurrentHealth() const override;
 	const unsigned int GetObjectID() const override;
+	const int GetFormationIndex() const override;
 
 	const std::shared_ptr<Sprite> GetSprite() const override;
 
@@ -44,6 +45,7 @@ public:
 	void DeactivateEnemy() override;
 	void HandleAttack() override;
 
+	void SetFormationIndex(int formationIndex) override;
 	void SetPosition(Vector2<float> position) override;
 	void SetTargetPosition(Vector2<float> targetPosition) override;
 	void SetTargetOrientation(float targetOrientation) override;
@@ -52,6 +54,8 @@ public:
 private:
 	void UpdateMovement();
 	void PickWeapon();
+	void PickWeaponFormation();
+	void PickWeaponSurvival();
 	const char* _humanSprite = "res/sprites/Human.png";
 };
 

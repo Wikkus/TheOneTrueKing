@@ -7,14 +7,17 @@ class Sprite;
 class Timer;
 
 enum class WeaponType {
-	Sword,
+	Shield,
 	Staff,
+	Sword,
 	Count
 };
 
+class EnemyBase;
+
 class WeaponComponent {
 public:
-	WeaponComponent() {}
+	WeaponComponent(EnemyBase* enemyOwner) {}
 	~WeaponComponent() {}
 
 	virtual void Render(Vector2<float> position, float orientation) = 0;
@@ -31,6 +34,7 @@ public:
 	const virtual WeaponType GetWeaponType() const = 0;
 
 protected:
+	EnemyBase* _enemyOwner = nullptr;
 	std::shared_ptr<Sprite> _sprite = nullptr;
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
@@ -48,10 +52,10 @@ protected:
 	WeaponType _weaponType = WeaponType::Count;
 };
 
-class SwordComponent : public WeaponComponent {
+class ShieldComponent : public WeaponComponent {
 public:
-	SwordComponent();
-	~SwordComponent() {}
+	ShieldComponent(EnemyBase* enemyOwner);
+	~ShieldComponent();
 
 	void Render(Vector2<float> position, float orientation) override;
 
@@ -69,8 +73,8 @@ public:
 
 class StaffComponent : public WeaponComponent {
 public:
-	StaffComponent();
-	~StaffComponent() {}
+	StaffComponent(EnemyBase* enemyOwner);
+	~StaffComponent();
 
 	void Render(Vector2<float> position, float orientation) override;
 
@@ -87,4 +91,23 @@ public:
 
 private:
 	float _projectileSpeed = 200.f;
+};
+
+class SwordComponent : public WeaponComponent {
+public:
+	SwordComponent(EnemyBase* enemyOwner);
+	~SwordComponent();
+
+	void Render(Vector2<float> position, float orientation) override;
+
+	void Attack(Vector2<float> position, float orientation) override;
+
+	const bool GetIsAttacking() const override;
+
+	const float GetAttackRange() const override;
+
+	const int GetAttackDamage() const override;
+	const int GetHealthModifier() const override;
+
+	const WeaponType GetWeaponType() const override;
 };

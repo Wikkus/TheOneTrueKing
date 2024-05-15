@@ -18,9 +18,9 @@ enum class FormationType {
 };
 
 enum class SlotAttackType {
-	Bow,
-	Magic,
-	Melee,
+	Defender,
+	MagicAttacker,
+	MeleeAttacker,
 	Count
 };
 
@@ -31,7 +31,8 @@ struct CostAndSlot {
 
 struct SlotPositionAndType {
 	unsigned int slotNumber = 0;
-	AnchorPoint positionAndOrientation;
+	float orientation = 0.f;
+	Vector2<float> position;
 	SlotAttackType slotAttackType;
 };
 
@@ -125,6 +126,7 @@ public:
 	~VShapePattern() {}
 
 	void CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) override;
+	void CreateSlotsOfType(AnchorPoint anchorPoint, unsigned int amountSlots, Vector2<float> frontSlotPosition, SlotAttackType attackType);
 
 	unsigned int CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) override;
 
@@ -140,9 +142,19 @@ public:
 	void SetSlotPositionAndType() override;
 
 private:
-	unsigned int _numberOfSlots = 7;
+	unsigned int _numberOfSlots = 0;
 	std::vector<SlotPositionAndType> _slotPositionAndType;
+	std::vector<std::vector<SlotPositionAndType>> _slotPositionAndTypeGroup;
 	float _offset = 15.f;
+	float _multiplier = 0.f;
+	
+	Vector2<float> _frontPosition = { 0.f, 0.f };
+	Vector2<float> _rowDistance = { 0.f, 32.f };
+
+	Vector2<float> _positionOffset = { 0.f, 0.f };
+
+	Vector2<float> _slotOffsetA = { -32.f, 32.f };
+	Vector2<float> _slotOffsetB = { 32.f, 32.f };
 
 };
 
@@ -157,6 +169,8 @@ public:
 	void RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter);
 
 	std::vector<SlotAssignment> GetSlotAssignments();
+
+	const unsigned int GetNumberOfSlots() const;
 
 private:
 	AnchorPoint _anchorPoint;

@@ -118,6 +118,10 @@ const unsigned int EnemyBoar::GetObjectID() const {
 	return _objectID;
 }
 
+const int EnemyBoar::GetFormationIndex() const {
+	return _formationIndex;
+}
+
 const std::shared_ptr<Sprite> EnemyBoar::GetSprite() const {
 	return _sprite;
 }
@@ -154,6 +158,8 @@ void EnemyBoar::DeactivateEnemy() {
 	_isAttacking = false;
 	_damagedPlayer = false;
 	_playerInRange = false;
+
+	_formationIndex = -1;
 }
 
 bool EnemyBoar::TakeDamage(unsigned int damageAmount) {
@@ -195,6 +201,10 @@ void EnemyBoar::HandleAttack() {
 		_dashDistance = (playerCharacter->GetPosition() - _position).absolute() * 1.75f;
 		_chargeAttackTimer->ResetTimer();
 	}
+}
+
+void EnemyBoar::SetFormationIndex(int formationIndex) {
+	_formationIndex = formationIndex;
 }
 
 void EnemyBoar::SetPosition(Vector2<float> position) {

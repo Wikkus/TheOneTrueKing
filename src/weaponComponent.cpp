@@ -2,67 +2,77 @@
 
 #include "collision.h"
 #include "dataStructuresAndMethods.h"
+#include "enemyBase.h"
 #include "gameEngine.h"
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "sprite.h"
 #include "timerManager.h"
 
-SwordComponent::SwordComponent() {
+ShieldComponent::ShieldComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
+	_enemyOwner = enemyOwner;
 	_sprite = std::make_shared<Sprite>();
-	_sprite->Load("res/sprites/Sword.png");
-	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
-	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
+	_sprite->Load("res/sprites/Shield.png");
+
+	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
+	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
+
+	_attackCooldownTimer->DeactivateTimer();
+	_chargeAttackTimer->DeactivateTimer();
+
 	_attackRange = 25.f;
 
-	_attackDamage = 15;
-	_healthModifier = 25;
+	_attackDamage = 10;
+	_healthModifier = 125;
 
-	_weaponType = WeaponType::Sword;
+	_weaponType = WeaponType::Shield;
 }
 
-void SwordComponent::Render(Vector2<float> position, float orientation) {
+ShieldComponent::~ShieldComponent() {
+	_enemyOwner = nullptr;
+	delete _enemyOwner;
+}
+
+void ShieldComponent::Render(Vector2<float> position, float orientation) {
 	_sprite->RenderWithOrientation(position, orientation);
 }
-//If the weapon is a sword it damages the player if its close enough
-void SwordComponent::Attack(Vector2<float> position, float orientation) {
-	if (_attackCooldownTimer->GetTimerActive()) {
-		return;
-	}
-	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange)) {
-			playerCharacter->TakeDamage(_attackDamage);
-		}
-		_isAttacking = false;
-		_attackCooldownTimer->ResetTimer();
 
-	} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
-		_chargeAttackTimer->ResetTimer();
-		_isAttacking = true;
-	}
+void ShieldComponent::Attack(Vector2<float> position, float orientation) {
+	//if (_attackCooldownTimer->GetTimerActive()) {
+	//	return;
+	//}
+	//if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
+	//	_isAttacking = false;
+	//	_attackCooldownTimer->ResetTimer();
+
+	//} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
+	//	_chargeAttackTimer->ResetTimer();
+	//	_isAttacking = true;
+	//}
 }
 
-const bool SwordComponent::GetIsAttacking() const {
+const bool ShieldComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
 
-const int SwordComponent::GetAttackDamage() const {
-	return _attackDamage;
-}
-
-const int SwordComponent::GetHealthModifier() const {
-	return _healthModifier;
-}
-
-const float SwordComponent::GetAttackRange() const {
+const float ShieldComponent::GetAttackRange() const {
 	return _attackRange;
 }
 
-const WeaponType SwordComponent::GetWeaponType() const {
+const int ShieldComponent::GetAttackDamage() const {
+	return _attackDamage;
+}
+
+const int ShieldComponent::GetHealthModifier() const {
+	return _healthModifier;
+}
+
+const WeaponType ShieldComponent::GetWeaponType() const {
 	return _weaponType;
 }
 
-StaffComponent::StaffComponent() {
+StaffComponent::StaffComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
+	_enemyOwner = enemyOwner;
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Staff.png");
 
@@ -75,6 +85,11 @@ StaffComponent::StaffComponent() {
 	_healthModifier = -25;
 	
 	_weaponType = WeaponType::Staff;
+}
+
+StaffComponent::~StaffComponent() {
+	_enemyOwner = nullptr;
+	delete _enemyOwner;
 }
 
 void StaffComponent::Render(Vector2<float> position, float orientation) {
@@ -117,3 +132,67 @@ const int StaffComponent::GetHealthModifier() const {
 const WeaponType StaffComponent::GetWeaponType() const {
 	return _weaponType;
 }
+
+SwordComponent::SwordComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
+	_enemyOwner = enemyOwner;
+	_sprite = std::make_shared<Sprite>();
+	_sprite->Load("res/sprites/Sword.png");
+	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
+	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
+	_attackRange = 25.f;
+
+	_attackDamage = 15;
+	_healthModifier = 25;
+
+	_weaponType = WeaponType::Sword;
+}
+
+SwordComponent::~SwordComponent() {
+	_enemyOwner = nullptr;
+	delete _enemyOwner;
+}
+
+void SwordComponent::Render(Vector2<float> position, float orientation) {
+	_sprite->RenderWithOrientation(position, orientation);
+}
+//If the weapon is a sword it damages the player if its close enough
+void SwordComponent::Attack(Vector2<float> position, float orientation) {
+	if ((playerCharacter->GetPosition() - position).absolute() <= 200.f) {
+		_enemyOwner->SetTargetPosition(playerCharacter->GetPosition());
+	}
+	if (_attackCooldownTimer->GetTimerActive()) {
+		return;
+	}
+	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
+		if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange)) {
+			playerCharacter->TakeDamage(_attackDamage);
+		}
+		_isAttacking = false;
+		_attackCooldownTimer->ResetTimer();
+
+	} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
+		_chargeAttackTimer->ResetTimer();
+		_isAttacking = true;
+	}
+}
+
+const bool SwordComponent::GetIsAttacking() const {
+	return _isAttacking;
+}
+
+const int SwordComponent::GetAttackDamage() const {
+	return _attackDamage;
+}
+
+const int SwordComponent::GetHealthModifier() const {
+	return _healthModifier;
+}
+
+const float SwordComponent::GetAttackRange() const {
+	return _attackRange;
+}
+
+const WeaponType SwordComponent::GetWeaponType() const {
+	return _weaponType;
+}
+

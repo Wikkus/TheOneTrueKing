@@ -42,9 +42,14 @@ bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 }
 
 void FormationManager::UpdateSlots() {
-	Vector2<float> direction = Vector2<float>(playerCharacter->GetPosition() - _anchorPoint.position).normalized();
-	_anchorPoint.position += direction * deltaTime * 50.f;
+	Vector2<float> direction = Vector2<float>(playerCharacter->GetPosition() - _anchorPoint.position);
+	float distance = direction.absolute();
+	if (distance >= 200.f) {
+		direction.normalize();
+		_anchorPoint.position += direction * deltaTime * 50.f;
+	}
 	_anchorPoint.orientation = VectorAsOrientation(direction);
+	
 	debugDrawer->AddDebugCross(_anchorPoint.position, 25.f, { 75, 255, 175, 255 });
 
 	//Offsets each character based on the anchor point and current slot location
@@ -143,6 +148,7 @@ void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter
 		if (_slotAssignments[i].enemyCharacter->GetObjectID() == enemyCharacter->GetObjectID()) {
 			_slotAssignments[i] = _slotAssignments.back();
 			_slotAssignments.pop_back();
+			_numberOfSlots--;
 			break;
 		}
 	}
@@ -151,6 +157,10 @@ void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter
 
 std::vector<SlotAssignment> FormationManager::GetSlotAssignments() {
 	return _slotAssignments;
+}
+
+const unsigned int FormationManager::GetNumberOfSlots() const {
+	return _numberOfSlots;
 }
 
 void DefensiveCirclePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {}
@@ -207,15 +217,15 @@ SlotRolePattern::SlotRolePattern() {
 }
 
 void SlotRolePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {
-	_slotPositionAndType.emplace_back(SlotPositionAndType(0, AnchorPoint(anchorPoint.borderSide, Vector2(-50.f, 0.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(1, AnchorPoint(anchorPoint.borderSide, Vector2(-25.f, -25.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(2, AnchorPoint(anchorPoint.borderSide, Vector2(-25.f, 25.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(3, AnchorPoint(anchorPoint.borderSide, Vector2(0.f, 50.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(4, AnchorPoint(anchorPoint.borderSide, Vector2(0.f, 0.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(5, AnchorPoint(anchorPoint.borderSide, Vector2(0.f, -50.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(6, AnchorPoint(anchorPoint.borderSide, Vector2(25.f, 25.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(7, AnchorPoint(anchorPoint.borderSide, Vector2(25.f, -25.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(8, AnchorPoint(anchorPoint.borderSide, Vector2(50.f, 0.f), 0), SlotAttackType::Melee));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(0, 0, Vector2<float>(-50.f, 0.f), SlotAttackType::MeleeAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(1, 0, Vector2<float>(-25.f, -25.f), SlotAttackType::MagicAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(2, 0, Vector2<float>(-25.f, 25.f), SlotAttackType::MagicAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(3, 0, Vector2<float>(0.f, 50.f), SlotAttackType::MeleeAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(4, 0, Vector2<float>(0.f, 0.f), SlotAttackType::MagicAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(5, 0, Vector2<float>(0.f, -50.f), SlotAttackType::MeleeAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(6, 0, Vector2<float>(25.f, 25.f), SlotAttackType::MagicAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(7, 0, Vector2<float>(25.f, -25.f), SlotAttackType::MagicAttacker));
+	_slotPositionAndType.emplace_back(SlotPositionAndType(8, 0, Vector2<float>(50.f, 0.f), SlotAttackType::MeleeAttacker));
 }
 
 unsigned int SlotRolePattern::CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) {
@@ -236,8 +246,8 @@ AnchorPoint SlotRolePattern::GetDriftOffset(std::vector<SlotAssignment> slotAssi
 
 AnchorPoint SlotRolePattern::GetSlotLocation(unsigned int slotNumber, unsigned int numberOfSlots) {
 	AnchorPoint result;
-	result.position = _slotPositionAndType[slotNumber].positionAndOrientation.position;
-	result.orientation = _slotPositionAndType[slotNumber].positionAndOrientation.orientation;
+	result.position = _slotPositionAndType[slotNumber].position;
+	result.orientation = _slotPositionAndType[slotNumber].orientation;
 	result.orientation = WrapMinMax(result.orientation, -PI, PI);
 	return result;
 }
@@ -258,9 +268,9 @@ float SlotRolePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 	//	break;
 	case WeaponType::Staff:
 		switch (_slotPositionAndType[index].slotAttackType) {
-		case SlotAttackType::Magic:
+		case SlotAttackType::MagicAttacker:
 			return 0.f;
-		case SlotAttackType::Melee:
+		case SlotAttackType::MeleeAttacker:
 			return 1500.f;
 		//case SlotAttackType::Missle:
 		//	return 500.f;
@@ -270,9 +280,9 @@ float SlotRolePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 		break;
 	case WeaponType::Sword:
 		switch (_slotPositionAndType[index].slotAttackType) {
-		case SlotAttackType::Magic:
+		case SlotAttackType::MagicAttacker:
 			return 1500.f;
-		case SlotAttackType::Melee:
+		case SlotAttackType::MeleeAttacker:
 			return 0.f;
 		//case SlotAttackType::Missle:
 		//	return 1500.f;
@@ -311,14 +321,33 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 
 VShapePattern::VShapePattern() {}
 
-void VShapePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {	
-	_slotPositionAndType.emplace_back(SlotPositionAndType(0, AnchorPoint(anchorPoint.borderSide, Vector2(0.f, -50.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(1, AnchorPoint(anchorPoint.borderSide, Vector2(-25.f, -25.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(2, AnchorPoint(anchorPoint.borderSide, Vector2(25.f, -25.f), 0), SlotAttackType::Melee));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(3, AnchorPoint(anchorPoint.borderSide, Vector2(50.f, 0.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(4, AnchorPoint(anchorPoint.borderSide, Vector2(-50.f, 0.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(5, AnchorPoint(anchorPoint.borderSide, Vector2(75.f, 25.f), 0), SlotAttackType::Magic));
-	_slotPositionAndType.emplace_back(SlotPositionAndType(6, AnchorPoint(anchorPoint.borderSide, Vector2(-75.f, 25.f), 0), SlotAttackType::Magic));
+void VShapePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {
+	_numberOfSlots = slotCount;
+
+	std::uniform_real_distribution range{ 0.33f, 0.5f };
+	float number = range(randomEngine);
+
+	CreateSlotsOfType(anchorPoint, _numberOfSlots * number, _frontPosition, SlotAttackType::Defender);
+	
+	std::uniform_real_distribution range2{ 0.1f, 1.f - number};
+	number = range2(randomEngine);
+	CreateSlotsOfType(anchorPoint, _numberOfSlots * number, _frontPosition + (_rowDistance * 2.f), SlotAttackType::MagicAttacker);
+	
+	CreateSlotsOfType(anchorPoint, _numberOfSlots - _slotPositionAndType.size(), _frontPosition + _rowDistance, SlotAttackType::MeleeAttacker);
+}
+
+void VShapePattern::CreateSlotsOfType(AnchorPoint anchorPoint, unsigned int amountSlots, Vector2<float> frontSlotPosition, SlotAttackType attackType) {
+	_multiplier = 0.f;
+	for (unsigned int i = 0; i < amountSlots; ++i) {
+		if (i % 2 == 0) {
+			_positionOffset = _slotOffsetA * _multiplier;
+			_multiplier++;
+		} else {
+			_positionOffset = _slotOffsetB * _multiplier;
+		}
+		_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(),
+			anchorPoint.orientation, frontSlotPosition + _positionOffset, attackType));
+	}
 }
 
 unsigned int VShapePattern::CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) {
@@ -339,46 +368,46 @@ AnchorPoint VShapePattern::GetDriftOffset(std::vector<SlotAssignment> slotAssign
 
 AnchorPoint VShapePattern::GetSlotLocation(unsigned int slotNumber, unsigned int numberOfSlots) {
 	AnchorPoint result;
-	result.position = _slotPositionAndType[slotNumber].positionAndOrientation.position;
-	result.orientation = _slotPositionAndType[slotNumber].positionAndOrientation.orientation;
+	result.position = _slotPositionAndType[slotNumber].position;
+	result.orientation = _slotPositionAndType[slotNumber].orientation;
 	result.orientation = WrapMinMax(result.orientation, -PI, PI);
 	return result;
 }
 
 float VShapePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 	switch (weaponType) {
-		//case WeaponType::Bow:
-		//	switch (_slotPositionAndType[index].slotAttackType) {
-		//	case SlotAttackType::Magic:
-		//		return 1000.f;
-		//	case SlotAttackType::Melee:
-		//		return 1500.f;
-		//	case SlotAttackType::Arrow:
-		//		return 0.f;
-		//	default:
-		//		break;
-		//	}
-		//	break;
+	case WeaponType::Shield:
+		switch (_slotPositionAndType[index].slotAttackType) {
+		case SlotAttackType::Defender:
+			return 0.f;
+		case SlotAttackType::MagicAttacker:
+			return 2000.f;
+		case SlotAttackType::MeleeAttacker:
+			return 500.f;
+		default:
+			break;
+		}
+		break;
 	case WeaponType::Staff:
 		switch (_slotPositionAndType[index].slotAttackType) {
-		case SlotAttackType::Magic:
-			return 0.f;
-		case SlotAttackType::Melee:
+		case SlotAttackType::Defender:
 			return 2000.f;
-			//case SlotAttackType::Arrow:
-			//	return 500.f;
+		case SlotAttackType::MagicAttacker:
+			return 0.f;
+		case SlotAttackType::MeleeAttacker:
+			return 1000.f;
 		default:
 			break;
 		}
 		break;
 	case WeaponType::Sword:
 		switch (_slotPositionAndType[index].slotAttackType) {
-		case SlotAttackType::Magic:
-			return 2000.f;
-		case SlotAttackType::Melee:
+		case SlotAttackType::Defender:
+			return 500.f;
+		case SlotAttackType::MagicAttacker:
+			return 1500.f;
+		case SlotAttackType::MeleeAttacker:
 			return 0.f;
-			//case SlotAttackType::Arrow:
-			//	return 1500.f;
 		default:
 			break;
 		}

@@ -15,20 +15,6 @@ template<typename T> class QuadTree;
 
 enum class EnemyType;
 
-enum class SteeringBehaviorType {
-	Align,
-	Arrive,
-	CollisionAbvoidance,
-	FaceBehavior,
-	LookAtDirection,
-	Pursue,
-	Seek,
-	Separation,
-	Velocity,
-	Wander,
-	Count
-};
-
 enum class EnemyType {
 	Boar,
 	Human,
@@ -88,7 +74,7 @@ public:
 	void Init();
 	void Update();
 	void UpdateSurvival();
-	void UpdateTactical();
+	void UpdateFormation();
 	void Render();
 
 	std::vector<std::shared_ptr<EnemyBase>> GetActiveEnemies();
@@ -111,7 +97,7 @@ public:
 
 	void UpdateQuadTree();
 
-	const unsigned int GetWaveNumver() const;
+	const unsigned int GetWaveNumber() const;
 
 	int BinarySearch(int low, int high, int objectID);
 
@@ -134,6 +120,6 @@ private:
 	unsigned int _numberOfEnemyTypes = 0;
 	unsigned int _spawnNumberOfEnemies = 5;
 	unsigned int _waveNumber = 0;
-
+	unsigned int _enemiesInFormation = 9;
 };
 
