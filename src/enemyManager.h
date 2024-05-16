@@ -83,10 +83,12 @@ public:
 		Vector2<float> direction, Vector2<float> position);
 
 	void TacticalEnemySpawner();
+	void SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, FormationType formationType, SlotAttackType sloatAttackType, WeaponType weaponType);
+	
 	void SurvivalEnemySpawner();
 
 	void SpawnEnemy(EnemyType enemyType, float orientation,
-		Vector2<float> direction, Vector2<float> position);
+		Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
 
 	void RemoveAllEnemies();
 	void RemoveEnemy(EnemyType enemyType, unsigned int objectID);

@@ -52,16 +52,12 @@ void EnemyHuman::Init() {
 	_direction = Vector2<float>(_behaviorData.targetPosition - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
 
-	switch (gameStateHandler->GetGameMode()) {
-	case GameMode::Formation:
-		PickWeaponFormation();
-		break;
-	case GameMode::Survival:
-		PickWeaponSurvival();
-		break;
-	default:
-		break;
-	}
+	_prioritySteering->ClearGroups();
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 2.f));
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f));
+	_prioritySteering->AddGroup(*_blendSteering);
+
 }
 
 void EnemyHuman::Update() {
@@ -136,12 +132,23 @@ const std::shared_ptr<WeaponComponent> EnemyHuman::GetWeaponComponent() const {
 	return _weaponComponent;
 }
 
-void EnemyHuman::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) {
+void EnemyHuman::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	_orientation = orienation;
 	_direction = direction;
 	_position = position;
 	_circleCollider.position = position;
 	Init();
+
+	switch (gameStateHandler->GetGameMode()) {
+	case GameMode::Formation:
+		PickWeaponFormation(weaponType);
+		break;
+	case GameMode::Survival:
+		PickWeaponSurvival();
+		break;
+	default:
+		break;
+	}
 }
 
 void EnemyHuman::DeactivateEnemy() {
@@ -149,7 +156,7 @@ void EnemyHuman::DeactivateEnemy() {
 	_direction = Vector2<float>(0.f, 0.f);
 	_position = Vector2<float>(-10000.f, -10000.f);
 	_circleCollider.position = _position;
-	
+	_prioritySteering->ClearGroups();
 	_formationIndex = -1;
 }
 
@@ -210,7 +217,7 @@ void EnemyHuman::UpdateTarget() {
 		}
 		break;
 	case CurrentTarget::SlotFormation:
-		if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 200.f, true)) {
+		if (_weaponComponent->AtTargetDistance(_position, playerCharacter->GetPosition(), 200.f, true)) {
 			_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Align,
 				BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0);
 			_currentTarget = CurrentTarget::Player;
@@ -230,10 +237,10 @@ void EnemyHuman::UpdateTarget() {
 	}
 }
 
-void EnemyHuman::PickWeapon() {
+void EnemyHuman::PickWeapon(WeaponType weaponType) {
 	switch (gameStateHandler->GetGameMode()) {
 	case GameMode::Formation:
-		PickWeaponFormation();
+		PickWeaponFormation(weaponType);
 		break;
 	case GameMode::Survival:
 		PickWeaponSurvival();
@@ -243,31 +250,40 @@ void EnemyHuman::PickWeapon() {
 	}
 }
 
-void EnemyHuman::PickWeaponFormation() {
+void EnemyHuman::PickWeaponFormation(WeaponType weaponType) {
 	std::uniform_real_distribution decideWeapon{ 0.f, 1.f };
 	float weaponPicked = decideWeapon(randomEngine);
-
-	_prioritySteering->ClearGroups();
-
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 2.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f));
-
-	if (weaponPicked <= 0.4f) {
+	switch (weaponType) {
+	case WeaponType::Shield:
 		_weaponComponent = std::make_shared<ShieldComponent>(this);
-	} else if (weaponPicked <= 0.75f) {
+		break;
+	case WeaponType::Staff:
 		_weaponComponent = std::make_shared<StaffComponent>(this);
-
-	} else {
+		break;
+	case WeaponType::Sword:
 		_weaponComponent = std::make_shared<SwordComponent>(this);
+		break;
+	case WeaponType::Count:
+		if (weaponPicked <= 0.4f) {
+			_weaponComponent = std::make_shared<ShieldComponent>(this);
+		} else if (weaponPicked <= 0.75f) {
+			_weaponComponent = std::make_shared<StaffComponent>(this);
+
+		} else {
+			_weaponComponent = std::make_shared<SwordComponent>(this);
+		}
+		break;
+	default:
+		break;
 	}
+
+
 	_maxHealth += _weaponComponent->GetHealthModifier();
 	_currentHealth = _maxHealth;
 
 	_behaviorData.linearTargetRadius = 0.05f;
 	_behaviorData.linearSlowDownRadius = 10.f;
 	
-	_prioritySteering->AddGroup(*_blendSteering);
 }
 
 void EnemyHuman::PickWeaponSurvival() {

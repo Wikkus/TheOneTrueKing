@@ -90,14 +90,32 @@ void EnemyManager::TacticalEnemySpawner() {
 	AnchorPoint anchorPoint;
 	anchorPoint.position = { windowWidth, windowHeight * 0.5f };
 	anchorPoint.orientation = 0.f;
-	_formationManagers.emplace_back(std::make_shared<FormationManager>(FormationType::VShape, _enemiesInFormation + (_waveNumber * 3), anchorPoint));
+	
+	unsigned int spawnNumber = (_enemiesInFormation + (_waveNumber * 3));
 
-	while (_activeEnemies.size() < _enemiesInFormation + (_waveNumber * 3)) {
-		enemyManager->SpawnEnemy(EnemyType::Human, anchorPoint.orientation, Vector2<float>(0.f, 0.f), anchorPoint.position);
+	
+	SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::Count, WeaponType::Count);
+
+	//anchorPoint.position.x += 32.f;
+	//SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::MeleeAttacker, WeaponType::Sword);
+	//
+	//anchorPoint.position.x += 32.f;	
+	//SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::MagicAttacker, WeaponType::Staff);
+
+	_spawnTimer->DeactivateTimer();
+}
+
+void EnemyManager::SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, 
+	FormationType formationType, SlotAttackType sloatAttackType, WeaponType weaponType) {
+	_formationManagers.emplace_back(std::make_shared<FormationManager>(formationType,
+		spawnNumber, anchorPoint, true, sloatAttackType));
+	int enemiesSpawned = 0;
+	while (enemiesSpawned < spawnNumber) {
+		enemyManager->SpawnEnemy(EnemyType::Human, anchorPoint.orientation, Vector2<float>(0.f, 0.f), anchorPoint.position, weaponType);
 		_activeEnemies.back()->SetFormationIndex(_formationManagers.size() - 1);
 		_formationManagers.back()->AddCharacter(_activeEnemies.back());
+		enemiesSpawned++;
 	}
-	_spawnTimer->DeactivateTimer();
 }
 
 void EnemyManager::SurvivalEnemySpawner() {
@@ -129,9 +147,9 @@ void EnemyManager::SurvivalEnemySpawner() {
 		}
 		Vector2<float> direction = (playerCharacter->GetPosition() - spawnPosition).normalized();
 		if (i % 3 == 0) {
-			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(direction), direction, spawnPosition);
+			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(direction), direction, spawnPosition, WeaponType::Count);
 		} else {
-			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(direction), direction, spawnPosition);
+			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(direction), direction, spawnPosition, WeaponType::Count);
 		}
 	}
 	_waveNumber++;
@@ -140,13 +158,13 @@ void EnemyManager::SurvivalEnemySpawner() {
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type
 void EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation,
-	Vector2<float> direction, Vector2<float> position) {
+	Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	if (_enemyPools[enemyType]->IsEmpty()) {
 		CreateNewEnemy(enemyType, orientation, direction, position);
 	}
 	//Then add the enemy to the active enemies vector which is called in Update
 	_activeEnemies.emplace_back(_enemyPools[enemyType]->SpawnObject());
-	_activeEnemies.back()->ActivateEnemy(orientation, direction, position);
+	_activeEnemies.back()->ActivateEnemy(orientation, direction, position, weaponType);
 }
 
 void EnemyManager::RemoveAllEnemies() {

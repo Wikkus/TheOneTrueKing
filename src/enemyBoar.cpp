@@ -142,7 +142,7 @@ const std::shared_ptr<WeaponComponent> EnemyBoar::GetWeaponComponent() const {
 	return _weaponComponent;
 }
 
-void EnemyBoar::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) {
+void EnemyBoar::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	_orientation = orienation;
 	_direction = direction;
 	_position = position;
