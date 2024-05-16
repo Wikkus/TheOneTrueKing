@@ -367,8 +367,26 @@ void BlendSteering::AddSteeringBehaviour(BehaviorAndWeight behaviour) {
 	_behaviors.emplace_back(behaviour);
 }
 
+void BlendSteering::RemoveSteeringBehaviour(SteeringBehaviorType oldBehaviorType) {
+	for (unsigned int i = 0; i < _behaviors.size(); i++) {
+		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == oldBehaviorType) {
+			_behaviors.erase(_behaviors.begin() + i);
+		}
+	}
+}
+
 void BlendSteering::ClearBehaviours() {
 	_behaviors.clear();
+}
+
+bool BlendSteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+	for (unsigned int i = 0; i < _behaviors.size(); i++) {
+		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == oldBehaviorType) {
+			_behaviors[i] = newBehavior;
+			return true;
+		}
+	}
+	return false;
 }
 
 SteeringOutput PrioritySteering::Steering(BehaviorData behaviorData, EnemyBase& enemy) {
@@ -391,4 +409,16 @@ void PrioritySteering::AddGroup(BlendSteering& behaviour) {
 
 void PrioritySteering::ClearGroups() {
 	_groups.clear();
+}
+
+void PrioritySteering::AddBehaviorInGroup(BehaviorAndWeight newBehavior, int groupIndex) {
+	_groups[groupIndex].AddSteeringBehaviour(newBehavior);
+}
+
+void PrioritySteering::RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType, unsigned int groupIndex) {
+	_groups[groupIndex].RemoveSteeringBehaviour(oldBehaviorType);
+}
+
+bool PrioritySteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior, unsigned int groupIndex) {
+	return _groups[groupIndex].ReplaceSteeringBheavior(oldBehaviorType, newBehavior);
 }

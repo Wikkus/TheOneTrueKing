@@ -24,6 +24,8 @@ public:
 
 	virtual void Attack(Vector2<float> position, float orientation) = 0;
 
+	virtual bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) = 0;
+
 	const virtual bool GetIsAttacking() const = 0;
 
 	const virtual float GetAttackRange() const = 0;
@@ -61,6 +63,8 @@ public:
 
 	void Attack(Vector2<float> position, float orientation) override;
 
+	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
+	
 	const bool GetIsAttacking() const override;
 
 	const float GetAttackRange() const override;
@@ -79,6 +83,8 @@ public:
 	void Render(Vector2<float> position, float orientation) override;
 
 	void Attack(Vector2<float> position, float orientation) override;
+
+	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
 
 	const bool GetIsAttacking() const override;
 
@@ -101,6 +107,8 @@ public:
 	void Render(Vector2<float> position, float orientation) override;
 
 	void Attack(Vector2<float> position, float orientation) override;
+	
+	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
 
 	const bool GetIsAttacking() const override;
 

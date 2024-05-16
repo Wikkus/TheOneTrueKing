@@ -212,8 +212,12 @@ public:
 	~BlendSteering() {}
 
 	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy);
-	void AddSteeringBehaviour(BehaviorAndWeight behaviour);
+
+	void AddSteeringBehaviour(BehaviorAndWeight behaviour);	
+	void RemoveSteeringBehaviour(SteeringBehaviorType oldBehaviorType);
 	void ClearBehaviours();
+	
+	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
 
 private:
 	float _currentWeight = 0.f;
@@ -231,9 +235,13 @@ public:
 
 	void AddGroup(BlendSteering& behaviour);
 	void ClearGroups();
+	
+	void AddBehaviorInGroup(BehaviorAndWeight newBehavior, int groupIndex);
+	void RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType, unsigned int groupIndex);
+	
+	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior, unsigned int groupIndex);
 
 private:
 	std::vector<BlendSteering> _groups;
-
 	SteeringOutput _result;
 };

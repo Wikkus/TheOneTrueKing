@@ -6,6 +6,13 @@
 
 #include <memory>
 
+enum class CurrentTarget {
+	Player,
+	SlotFormation,
+	Travelling,
+	Count
+};
+
 class WeaponComponent;
 
 class EnemyHuman : public EnemyBase {
@@ -53,9 +60,12 @@ public:
 
 private:
 	void UpdateMovement();
+	void UpdateTarget();
 	void PickWeapon();
 	void PickWeaponFormation();
 	void PickWeaponSurvival();
 	const char* _humanSprite = "res/sprites/Human.png";
+
+	CurrentTarget _currentTarget = CurrentTarget::SlotFormation;
 };
 

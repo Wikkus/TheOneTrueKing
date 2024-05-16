@@ -12,6 +12,7 @@ struct AnchorPoint {
 };
 
 bool IsInDistance(Vector2<float> positionA, Vector2<float> positionB, float distance);
+bool IsOutOfDistance(Vector2<float> positionA, Vector2<float> positionB, float distance);
 bool OutOfBorderX(float positionX);
 bool OutOfBorderY(float positionY);
 

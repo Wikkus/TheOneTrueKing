@@ -32,8 +32,8 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_behaviorData.maxRotation = PI * 2.f;
 	
 	_behaviorData.timeToTarget = 0.1f;
-	
-	_behaviorData.maxLinearAcceleration = 125.f;
+
+	_behaviorData.maxLinearAcceleration = 150.f;
 	_behaviorData.maxSpeed = 75.f;
 
 	_behaviorData.separationThreshold = _circleCollider.radius * 1.5f;
@@ -66,6 +66,7 @@ void EnemyHuman::Init() {
 
 void EnemyHuman::Update() {
 	_queriedObjects = objectBaseQuadTree->Query(_circleCollider);
+	UpdateTarget();
 	HandleAttack();
 
 	UpdateMovement();	
@@ -195,6 +196,37 @@ void EnemyHuman::UpdateMovement() {
 	if (_velocity.absolute() > _behaviorData.maxSpeed) {
 		_velocity.normalize();
 		_velocity *= _behaviorData.maxSpeed;
+	}
+}
+
+void EnemyHuman::UpdateTarget() {
+	switch (_currentTarget) {
+	case CurrentTarget::Player:
+		_behaviorData.targetPosition = playerCharacter->GetPosition();
+		if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 250.f, false)) {
+			_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Face,
+				BehaviorAndWeight(std::make_shared<LookAtDirectionBehavior>(), 1.f), 0);
+			_currentTarget = CurrentTarget::Travelling;
+		}
+		break;
+	case CurrentTarget::SlotFormation:
+		if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 200.f, true)) {
+			_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Align,
+				BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0);
+			_currentTarget = CurrentTarget::Player;
+		}
+		break;
+	case CurrentTarget::Travelling:
+		if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 50.f, true)) {
+			_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::LookAtDirection,
+				BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f), 0);
+			_currentTarget = CurrentTarget::SlotFormation;
+		}	
+		break;
+	case CurrentTarget::Count:
+		break;
+	default:
+		break;
 	}
 }
 

@@ -51,6 +51,10 @@ void ShieldComponent::Attack(Vector2<float> position, float orientation) {
 	//}
 }
 
+bool ShieldComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
+	return false;
+}
+
 const bool ShieldComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
@@ -113,6 +117,10 @@ void StaffComponent::Attack(Vector2<float> position, float orientation) {
 	}
 }
 
+bool StaffComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
+	return false;
+}
+
 const bool StaffComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
@@ -157,9 +165,10 @@ void SwordComponent::Render(Vector2<float> position, float orientation) {
 }
 //If the weapon is a sword it damages the player if its close enough
 void SwordComponent::Attack(Vector2<float> position, float orientation) {
-	if ((playerCharacter->GetPosition() - position).absolute() <= 200.f) {
-		_enemyOwner->SetTargetPosition(playerCharacter->GetPosition());
-	}
+	//if ((playerCharacter->GetPosition() - position).absolute() <= 200.f) {
+	//	_enemyOwner->SetTargetPosition(playerCharacter->GetPosition());
+	//	
+	//}
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
@@ -173,6 +182,14 @@ void SwordComponent::Attack(Vector2<float> position, float orientation) {
 	} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
 		_chargeAttackTimer->ResetTimer();
 		_isAttacking = true;
+	}
+}
+
+bool SwordComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
+	if (isInDistance) {
+		return IsInDistance(targetPosition, position, distance);
+	} else {
+		return IsOutOfDistance(targetPosition, position, distance);
 	}
 }
 
