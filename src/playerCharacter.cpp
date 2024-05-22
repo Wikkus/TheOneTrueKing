@@ -15,18 +15,16 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int object
 	ObjectBase(objectID, ObjectType::Player) {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_kingSprite);
-
 	_orientation = characterOrientation;
 	_position = characterPosition;
+	_circleCollider = std::make_shared<Circle>();
+	_circleCollider->Init(_position, 16.f);
 	_oldPosition = _position;
 
 	_currentHealth = _maxHealth;
-
-	_circleCollider.position = characterPosition;
-	_circleCollider.radius = 16.f;
 	
 	_healthTextSprite = std::make_shared<TextSprite>();
-	_healthTextSprite->SetTargetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
+	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
 }
 
 PlayerCharacter::~PlayerCharacter() {}
@@ -42,8 +40,6 @@ void PlayerCharacter::Update() {
 	UpdateInput();
 	UpdateMovement();
 	UpdateTarget();
-
-	_circleCollider.position = _position;
 }
 
 void PlayerCharacter::Render() {
@@ -56,6 +52,10 @@ void PlayerCharacter::RenderText() {
 
 const unsigned int PlayerCharacter::GetObjectID() const {
 	return _objectID;
+}
+
+const std::shared_ptr<Collider> PlayerCharacter::GetCollider() const {
+	return _circleCollider;
 }
 
 const ObjectType PlayerCharacter::GetObjectType() const {
@@ -77,7 +77,8 @@ void PlayerCharacter::ExecuteDeath() {
 }
 
 void PlayerCharacter::FireProjectile() {
-	projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), _orientation, _attackDamage, _projectileSpeed, _direction, _position);
+	projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), 
+		_orientation, _attackDamage, _projectileSpeed, _direction, _position);
 }
 
 void PlayerCharacter::Respawn() {
@@ -116,19 +117,22 @@ void PlayerCharacter::UpdateInput() {
 
 void PlayerCharacter::UpdateMovement() { 
 	_oldPosition = _position;
+	_velocity = { 0.f, 0.f };
+
 	if (GetKey(SDL_SCANCODE_W)) {
-		_position.y -= _movementSpeed * deltaTime;
+		_velocity.y -= _movementSpeed;
 
 	} else if (GetKey(SDL_SCANCODE_S)) {
-		_position.y += _movementSpeed * deltaTime;
+		_velocity.y += _movementSpeed;
 	}	
 	
 	if (GetKey(SDL_SCANCODE_A)) {
-		_position.x -= _movementSpeed * deltaTime;
+		_velocity.x -= _movementSpeed;
 
 	} else if (GetKey(SDL_SCANCODE_D)) {
-		_position.x += _movementSpeed * deltaTime;
+		_velocity.x += _movementSpeed;
 	}
+	_position += _velocity * deltaTime;
 
 	if (OutOfBorderX(_position.x)) {
 		_position.x = _oldPosition.x;
@@ -136,16 +140,12 @@ void PlayerCharacter::UpdateMovement() {
 	if (OutOfBorderY(_position.y)) {
 		_position.y = _oldPosition.y;
 	}
-	_circleCollider.position = _position;
+	_circleCollider->SetPosition(_position);
 }
 
 void PlayerCharacter::UpdateTarget() {
 	_direction = (GetCursorPosition() - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
-}
-
-const Circle PlayerCharacter::GetCircleCollider() const {
-	return _circleCollider;
 }
 
 const std::shared_ptr<Sprite> PlayerCharacter::GetSprite() const {
@@ -162,4 +162,8 @@ const int PlayerCharacter::GetCurrentHealth() const {
 
 const Vector2<float> PlayerCharacter::GetPosition() const {
 	return _position;
+}
+
+const Vector2<float> PlayerCharacter::GetVelocity() const {
+	return _velocity;
 }

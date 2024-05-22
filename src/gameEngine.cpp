@@ -1,6 +1,7 @@
 #include "gameEngine.h"
 
 #include "debugDrawer.h"
+#include "enemyBase.h"
 #include "enemyManager.h"
 #include "imGuiManager.h"
 #include "obstacleManager.h"
@@ -26,9 +27,11 @@ std::shared_ptr<ImGuiHandler> imGuiHandler;
 std::shared_ptr<ObstacleManager> obstacleManager;
 std::shared_ptr<PlayerCharacter> playerCharacter;
 std::shared_ptr<ProjectileManager> projectileManager;
+
+std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+
 std::shared_ptr<RayCast> rayCast;
-std::shared_ptr<SteeringBehavior> separationBehavior;
 std::shared_ptr<TimerManager> timerManager;
 std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 
@@ -75,6 +78,8 @@ void ClearText(SDL_Surface* textSurface, SDL_Texture* textTexture) {
 
 float deltaTime = 0.f;
 int frameNumber = 0;
+
+unsigned int objectID = 0;
 
 std::random_device randomDevice;
 std::mt19937 randomEngine(randomDevice());

@@ -51,7 +51,6 @@ private:
 	unsigned int _projectileAmountLimit = 2000;
 	unsigned int _numberOfProjectileTypes = 0;
 
-	unsigned int _lastProjectileID = 0;
 	int _latestProjectileIndex = -1;
 
 	std::vector<std::shared_ptr<ObjectBase>> _objectsHit;

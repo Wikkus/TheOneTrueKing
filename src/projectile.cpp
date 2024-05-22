@@ -10,9 +10,8 @@ Projectile::Projectile(ProjectileType projectileType, const char* spritePath, un
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(spritePath);
 	_projectileType = projectileType;
-
-	_circleCollider.radius = 8.f;
-	_circleCollider.position = _position;
+	_circleCollider = std::make_shared<Circle>();
+	_circleCollider->Init(_position, 16.f);
 }
 
 Projectile::~Projectile() {}
@@ -20,8 +19,9 @@ Projectile::~Projectile() {}
 void Projectile::Init() {}
 
 void Projectile::Update() {
-	_position += _direction * _projectileSpeed * deltaTime;
-	_circleCollider.position = _position + _direction * (_sprite->h * 0.25f);
+	_velocity = _direction * _projectileSpeed;
+	_position += _velocity * deltaTime;
+	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
 void Projectile::Render() {
@@ -30,7 +30,7 @@ void Projectile::Render() {
 
 void Projectile::RenderText() {}
 
-const Circle Projectile::GetCollider() const {
+const std::shared_ptr<Collider> Projectile::GetCollider() const {
 	return _circleCollider;
 }
 
@@ -62,31 +62,39 @@ const Vector2<float> Projectile::GetPosition() const {
 	return _position;
 }
 
+const Vector2<float> Projectile::GetVelocity() const {
+	return _direction;
+}
+
 void Projectile::SetDirection(Vector2<float> direction) {
 	_direction = direction;
 }
 
-void Projectile::SetTargetOrientation(float orientation) {
+void Projectile::SetOrientation(float orientation) {
 	_orientation = orientation;
 }
 
-void Projectile::SetTargetPosition(Vector2<float> position) {
+void Projectile::SetPosition(Vector2<float> position) {
 	_position = position;
-	_circleCollider.position = _position + _direction * (_sprite->h * 0.25f);
+	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
 void Projectile::ActivateProjectile(float orientation, unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position) {
 	_orientation = orientation;
 	_projectileDamage = projectileDamage;
 	_projectileSpeed = projectileSpeed;
+
 	_direction = direction.normalized();
+	_velocity = _direction * _projectileSpeed;
+
 	_position = position;
-	_circleCollider.position = _position + _direction * (_sprite->h * 0.25f);
+	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
 void Projectile::DeactivateProjectile() {
 	_orientation = 0.f;
-	_direction = Vector2<float>(0.f, 0.f);
-	_position = Vector2<float>(-10000.f, 10000.f);
-	_circleCollider.position = _position;
+	_direction = { 0.f, 0.f };
+	_velocity = { 0.f, 0.f };
+	_position = { -10000.f, 10000.f };
+	_circleCollider->SetPosition(_position);
 }

@@ -28,7 +28,7 @@ public:
 	bool TakeDamage(unsigned int damageAmount) override;
 
 	const BehaviorData GetBehaviorData() const override;
-	const Circle GetCollider() const override;
+	const std::shared_ptr<Collider> GetCollider() const override;
 	const EnemyType GetEnemyType() const override;
 	const ObjectType GetObjectType() const override;
 

@@ -17,20 +17,18 @@
 Button::Button(const char* buttonText, int height, int width, Vector2<float> position) {
 	_position = position;
 	
-	_boxCollider = AABB::makeFromPositionSize(position, height, width);
+	_boxCollider.Init(position, height, width);
+	_cursorCollider.Init({ 0.f, 0.f }, 10.f);
 	_text = std::make_shared<TextSprite>();
 	
 	_text->Init("res/roboto.ttf", 24, buttonText, _textColor);
-	_text->SetTargetPosition(_position);
+	_text->SetPosition(_position);
 }
 
 bool Button::ClickedOn() {
-	Vector2<float> cursorPosition = GetCursorPosition();
-	Circle circle;
-	circle.position = cursorPosition;
-	circle.radius = 10.f;
+	_cursorCollider.SetPosition(GetCursorPosition());
 	if (GetMouseButtonPressed(SDL_BUTTON_LEFT)) {
-		if (AABBCircleIntersect(_boxCollider, circle)) {
+		if (AABBCircleIntersect(_boxCollider, _cursorCollider)) {
 			return true;
 		}
 	}
@@ -38,17 +36,17 @@ bool Button::ClickedOn() {
 }
 
 void Button::Render() {
-	debugDrawer->AddDebugBox(_position, _boxCollider.min, _boxCollider.max, _buttonColor);
+	debugDrawer->AddDebugBox(_position, _boxCollider.GetMin(), _boxCollider.GetMax(), _buttonColor);
 }
 
 void Button::RenderText() {
 	_text->RenderCentered();
 }
 
-void Button::SetTargetPosition(Vector2<float> position) {
+void Button::SetPosition(Vector2<float> position) {
 	_position = position;
-	_boxCollider = AABB::makeFromPositionSize(position, _boxCollider.height, _boxCollider.width);
-	_text->SetTargetPosition(_position);
+	_boxCollider.SetPosition(position);
+	_text->SetPosition(_position);
 }
 GameStateHandler::GameStateHandler() {
 	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f));
@@ -114,7 +112,7 @@ InGameState::InGameState() {
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
-	objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCircleCollider());
+	objectBaseQuadTree->Insert(playerCharacter, *std::static_pointer_cast<Circle>(playerCharacter->GetCollider()));
 	
 	enemyManager->UpdateQuadTree();
 	projectileManager->UpdateQuadTree();
@@ -144,8 +142,8 @@ void SurvivalGameState::SetButtonPositions() {
 }
 
 void SurvivalGameState::Update() {
-	enemyManager->UpdateSurvival();
 	InGameState::Update();
+	enemyManager->UpdateSurvival();
 }
 
 void SurvivalGameState::Render() {
@@ -178,14 +176,14 @@ void FormationGameState::RenderText() {
 GameOverState::GameOverState() {
 	_waveNumberText = std::make_shared<TextSprite>();
 	_waveNumberText->Init("res/roboto.ttf", 24, ("Waves survived: " + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
-	_waveNumberText->SetTargetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
+	_waveNumberText->SetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
 	SetButtonPositions();
 }
 
 void GameOverState::SetButtonPositions() {
-	_buttons[ButtonType::Restart]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
-	_buttons[ButtonType::MainMenu]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
-	_buttons[ButtonType::Quit]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
+	_buttons[ButtonType::Restart]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
+	_buttons[ButtonType::MainMenu]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
+	_buttons[ButtonType::Quit]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
 }
 
 void GameOverState::Update() {
@@ -227,15 +225,15 @@ MenuState::MenuState() {
 
 	_titleText = std::make_shared<TextSprite>();
 	_titleText->Init("res/roboto.ttf", 48, _gameTitle, _textColor);
-	_titleText->SetTargetPosition(_titleTextPosition);
+	_titleText->SetPosition(_titleTextPosition);
 	
 	SetButtonPositions();
 }
 
 void MenuState::SetButtonPositions() {
-	_buttons[ButtonType::FormationGame]->SetTargetPosition(Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
-	_buttons[ButtonType::SurvivalGame]->SetTargetPosition(Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f));
-	_buttons[ButtonType::Quit]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.7f));
+	_buttons[ButtonType::FormationGame]->SetPosition(Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
+	_buttons[ButtonType::SurvivalGame]->SetPosition(Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f));
+	_buttons[ButtonType::Quit]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.7f));
 }
 
 void MenuState::Update() {
@@ -270,10 +268,10 @@ PauseState::PauseState() {
 }
 
 void PauseState::SetButtonPositions() {
-	_buttons[ButtonType::Resume]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
-	_buttons[ButtonType::Restart]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f));
-	_buttons[ButtonType::MainMenu]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f));
-	_buttons[ButtonType::Quit]->SetTargetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
+	_buttons[ButtonType::Resume]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
+	_buttons[ButtonType::Restart]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f));
+	_buttons[ButtonType::MainMenu]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f));
+	_buttons[ButtonType::Quit]->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
 }
 
 void PauseState::Update() {

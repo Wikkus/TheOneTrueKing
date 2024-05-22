@@ -42,7 +42,7 @@ void EnemyManager::UpdateSurvival() {
 		SurvivalEnemySpawner();
 	}	
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->SetPosition(playerCharacter->GetPosition());
+		_activeEnemies[i]->SetTargetPosition(playerCharacter->GetPosition());
 		_activeEnemies[i]->Update();
 	}
 }
@@ -73,17 +73,17 @@ std::vector<std::shared_ptr<EnemyBase>> EnemyManager::GetActiveEnemies() {
 void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position) {
 	switch (enemyType) {
 	case EnemyType::Boar:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>(_lastEnemyID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>(objectID, enemyType));
 		break;
 
 	case EnemyType::Human:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>(_lastEnemyID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>(objectID, enemyType));
 		break;
 	
 	default:
 		break;
 	}	
-	_lastEnemyID++;
+	objectID++;
 }
 
 void EnemyManager::TacticalEnemySpawner() {
@@ -120,7 +120,7 @@ void EnemyManager::SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoi
 
 void EnemyManager::SurvivalEnemySpawner() {
 	std::uniform_int_distribution dist{ 0, 3 };
-	unsigned int amountEnemies = _spawnNumberOfEnemies + _waveNumber;
+	unsigned int amountEnemies = (_spawnNumberOfEnemies + 4) + _waveNumber;
 	for (unsigned int i = 0; i < amountEnemies; i++) {
 		Vector2<float> spawnPosition = { 0.f, 0.f };
 		if (i < amountEnemies * 0.5f) {
@@ -184,10 +184,12 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 		//Search through the sorted vector to find the enemy with a specific ID
 		_latestEnemyIndex = BinarySearch(0, _activeEnemies.size() - 1, objectID);
 		if (_latestEnemyIndex >= 0) {
-			_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->RemoveCharacter(_activeEnemies[_latestEnemyIndex]);				
-			if (_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->GetNumberOfSlots() <= 0) {
-				_formationManagers.erase(_formationManagers.begin() + _activeEnemies[_latestEnemyIndex]->GetFormationIndex());
-			}	
+			if (_formationManagers.size() > 0) {
+				_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->RemoveCharacter(_activeEnemies[_latestEnemyIndex]);				
+				if (_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->GetNumberOfSlots() <= 0) {
+					_formationManagers.erase(_formationManagers.begin() + _activeEnemies[_latestEnemyIndex]->GetFormationIndex());
+				}
+			}
 			//Deactivate the enemy by setting its position to a far away place
 			_activeEnemies[_latestEnemyIndex]->DeactivateEnemy();
 			//Adds the enemy to the object pool and place it at the back of the vector
@@ -219,7 +221,9 @@ void EnemyManager::TakeDamage(unsigned int enemyIndex, unsigned int damageAmount
 
 void EnemyManager::UpdateQuadTree() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		objectBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
+		std::shared_ptr<Circle> temp = std::static_pointer_cast<Circle>(_activeEnemies[i]->GetCollider());
+		objectBaseQuadTree->Insert(_activeEnemies[i], *temp);
+		enemyBaseQuadTree->Insert(_activeEnemies[i], *temp);
 	}
 }
 const unsigned int EnemyManager::GetWaveNumber() const {

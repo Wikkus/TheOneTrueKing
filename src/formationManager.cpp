@@ -137,6 +137,7 @@ void FormationManager::ReconstructSlotAssignments() {
 	}
 	//Overwrite the current slot assignments with the updated ones
 	_slotAssignments = slotAssignments;
+	//Update the driftoffset to match the current formation
 	_driftOffset = _formationPattern->GetDriftOffset(_anchorPoint, _slotAssignments);
 }
 

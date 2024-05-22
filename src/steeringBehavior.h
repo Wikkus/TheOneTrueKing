@@ -10,6 +10,7 @@ class EnemyBase;
 enum class SteeringBehaviorType {
 	Align,
 	Arrive,
+	Attraction,
 	CollisionAbvoidance,
 	Evade,
 	Face,
@@ -33,8 +34,9 @@ class SteeringBehavior {
 public:
 	SteeringBehavior() {}
 	~SteeringBehavior() {}
-	virtual SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) = 0;
+	virtual SteeringOutput Steering(BehaviorData behaviorData) = 0;
 	virtual const SteeringBehaviorType GetBehaviorType() const = 0;
+
 
 protected:
 	SteeringBehaviorType _behaviorType = SteeringBehaviorType::Count;
@@ -45,7 +47,7 @@ class AlignBehavior : public SteeringBehavior {
 public:
 	AlignBehavior();
 	~AlignBehavior() {}
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -59,7 +61,7 @@ public:
 	FaceBehavior();
 	~FaceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -71,7 +73,7 @@ public:
 	LookAtDirectionBehavior();
 	~LookAtDirectionBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 };
 
@@ -80,7 +82,7 @@ public:
 	ArriveBehavior();
 	~ArriveBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -96,13 +98,12 @@ public:
 	CollisionAvoidanceBehavior();
 	~CollisionAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
 	bool _gotTarget = false;
 
-	Vector2<float> _direction = { 0.f, 0.f };
 	Vector2<float> _firstTargetPosition = { 0.f, 0.f };
 	Vector2<float> _firstRelativePos = { 0.f, 0.f };
 	Vector2<float> _firstRelativeVel = { 0.f, 0.f };
@@ -123,14 +124,11 @@ private:
 
 class SeekBehavior : public SteeringBehavior {
 public:
-	SeekBehavior(bool fleeBehaviour);
+	SeekBehavior(SteeringBehaviorType behaviorType);
 	~SeekBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
-
-private:
-	bool _fleeBehaviour = false;
 
 };
 class ObstacleAvoidanceBehavior : public SeekBehavior {
@@ -138,10 +136,11 @@ public:
 	ObstacleAvoidanceBehavior();
 	~ObstacleAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
+	std::shared_ptr<AABB> _currentCollider = nullptr;
 	Ray _ray;
 	Ray _whiskerA;
 	Ray _whiskerB;
@@ -149,19 +148,16 @@ private:
 };
 class PursueBehavior : public SeekBehavior {
 public:
-	PursueBehavior(bool evadeBehaviour);
+	PursueBehavior(SteeringBehaviorType behaviorType);
 	~PursueBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
 	float _distance = 0.f;
 	float _speed = 0.f;
 	float _prediction = 0.f;
-
-	Vector2<float> _direction = { 0.f, 0.f };
-
 };
 
 class SeparationBehavior : public SteeringBehavior {
@@ -169,7 +165,7 @@ public:
 	SeparationBehavior();
 	~SeparationBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -184,7 +180,7 @@ public:
 	VelocityMatchBehaviour();
 	~VelocityMatchBehaviour() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 };
 
@@ -193,7 +189,7 @@ public:
 	WanderBehavior();
 	~WanderBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy) override;
+	SteeringOutput Steering(BehaviorData behaviorData) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -211,10 +207,10 @@ public:
 	BlendSteering() {}
 	~BlendSteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy);
+	SteeringOutput Steering(BehaviorData behaviorData);
 
 	void AddSteeringBehaviour(BehaviorAndWeight behaviour);	
-	void RemoveSteeringBehaviour(SteeringBehaviorType oldBehaviorType);
+	void RemoveSteeringBehaviour(SteeringBehaviorType behaviorType);
 	void ClearBehaviours();
 	
 	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
@@ -231,7 +227,7 @@ public:
 	PrioritySteering() {}
 	~PrioritySteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, EnemyBase& enemy);
+	SteeringOutput Steering(BehaviorData behaviorData);
 
 	void AddGroup(BlendSteering& behaviour);
 	void ClearGroups();

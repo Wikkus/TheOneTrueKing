@@ -20,6 +20,9 @@ Vector2<float> GetCursorPosition();
 Vector2<float>  OrientationAsVector(float orientation);
 Vector2<float> RotateVector(float degree, Vector2<float> startPoint, Vector2<float> endPoint);
 
+
+Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration);
+
 float RandomBinomal(float a, float b);
 float VectorAsOrientation(Vector2<float> direction);
 

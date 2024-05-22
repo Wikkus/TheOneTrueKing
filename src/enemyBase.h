@@ -27,7 +27,7 @@ public:
 
 	virtual bool TakeDamage(unsigned int damageAmount) = 0;
 
-	virtual const Circle GetCollider() const = 0;
+	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
 	virtual const EnemyType GetEnemyType() const = 0;
 	 
 	virtual const float GetOrientation() const = 0;
@@ -58,14 +58,18 @@ public:
 
 
 protected:
-	BehaviorData _behaviorData;
 	SteeringOutput _steeringOutput;
+
+	std::shared_ptr<BehaviorData> _behaviorData = nullptr;
 	std::shared_ptr<BlendSteering> _blendSteering = nullptr;
 	std::shared_ptr<PrioritySteering> _prioritySteering = nullptr;
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
-	Circle _circleCollider;
-	Circle _attackRadius;
+	BehaviorAndWeight _alignBehavior;
+	BehaviorAndWeight _faceBehavior;
+
+	std::shared_ptr<Circle> _circleCollider = nullptr;
+	std::shared_ptr<Circle> _attackRadius = nullptr;
 
 	const EnemyType _enemyType = EnemyType::Count;
 
@@ -78,10 +82,5 @@ protected:
 	int _formationIndex = -1;
 
 	float _rotation = 0.f;
-	Vector2<float> _direction = Vector2<float>(0.f, 0.f);
-	Vector2<float> _velocity = Vector2<float>(0.f, 0.f);
-
-	std::vector<std::shared_ptr<ObjectBase>> _queriedObjects;
-	std::vector<std::shared_ptr<ObjectBase>> _objectsInAttackRange;
 };
 

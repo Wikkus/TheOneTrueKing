@@ -46,17 +46,16 @@ int main(int argc, char* argv[]) {
 	imGuiHandler = std::make_shared<ImGuiHandler>();
 	obstacleManager = std::make_shared<ObstacleManager>();
 	projectileManager = std::make_shared<ProjectileManager>();
-	playerCharacter = std::make_shared<PlayerCharacter>(0.f, 0, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
+	playerCharacter = std::make_shared<PlayerCharacter>(0.f, objectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
+	objectID++;
 	rayCast = std::make_shared<RayCast>();
 
 	timerManager = std::make_shared<TimerManager>();
-	separationBehavior = std::make_shared<SeparationBehavior>();
 
 	QuadTreeNode quadTreeNode;
-	quadTreeNode.rectangle = AABB::makeFromPositionSize(
-		Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
-	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 25);
-
+	quadTreeNode.rectangle.Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
+	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 35);
+	enemyBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<EnemyBase>>>(quadTreeNode, 25);
 
 
 	//Init here

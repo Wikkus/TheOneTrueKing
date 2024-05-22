@@ -32,15 +32,17 @@ public:
 	~Button() {}
 
 	bool ClickedOn();
+
 	void Render();
 	void RenderText();
-	void SetTargetPosition(Vector2<float> position);
+	void SetPosition(Vector2<float> position);
 
 private:
 	SDL_Color _buttonColor = { 120,81,169, 255 };
 	SDL_Color _textColor = { 212, 175, 55, 255 };
 
 	AABB _boxCollider;
+	Circle _cursorCollider;
 	std::shared_ptr<TextSprite> _text;
 	Vector2<float> _position;
 };

@@ -15,7 +15,7 @@ public:
 	RayCast(){}
 	~RayCast(){}
 
-	RayPoint RayCastToAABB(AABB boxCollider, Ray ray);
+	RayPoint RayCastToAABB(std::shared_ptr<AABB> boxCollider, Ray ray);
 
 	RayPoint FindPoint(Vector2<float> wallStart, Vector2<float> wallEnd, Ray ray, Vector2<float> rayDir);
 	RayPoint ClosestPoint(Ray ray, std::array<RayPoint, 4> points);

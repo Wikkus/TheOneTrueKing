@@ -4,9 +4,10 @@
 #include "gameEngine.h"
 #include "obstacleWall.h"
 
-void ObstacleManager::CreateWall(Vector2<float> position, float width, float height, std::array<int, 4> color) {
-	std::shared_ptr<Wall> wall = std::make_shared<Wall>();
-	wall->Init(position, width, height, _walls.size(), color);
+void ObstacleManager::CreateWall(Vector2<float> position, float width, float height, SDL_Color color) {
+	std::shared_ptr<Wall> wall = std::make_shared<Wall>(objectID);
+	objectID++;
+	wall->Activate(position, width, height, _walls.size(), color);
 	_walls.emplace_back(wall);
 }
 

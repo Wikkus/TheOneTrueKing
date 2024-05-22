@@ -22,13 +22,19 @@ enum class EnemyType {
 };
 
 struct BehaviorData {
-	float rotation = 0.f;
+	std::vector<std::shared_ptr<ObjectBase>> queriedObjects;
+	int objectID;
+	Circle collider;
 
+	float orientation = 0.f;
+	float rotation = 0.f;
 	float targetOrientation = 0.f;
 
 	float timeToTarget = 0.f;
 
+	Vector2<float> position = Vector2<float>{ 0.f, 0.f };
 	Vector2<float> targetPosition = Vector2<float>{ 0.f, 0.f };
+	Vector2<float> velocity = Vector2<float>{ 0.f, 0.f };
 
 	//align data
 	float angularSlowDownRadius = 0.f;
@@ -115,7 +121,6 @@ private:
 
 	std::unordered_map<EnemyType, std::shared_ptr<ObjectPool<std::shared_ptr<EnemyBase>>>> _enemyPools;
 
-	int _lastEnemyID = 1;
 	int _latestEnemyIndex = -1;
 
 	unsigned int _enemyAmountLimit = 1000;

@@ -2,6 +2,7 @@
 #include "collision.h"
 #include "vector2.h"
 
+#include <SDL2/SDL.h>
 #include <vector>
 
 class Wall;
@@ -11,7 +12,7 @@ public:
 	ObstacleManager(){}
 	~ObstacleManager(){}
 
-	void CreateWall(Vector2<float> position, float width, float height, std::array<int, 4> color);
+	void CreateWall(Vector2<float> position, float width, float height, SDL_Color color);
 
 	void UpdateObstacles();
 	void RenderObstacles();
@@ -20,5 +21,4 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Wall>> _walls;
-
 };

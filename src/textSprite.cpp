@@ -14,7 +14,7 @@ void TextSprite::ChangeText(const char* text, SDL_Color color) {
 	_textTexture = SDL_CreateTextureFromSurface(renderer, _textSurface);
 }
 
-void TextSprite::SetTargetPosition(Vector2<float> position) {
+void TextSprite::SetPosition(Vector2<float> position) {
 	_posX = position.x;
 	_posY = position.y;
 }

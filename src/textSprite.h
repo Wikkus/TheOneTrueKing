@@ -13,7 +13,7 @@ public:
 
 	void ChangeText(const char* text, SDL_Color color);
 
-	void SetTargetPosition(Vector2<float> position);
+	void SetPosition(Vector2<float> position);
 
 	void ClearText();
 

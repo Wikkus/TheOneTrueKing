@@ -20,18 +20,18 @@ public:
 	void RenderText() override;
 
 	const unsigned int GetObjectID() const override;
+	const std::shared_ptr<Collider> GetCollider() const override;
 	const ObjectType GetObjectType() const override;
 
 	const std::shared_ptr<Sprite> GetSprite() const override;
 	const Vector2<float> GetPosition() const override;
+	const Vector2<float> GetVelocity() const override;
 
 	void ExecuteDeath();
 	void FireProjectile();
 	void Respawn();
 
 	void TakeDamage(unsigned int damageAmount);
-
-	const Circle GetCircleCollider() const;
 
 	const float GetOrientation() const;	
 
@@ -45,7 +45,7 @@ private:
 
 	const char* _kingSprite = "res/sprites/HumanKing.png";
 
-	Circle _circleCollider;
+	std::shared_ptr<Circle> _circleCollider = nullptr;
 
 	float _attackDamage = 50;
 	float _movementSpeed = 100.f;
@@ -65,6 +65,5 @@ private:
 	std::shared_ptr<Timer> _regenerationTimer = nullptr;
 
 	Vector2<float> _oldPosition = Vector2<float>(0.f, 0.f);
-	Vector2<float> _direction = Vector2<float>(0.f, 0.f);
 };
 

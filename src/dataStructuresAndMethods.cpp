@@ -41,6 +41,13 @@ Vector2<float> RotateVector(float degree, Vector2<float> startPoint, Vector2<flo
 	return rotatedVector;
 }
 
+Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration) {
+	if (velocity.absolute() > maxAcceleration) {
+		velocity = velocity.normalized() * maxAcceleration;
+	}
+	return velocity;
+}
+
 float RandomBinomal(float a, float b) {
 	std::uniform_real_distribution<float> dist(a, b);
 	float randomNumber = dist(randomEngine);

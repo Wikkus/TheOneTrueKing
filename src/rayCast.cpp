@@ -3,13 +3,13 @@
 #include "debugDrawer.h"
 #include "gameEngine.h"
 
-RayPoint RayCast::RayCastToAABB(AABB boxCollider, Ray ray) {
+RayPoint RayCast::RayCastToAABB(std::shared_ptr<AABB> boxCollider, Ray ray) {
 	_rayDirection = ray.startPosition + ray.direction;
 	RayPoint rayPoint = ClosestPoint(ray, { 
-		FindPoint(boxCollider.min, { boxCollider.min.x, boxCollider.max.y }, ray, _rayDirection),
-		FindPoint({ boxCollider.min.x, boxCollider.max.y }, boxCollider.max, ray, _rayDirection),
-		FindPoint(boxCollider.min, { boxCollider.max.x, boxCollider.min.y }, ray, _rayDirection),
-		FindPoint({ boxCollider.max.x, boxCollider.min.y }, boxCollider.max, ray, _rayDirection) 
+		FindPoint(boxCollider->GetMin(), {boxCollider->GetMin().x, boxCollider->GetMax().y}, ray, _rayDirection),
+		FindPoint({ boxCollider->GetMin().x, boxCollider->GetMax().y }, boxCollider->GetMax(), ray, _rayDirection),
+		FindPoint(boxCollider->GetMin(), { boxCollider->GetMax().x, boxCollider->GetMin().y }, ray, _rayDirection),
+		FindPoint({ boxCollider->GetMax().x, boxCollider->GetMin().y}, boxCollider->GetMax(), ray, _rayDirection)
 	});
 
 	if (ray.length < Vector2<float>::distanceBetweenVectors(ray.startPosition, rayPoint.position)) {

@@ -13,6 +13,7 @@
 
 class Button;
 class DebugDrawer;
+class EnemyBase;
 class EnemyManager;
 class GameStateHandler;
 class ImGuiHandler;
@@ -36,10 +37,14 @@ extern std::shared_ptr<EnemyManager> enemyManager;
 extern std::shared_ptr<DebugDrawer> debugDrawer;
 extern std::shared_ptr<GameStateHandler> gameStateHandler;
 extern std::shared_ptr<ImGuiHandler> imGuiHandler;
+
 extern std::shared_ptr<ObstacleManager> obstacleManager;
 extern std::shared_ptr<PlayerCharacter> playerCharacter;
 extern std::shared_ptr<ProjectileManager> projectileManager;
+
+extern std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+
 extern std::shared_ptr<RayCast> rayCast;
 extern std::shared_ptr<SteeringBehavior> separationBehavior;
 extern std::shared_ptr<TimerManager> timerManager;
@@ -77,6 +82,8 @@ void ClearText(SDL_Surface* textSurface, SDL_Texture* textTexture);
 
 extern float deltaTime;
 extern int frameNumber;
+
+extern unsigned int objectID;
 
 extern std::random_device randomDevice;
 extern std::mt19937 randomEngine;

@@ -18,7 +18,7 @@ public:
 
 	bool TakeDamage(unsigned int damageAmount) override;
 	
-	const Circle GetCollider() const override;
+	const std::shared_ptr<Collider> GetCollider() const override;
 	const EnemyType GetEnemyType() const override;
 	const ObjectType GetObjectType() const override;
 
@@ -57,8 +57,6 @@ private:
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
 	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
-
-	Circle _attackRadius;
 
 	Vector2<float> _dashDirection;
 	Vector2<float> _dashStartPosition;

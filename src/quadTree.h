@@ -139,37 +139,36 @@ inline void QuadTree<T>::Clear() {
 and sets devided to true to prevent the node from calling Subdevide more than once*/
 template<typename T>
 inline void QuadTree<T>::Subdevide() {
-	_upperLeft.rectangle =
-		AABB::makeFromPositionSize(Vector2<float>(
-			_quadTreeNode.rectangle.position.x - (_quadTreeNode.rectangle.width * 0.25f),
-			_quadTreeNode.rectangle.position.y - (_quadTreeNode.rectangle.height * 0.25f)),
-			_quadTreeNode.rectangle.height * 0.5f, _quadTreeNode.rectangle.width * 0.5f);
+	_upperLeft.rectangle.Init(Vector2<float>(
+		_quadTreeNode.rectangle.GetPosition().x - (_quadTreeNode.rectangle.GetWidth() * 0.25f),
+		_quadTreeNode.rectangle.GetPosition().y - (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
 	_quadTreeChildren[0] = std::make_shared<QuadTree<T>>(_upperLeft, _capacity);
 
-	_upperRight.rectangle = AABB::makeFromPositionSize(Vector2<float>(
-		_quadTreeNode.rectangle.position.x + (_quadTreeNode.rectangle.width * 0.25f),
-		_quadTreeNode.rectangle.position.y - (_quadTreeNode.rectangle.height * 0.25f)),
-		_quadTreeNode.rectangle.height * 0.5f, _quadTreeNode.rectangle.width * 0.5f);
+	_upperRight.rectangle.Init(Vector2<float>(
+		_quadTreeNode.rectangle.GetPosition().x + (_quadTreeNode.rectangle.GetWidth() * 0.25f),
+		_quadTreeNode.rectangle.GetPosition().y - (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
 	_quadTreeChildren[1] = std::make_shared<QuadTree<T>>(_upperRight, _capacity);
 
-	_lowerLeft.rectangle = AABB::makeFromPositionSize(Vector2<float>(
-		_quadTreeNode.rectangle.position.x - (_quadTreeNode.rectangle.width * 0.25f),
-		_quadTreeNode.rectangle.position.y + (_quadTreeNode.rectangle.height * 0.25f)),
-		_quadTreeNode.rectangle.height * 0.5f, _quadTreeNode.rectangle.width * 0.5f);
+	_lowerLeft.rectangle.Init(Vector2<float>(
+		_quadTreeNode.rectangle.GetPosition().x - (_quadTreeNode.rectangle.GetWidth() * 0.25f),
+		_quadTreeNode.rectangle.GetPosition().y + (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
 	_quadTreeChildren[2] = std::make_shared<QuadTree<T>>(_lowerLeft, _capacity);
 
-	_lowerRight.rectangle = AABB::makeFromPositionSize(Vector2<float>(
-		_quadTreeNode.rectangle.position.x + (_quadTreeNode.rectangle.width * 0.25f),
-		_quadTreeNode.rectangle.position.y + (_quadTreeNode.rectangle.height * 0.25f)),
-		_quadTreeNode.rectangle.height * 0.5f, _quadTreeNode.rectangle.width * 0.5f);
+	_lowerRight.rectangle.Init(Vector2<float>(
+		_quadTreeNode.rectangle.GetPosition().x + (_quadTreeNode.rectangle.GetWidth() * 0.25f),
+		_quadTreeNode.rectangle.GetPosition().y + (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
 	_quadTreeChildren[3] = std::make_shared<QuadTree<T>>(_lowerRight, _capacity);
 	_divided = true;
 }
 template<typename T>
 inline void QuadTree<T>::Render() {
 	debugDrawer->AddDebugRectangle(
-		_quadTreeNode.rectangle.position, Vector2<float>(_quadTreeNode.rectangle.min.x, _quadTreeNode.rectangle.min.y),
-		Vector2<float>(_quadTreeNode.rectangle.max.x, _quadTreeNode.rectangle.max.y), { 255, 125, 0, 255});
+		_quadTreeNode.rectangle.position, Vector2<float>(_quadTreeNode.rectangle._min.x, _quadTreeNode.rectangle._min.y),
+		Vector2<float>(_quadTreeNode.rectangle._max.x, _quadTreeNode.rectangle._max.y), { 255, 125, 0, 255});
 
 	for (unsigned int i = 0; i < _quadTreeChildren.size(); i++) {
 		if (_quadTreeChildren[i]) {
