@@ -84,6 +84,8 @@ struct Collision {
 	bool collisionDetected = false;
 };
 
+bool ColliderIntersect(std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB);
+
 bool CircleIntersect(Circle circleA, Circle circleB);
 
 bool AABBIntersect(AABB& boxA, AABB& boxB);

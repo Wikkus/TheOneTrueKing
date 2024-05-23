@@ -51,6 +51,42 @@ const Vector2<float> AABB::GetPosition() const {
 	return _position;
 }
 
+bool ColliderIntersect(std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB) {
+	switch (colliderA->GetColliderType()) {
+	case ColliderType::AABB:
+		switch (colliderB->GetColliderType()) {
+		case ColliderType::AABB:
+			return AABBIntersect(*std::static_pointer_cast<AABB>(colliderA), 
+				*std::static_pointer_cast<AABB>(colliderB));
+			break;
+		case ColliderType::Circle:
+			return AABBCircleIntersect(*std::static_pointer_cast<AABB>(colliderA), 
+				*std::static_pointer_cast<Circle>(colliderB));
+			break;
+		default:
+			break;
+		}
+		break;
+	case ColliderType::Circle:
+		switch (colliderB->GetColliderType()) {
+		case ColliderType::AABB:
+			return AABBCircleIntersect(*std::static_pointer_cast<AABB>(colliderB),
+				*std::static_pointer_cast<Circle>(colliderA));
+			break;
+		case ColliderType::Circle:
+			return CircleIntersect(*std::static_pointer_cast<Circle>(colliderA),
+				*std::static_pointer_cast<Circle>(colliderB));
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
 bool CircleIntersect(Circle circleA, Circle circleB) {
 	float dx = circleB.GetPosition().x - circleA.GetPosition().x;
 	float dy = circleB.GetPosition().y - circleA.GetPosition().y;

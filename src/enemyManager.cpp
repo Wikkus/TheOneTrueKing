@@ -221,9 +221,8 @@ void EnemyManager::TakeDamage(unsigned int enemyIndex, unsigned int damageAmount
 
 void EnemyManager::UpdateQuadTree() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		std::shared_ptr<Circle> temp = std::static_pointer_cast<Circle>(_activeEnemies[i]->GetCollider());
-		objectBaseQuadTree->Insert(_activeEnemies[i], *temp);
-		enemyBaseQuadTree->Insert(_activeEnemies[i], *temp);
+		objectBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
+		enemyBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
 	}
 }
 const unsigned int EnemyManager::GetWaveNumber() const {

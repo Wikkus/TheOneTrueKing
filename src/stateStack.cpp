@@ -112,7 +112,7 @@ InGameState::InGameState() {
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
-	objectBaseQuadTree->Insert(playerCharacter, *std::static_pointer_cast<Circle>(playerCharacter->GetCollider()));
+	objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCollider());
 	
 	enemyManager->UpdateQuadTree();
 	projectileManager->UpdateQuadTree();

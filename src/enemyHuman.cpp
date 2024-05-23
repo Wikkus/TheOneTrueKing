@@ -76,7 +76,7 @@ void EnemyHuman::Init() {
 }
 
 void EnemyHuman::Update() {
-	_behaviorData->queriedObjects = objectBaseQuadTree->Query(*_circleCollider);
+	_behaviorData->queriedObjects = objectBaseQuadTree->Query(_circleCollider);
 	UpdateTarget();
 	HandleAttack();
 

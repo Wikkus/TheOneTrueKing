@@ -80,7 +80,7 @@ void EnemyBoar::Init() {
 }
 
 void EnemyBoar::Update() {
-	_behaviorData->queriedObjects = objectBaseQuadTree->Query(*_circleCollider);
+	_behaviorData->queriedObjects = objectBaseQuadTree->Query(_circleCollider);
 	if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius->GetRadius())) {
 		_collidedWithPlayer = true;
 	}

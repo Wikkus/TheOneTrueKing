@@ -62,7 +62,7 @@ void ProjectileManager::SpawnProjectile(ProjectileType projectileType, const cha
 }
 
 bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {
-	_objectsHit = objectBaseQuadTree->Query(*std::static_pointer_cast<Circle>(_activeProjectiles[projectileIndex]->GetCollider()));
+	_objectsHit = objectBaseQuadTree->Query(_activeProjectiles[projectileIndex]->GetCollider());
 	switch (projectileType) {
 	case ProjectileType::EnemyProjectile:
 		if (_objectsHit.size() > 0) {
@@ -130,7 +130,7 @@ void ProjectileManager::Reset() {
 
 void ProjectileManager::UpdateQuadTree() {
 	for (unsigned int i = 0; i < _activeProjectiles.size(); i++) {
-		objectBaseQuadTree->Insert(_activeProjectiles[i], *std::static_pointer_cast<Circle>(_activeProjectiles[i]->GetCollider()));
+		objectBaseQuadTree->Insert(_activeProjectiles[i], _activeProjectiles[i]->GetCollider());
 	}
 }
 

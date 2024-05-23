@@ -11,8 +11,8 @@
 struct QuadTreeNode {
 	AABB rectangle;
 
-	bool Contains(Circle circleCollider);
-	bool Intersect(Circle range);
+	bool Contains(std::shared_ptr<Collider> collider);
+	bool Intersect(std::shared_ptr<Collider> range);
 };
 
 template<typename T> 
@@ -21,9 +21,9 @@ public:
 	QuadTree(QuadTreeNode boundary, unsigned int capacity);
 	~QuadTree();
 
-	bool Insert(T object, Circle circleCollider);
+	bool Insert(T object, std::shared_ptr<Collider> collider);
 
-	std::vector<T> Query(Circle range);
+	std::vector<T> Query(std::shared_ptr<Collider> range);
 
 	void Clear();
 
@@ -43,8 +43,12 @@ private:
 	QuadTreeNode _quadTreeNode;
 
 	std::array<std::shared_ptr<QuadTree<T>>, 4> _quadTreeChildren;
+	
+	std::vector<T> _objectsFound;
+	std::vector<T> _objectsFoundInChild;
 	std::vector<T> _objectsInserted;
-	std::vector<Circle> _circleColliders;
+
+	std::vector<std::shared_ptr<Collider>> _colliders;
 };
 template<typename T>
 inline QuadTree<T>::QuadTree(QuadTreeNode boundary, unsigned int capacity) {
@@ -63,72 +67,72 @@ inline QuadTree<T>::~QuadTree() {
 
 //Inserts an object into the quadtree node if the circle collider is in that node
 template<typename T>
-inline bool QuadTree<T>::Insert(T object, Circle circleCollider) {
-	if (!_quadTreeNode.Contains(circleCollider)) {
+inline bool QuadTree<T>::Insert(T object, std::shared_ptr<Collider> collider) {
+	if (!_quadTreeNode.Contains(collider)) {
 		return false;
 	}
 	//If the node is at its max capacity it will subdevide into 4 nodes
 	if (_objectsInserted.size() < _capacity) {
 		_objectsInserted.emplace_back(object);
-		_circleColliders.emplace_back(circleCollider);
+		_colliders.emplace_back(collider);
 		return true;
 	} else {
 		if (!_divided) {
 			Subdevide();
 		}
 		//After subdividing it checks if it can insert the object in one of the children nodes
-		if (_quadTreeChildren[0]->Insert(object, circleCollider)) {
+		if (_quadTreeChildren[0]->Insert(object, collider)) {
 			return true;
-		} else if (_quadTreeChildren[1]->Insert(object, circleCollider)) {
+		} else if (_quadTreeChildren[1]->Insert(object, collider)) {
 			return true;
-		} else if (_quadTreeChildren[2]->Insert(object, circleCollider)) {
+		} else if (_quadTreeChildren[2]->Insert(object, collider)) {
 			return true;
-		} else if (_quadTreeChildren[3]->Insert(object, circleCollider)) {
+		} else if (_quadTreeChildren[3]->Insert(object, collider)) {
 			return true;
 		}
 	}
 }
 //Returns a vector of the objects the collider hit
 template<typename T>
-inline std::vector<T> QuadTree<T>::Query(Circle range) {
-	std::vector<T> objectsFound;
+inline std::vector<T> QuadTree<T>::Query(std::shared_ptr<Collider> range) {
+	_objectsFound.clear();
 	//Checks if the collider is inside the quadtree node
 	if (_quadTreeNode.Intersect(range)) {
 		/*Loops through all the items in the node, checks if they are interacting with the collider.
 		If it does, add it to the vector*/
-		for (unsigned int i = 0; i < _objectsInserted.size(); i++) {
-			if (CircleIntersect(range, _circleColliders[i])) {
-				objectsFound.emplace_back(_objectsInserted[i]);
+		for (unsigned int i = 0; i < _objectsInserted.size(); i++) {	
+			if (ColliderIntersect(range, _colliders[i])) {
+				_objectsFound.emplace_back(_objectsInserted[i]);
 			}
 		}
 		/*If the node has divided, the query function is called from every child
 		Then I insert the queried objects from all the children into the objectsFound vector*/
 		if (_divided) {
-			std::vector<T> objectsFoundInChild;
+			_objectsFoundInChild.clear();
 			if (_quadTreeChildren[0]) {
-				objectsFoundInChild = _quadTreeChildren[0]->Query(range);
-				objectsFound.insert(objectsFound.end(), objectsFoundInChild.begin(), objectsFoundInChild.end());
+				_objectsFoundInChild = _quadTreeChildren[0]->Query(range);
+				_objectsFound.insert(_objectsFound.end(), _objectsFoundInChild.begin(), _objectsFoundInChild.end());
 			}
 			if (_quadTreeChildren[1]) {
-				objectsFoundInChild = _quadTreeChildren[1]->Query(range);
-				objectsFound.insert(objectsFound.end(), objectsFoundInChild.begin(), objectsFoundInChild.end());
+				_objectsFoundInChild = _quadTreeChildren[1]->Query(range);
+				_objectsFound.insert(_objectsFound.end(), _objectsFoundInChild.begin(), _objectsFoundInChild.end());
 			}
 			if (_quadTreeChildren[2]) {
-				objectsFoundInChild = _quadTreeChildren[2]->Query(range);
-				objectsFound.insert(objectsFound.end(), objectsFoundInChild.begin(), objectsFoundInChild.end());
+				_objectsFoundInChild = _quadTreeChildren[2]->Query(range);
+				_objectsFound.insert(_objectsFound.end(), _objectsFoundInChild.begin(), _objectsFoundInChild.end());
 			}
 			if (_quadTreeChildren[3]) {
-				objectsFoundInChild = _quadTreeChildren[3]->Query(range);
-				objectsFound.insert(objectsFound.end(), objectsFoundInChild.begin(), objectsFoundInChild.end());
+				_objectsFoundInChild = _quadTreeChildren[3]->Query(range);
+				_objectsFound.insert(_objectsFound.end(), _objectsFoundInChild.begin(), _objectsFoundInChild.end());
 			}
 		}
 	}
-	return objectsFound;
+	return _objectsFound;
 }
 template<typename T>
 inline void QuadTree<T>::Clear() {
 	_objectsInserted.clear();
-	_circleColliders.clear();
+	_colliders.clear();
 	_quadTreeChildren[0] = nullptr;
 	_quadTreeChildren[1] = nullptr;
 	_quadTreeChildren[2] = nullptr;
@@ -166,9 +170,8 @@ inline void QuadTree<T>::Subdevide() {
 }
 template<typename T>
 inline void QuadTree<T>::Render() {
-	debugDrawer->AddDebugRectangle(
-		_quadTreeNode.rectangle.position, Vector2<float>(_quadTreeNode.rectangle._min.x, _quadTreeNode.rectangle._min.y),
-		Vector2<float>(_quadTreeNode.rectangle._max.x, _quadTreeNode.rectangle._max.y), { 255, 125, 0, 255});
+	debugDrawer->AddDebugRectangle(_quadTreeNode.rectangle.position, _quadTreeNode.rectangle._min, 
+		_quadTreeNode.rectangle._max, { 255, 125, 0, 255});
 
 	for (unsigned int i = 0; i < _quadTreeChildren.size(); i++) {
 		if (_quadTreeChildren[i]) {
