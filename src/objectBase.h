@@ -26,8 +26,8 @@ public:
 
 	virtual const unsigned int GetObjectID() const = 0;	
 	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
+	virtual const float GetOrientation() const = 0;
 	virtual const ObjectType GetObjectType() const = 0;
-
 	virtual const std::shared_ptr<Sprite> GetSprite() const = 0;
 	virtual const Vector2<float> GetPosition() const = 0;
 	virtual const Vector2<float> GetVelocity() const = 0;

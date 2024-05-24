@@ -19,10 +19,11 @@ public:
 
 	const unsigned int GetObjectID() const override;
 	const std::shared_ptr<Collider> GetCollider() const override;
+	const float GetOrientation() const override;
 	const ObjectType GetObjectType() const override;
+	const std::shared_ptr<Sprite> GetSprite() const override;
 
 	const Vector2<float> GetPosition() const override;
-	const std::shared_ptr<Sprite> GetSprite() const override;
 	const Vector2<float> GetVelocity() const override;
 
 private:

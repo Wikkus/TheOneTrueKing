@@ -13,9 +13,6 @@
 
 EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
 	EnemyBase(objectID, enemyType) {
-	_behaviorData = std::make_shared<BehaviorData>();
-	_behaviorData->objectID = objectID;
-
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_boarSprite);
 
@@ -24,36 +21,33 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
 	_circleCollider = std::make_shared<Circle>();
 	_circleCollider->Init(_position, 16.f);
 
-	_behaviorData->collider = *_circleCollider;
-	_behaviorData->characterRadius = _circleCollider->GetRadius();
+	_behaviorData.characterRadius = _circleCollider->GetRadius();
 
 	_maxHealth = 150;
 	_currentHealth = _maxHealth;
 
-	_behaviorData->position = _position;
-	_behaviorData->orientation = _orientation;
-	_behaviorData->velocity = _velocity;
+	_behaviorData.velocity = _velocity;
 
 	_attackDamage = 20;
 	_attackRange = 150;
 	_attackRadius = std::make_shared<Circle>();
 	_attackRadius->Init(_position, 150.f);
 
-	_behaviorData->angularSlowDownRadius = PI * 0.5f;
-	_behaviorData->angularTargetRadius = PI * 0.005f;
-	_behaviorData->maxAngularAcceleration = PI * 2.5f;
-	_behaviorData->maxRotation = PI * 2.f;
+	_behaviorData.angularSlowDownRadius = PI * 0.5f;
+	_behaviorData.angularTargetRadius = PI * 0.005f;
+	_behaviorData.maxAngularAcceleration = PI * 2.5f;
+	_behaviorData.maxRotation = PI * 2.f;
 
-	_behaviorData->timeToTarget = 0.1f;
+	_behaviorData.timeToTarget = 0.1f;
 
-	_behaviorData->maxLinearAcceleration = 75.f;
-	_behaviorData->maxSpeed = 100.f;
+	_behaviorData.maxLinearAcceleration = 75.f;
+	_behaviorData.maxSpeed = 100.f;
 	
-	_behaviorData->linearTargetRadius = _attackRange - 5.f;
-	_behaviorData->linearSlowDownRadius = _attackRange + 25.f;
+	_behaviorData.linearTargetRadius = _attackRange - 5.f;
+	_behaviorData.linearSlowDownRadius = _attackRange + 25.f;
 
-	_behaviorData->separationThreshold = _circleCollider->GetRadius() * 1.5f;
-	_behaviorData->decayCoefficient = 10000.f;
+	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
+	_behaviorData.decayCoefficient = 10000.f;
 
 	_prioritySteering = std::make_shared<PrioritySteering>();
 	_blendSteering = std::make_shared<BlendSteering>();
@@ -71,16 +65,14 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
 EnemyBoar::~EnemyBoar() {}
 
 void EnemyBoar::Init() {
-	_behaviorData->targetPosition = playerCharacter->GetPosition();
-	_direction = _behaviorData->targetPosition - _position;
+	_behaviorData.targetPosition = playerCharacter->GetPosition();
+	_direction = _behaviorData.targetPosition - _position;
 
-	_behaviorData->position = _position;
-	_behaviorData->orientation = _orientation;
-	_behaviorData->velocity = _velocity;
+	_behaviorData.velocity = _velocity;
 }
 
 void EnemyBoar::Update() {
-	_behaviorData->queriedObjects = objectBaseQuadTree->Query(_circleCollider);
+	_behaviorData.queriedObjects = objectBaseQuadTree->Query(_circleCollider);
 	if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius->GetRadius())) {
 		_collidedWithPlayer = true;
 	}
@@ -113,7 +105,7 @@ const ObjectType EnemyBoar::GetObjectType() const {
 }
 
 const BehaviorData EnemyBoar::GetBehaviorData() const {
-	return *_behaviorData;
+	return _behaviorData;
 }
 
 const float EnemyBoar::GetOrientation() const {
@@ -149,19 +141,18 @@ const Vector2<float> EnemyBoar::GetVelocity() const {
 }
 
 const std::vector<std::shared_ptr<ObjectBase>> EnemyBoar::GetQueriedObjects() const {
-	return _behaviorData->queriedObjects;
+	return _behaviorData.queriedObjects;
 }
 
 const std::shared_ptr<WeaponComponent> EnemyBoar::GetWeaponComponent() const {
 	return _weaponComponent;
 }
 
-void EnemyBoar::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
+void EnemyBoar::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) {
 	_orientation = orienation;
 	_direction = direction;
 	_position = position;
 	_circleCollider->SetPosition(_position);
-	_behaviorData->collider = *_circleCollider;
 	Init();
 }
 
@@ -170,10 +161,14 @@ void EnemyBoar::DeactivateEnemy() {
 	_direction = Vector2<float>(0.f, 0.f);
 	_position = Vector2<float>(-10000.f, -10000.f);
 	_circleCollider->SetPosition(_position);
+	_behaviorData.rotation = 0.f;
+	_velocity = { 0.f, 0.f };
+
 	_isAttacking = false;
 	_damagedPlayer = false;
 	_playerInRange = false;
-
+	_chargeAttackTimer->DeactivateTimer();
+	_attackCooldownTimer->DeactivateTimer();
 	_formationIndex = -1;
 }
 
@@ -228,11 +223,11 @@ void EnemyBoar::SetPosition(Vector2<float> position) {
 }
 
 void EnemyBoar::SetTargetPosition(Vector2<float> targetPosition) {
-	_behaviorData->targetPosition = targetPosition;
+	_behaviorData.targetPosition = targetPosition;
 }
 
 void EnemyBoar::SetTargetOrientation(float targetOrientation) {	
-	_behaviorData->targetOrientation = targetOrientation;
+	_behaviorData.targetOrientation = targetOrientation;
 }
 
 void EnemyBoar::SetVelocity(Vector2<float> velocity) {
@@ -240,25 +235,22 @@ void EnemyBoar::SetVelocity(Vector2<float> velocity) {
 }
 
 void EnemyBoar::UpdateMovement() {
-	_behaviorData->targetPosition = playerCharacter->GetPosition();
+	_behaviorData.targetPosition = playerCharacter->GetPosition();
 
 	_position += _velocity * deltaTime;
 	_orientation += _rotation * deltaTime;
 
 	_circleCollider->SetPosition(_position);
-	_behaviorData->collider = *_circleCollider;
-	_behaviorData->rotation = _rotation;
-	_behaviorData->position = _position;
-	_behaviorData->orientation = _orientation;
-	_behaviorData->velocity = _velocity;
+	_behaviorData.rotation = _rotation;
+	_behaviorData.velocity = _velocity;
 
-	_steeringOutput = _prioritySteering->Steering(*_behaviorData);
+	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	_rotation += _steeringOutput.angularVelocity * deltaTime;
 	_velocity += _steeringOutput.linearVelocity * deltaTime;
 
 	if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
 		_velocity = { 0.f, 0.f };
 	}
-	_velocity = LimitVelocity(_velocity, _behaviorData->maxSpeed);
+	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
 }
 

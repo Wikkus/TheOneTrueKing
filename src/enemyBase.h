@@ -15,22 +15,22 @@ public:
 	EnemyBase(int objectID, EnemyType enemyType) : ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {}
 	~EnemyBase() {}
 
-	virtual void Init() override = 0;
-	virtual void Update() override = 0;
-	virtual void Render() override = 0;
-	virtual void RenderText() = 0;
+	void Init() override = 0;
+	void Update() override = 0;
+	void Render() override = 0;
+	void RenderText() override = 0;
 
-	virtual const ObjectType GetObjectType() const override = 0;
-	virtual const std::shared_ptr<Sprite> GetSprite() const override = 0;
-	virtual const unsigned int GetObjectID() const override = 0;
-	virtual const Vector2<float> GetPosition() const override = 0;
+	const ObjectType GetObjectType() const override = 0;
+	const std::shared_ptr<Sprite> GetSprite() const override = 0;
+	const float GetOrientation() const override = 0;
+	const unsigned int GetObjectID() const override = 0;
+	const Vector2<float> GetPosition() const override = 0;
 
 	virtual bool TakeDamage(unsigned int damageAmount) = 0;
 
 	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
 	virtual const EnemyType GetEnemyType() const = 0;
 	 
-	virtual const float GetOrientation() const = 0;
 
 	virtual const float GetRotation() const = 0;
 
@@ -46,7 +46,7 @@ public:
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const = 0;
 	
-	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) = 0;
+	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) = 0;
 	virtual void DeactivateEnemy() = 0;
 	virtual void HandleAttack() = 0;
 	
@@ -60,13 +60,13 @@ public:
 protected:
 	SteeringOutput _steeringOutput;
 
-	std::shared_ptr<BehaviorData> _behaviorData = nullptr;
 	std::shared_ptr<BlendSteering> _blendSteering = nullptr;
 	std::shared_ptr<PrioritySteering> _prioritySteering = nullptr;
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
 	BehaviorAndWeight _alignBehavior;
 	BehaviorAndWeight _faceBehavior;
+	BehaviorData _behaviorData;
 
 	std::shared_ptr<Circle> _circleCollider = nullptr;
 	std::shared_ptr<Circle> _attackRadius = nullptr;

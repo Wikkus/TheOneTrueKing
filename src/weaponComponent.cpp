@@ -9,8 +9,7 @@
 #include "sprite.h"
 #include "timerManager.h"
 
-ShieldComponent::ShieldComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
-	_enemyOwner = enemyOwner;
+ShieldComponent::ShieldComponent() {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Shield.png");
 
@@ -28,10 +27,7 @@ ShieldComponent::ShieldComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyO
 	_weaponType = WeaponType::Shield;
 }
 
-ShieldComponent::~ShieldComponent() {
-	_enemyOwner = nullptr;
-	delete _enemyOwner;
-}
+ShieldComponent::~ShieldComponent() {}
 
 void ShieldComponent::Render(Vector2<float> position, float orientation) {
 	_sprite->RenderWithOrientation(position, orientation);
@@ -75,8 +71,12 @@ const WeaponType ShieldComponent::GetWeaponType() const {
 	return _weaponType;
 }
 
-StaffComponent::StaffComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
-	_enemyOwner = enemyOwner;
+void ShieldComponent::DeactivateTimers() {
+	_attackCooldownTimer->DeactivateTimer();
+	_chargeAttackTimer->DeactivateTimer();
+}
+
+StaffComponent::StaffComponent() {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Staff.png");
 
@@ -91,10 +91,7 @@ StaffComponent::StaffComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwn
 	_weaponType = WeaponType::Staff;
 }
 
-StaffComponent::~StaffComponent() {
-	_enemyOwner = nullptr;
-	delete _enemyOwner;
-}
+StaffComponent::~StaffComponent() {}
 
 void StaffComponent::Render(Vector2<float> position, float orientation) {
 	_sprite->RenderWithOrientation(position, orientation);
@@ -141,8 +138,12 @@ const WeaponType StaffComponent::GetWeaponType() const {
 	return _weaponType;
 }
 
-SwordComponent::SwordComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwner) {
-	_enemyOwner = enemyOwner;
+void StaffComponent::DeactivateTimers() {
+	_attackCooldownTimer->DeactivateTimer();
+	_chargeAttackTimer->DeactivateTimer();
+}
+
+SwordComponent::SwordComponent() {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Sword.png");
 	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
@@ -155,20 +156,13 @@ SwordComponent::SwordComponent(EnemyBase* enemyOwner) : WeaponComponent(enemyOwn
 	_weaponType = WeaponType::Sword;
 }
 
-SwordComponent::~SwordComponent() {
-	_enemyOwner = nullptr;
-	delete _enemyOwner;
-}
+SwordComponent::~SwordComponent() {}
 
 void SwordComponent::Render(Vector2<float> position, float orientation) {
 	_sprite->RenderWithOrientation(position, orientation);
 }
 //If the weapon is a sword it damages the player if its close enough
 void SwordComponent::Attack(Vector2<float> position, float orientation) {
-	//if ((playerCharacter->GetPosition() - position).absolute() <= 200.f) {
-	//	_enemyOwner->SetTargetPosition(playerCharacter->GetPosition());
-	//	
-	//}
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
@@ -211,5 +205,10 @@ const float SwordComponent::GetAttackRange() const {
 
 const WeaponType SwordComponent::GetWeaponType() const {
 	return _weaponType;
+}
+
+void SwordComponent::DeactivateTimers() {
+	_attackCooldownTimer->DeactivateTimer();
+	_chargeAttackTimer->DeactivateTimer();
 }
 

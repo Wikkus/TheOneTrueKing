@@ -23,16 +23,12 @@ enum class EnemyType {
 
 struct BehaviorData {
 	std::vector<std::shared_ptr<ObjectBase>> queriedObjects;
-	int objectID;
-	Circle collider;
 
-	float orientation = 0.f;
 	float rotation = 0.f;
 	float targetOrientation = 0.f;
 
-	float timeToTarget = 0.f;
+	float timeToTarget = 0.1f;
 
-	Vector2<float> position = Vector2<float>{ 0.f, 0.f };
 	Vector2<float> targetPosition = Vector2<float>{ 0.f, 0.f };
 	Vector2<float> velocity = Vector2<float>{ 0.f, 0.f };
 
@@ -50,7 +46,7 @@ struct BehaviorData {
 
 	//pursue data
 	float maxPrediction = 0.f;
-	Vector2<float> targetVelocity = Vector2<float>{ 0.f, 0.f };
+	Vector2<float> targetsVelocity = Vector2<float>{ 0.f, 0.f };
 
 	//collision avoidance data
 	float characterRadius = 0.f;
@@ -85,16 +81,19 @@ public:
 
 	std::vector<std::shared_ptr<EnemyBase>> GetActiveEnemies();
 
+	std::shared_ptr<WeaponComponent> AccessWeapon(WeaponType weaponType);
+
 	void CreateNewEnemy(EnemyType enemyType, float orientation,
 		Vector2<float> direction, Vector2<float> position);
 
+	void CreateWeapon(WeaponType weaponType);
+
 	void TacticalEnemySpawner();
-	void SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, FormationType formationType, SlotAttackType sloatAttackType, WeaponType weaponType);
+	void SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, FormationType formationType, SlotAttackType sloatAttackType);
 	
 	void SurvivalEnemySpawner();
 
-	void SpawnEnemy(EnemyType enemyType, float orientation,
-		Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
+	void SpawnEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position);
 
 	void RemoveAllEnemies();
 	void RemoveEnemy(EnemyType enemyType, unsigned int objectID);
@@ -121,10 +120,14 @@ private:
 
 	std::unordered_map<EnemyType, std::shared_ptr<ObjectPool<std::shared_ptr<EnemyBase>>>> _enemyPools;
 
+	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
+
 	int _latestEnemyIndex = -1;
 
 	unsigned int _enemyAmountLimit = 1000;
+	unsigned int _weaponAmountLimit = 1000;
 	unsigned int _numberOfEnemyTypes = 0;
+	unsigned int _numberOfWeaponTypes = 0;
 	unsigned int _spawnNumberOfEnemies = 5;
 	unsigned int _waveNumber = 0;
 	unsigned int _enemiesInFormation = 9;

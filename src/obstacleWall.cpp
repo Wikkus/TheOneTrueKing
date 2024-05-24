@@ -56,6 +56,10 @@ const std::shared_ptr<Collider> Wall::GetCollider() const {
 	return _boxCollider;
 }
 
+const float Wall::GetOrientation() const {
+	return _orientation;
+}
+
 const ObjectType Wall::GetObjectType() const {
 	return _objectType;
 }

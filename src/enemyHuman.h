@@ -48,7 +48,7 @@ public:
 
 	const std::shared_ptr<WeaponComponent> GetWeaponComponent() const override;
 
-	void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) override;
+	void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) override;
 	void DeactivateEnemy() override;
 	void HandleAttack() override;
 
@@ -61,10 +61,12 @@ public:
 private:
 	void UpdateMovement();
 	void UpdateTarget();
-	void PickWeapon(WeaponType weaponType);
-	void PickWeaponFormation(WeaponType weaponType);
+	void PickWeapon();
+	void PickWeaponFormation();
 	void PickWeaponSurvival();
 	const char* _humanSprite = "res/sprites/Human.png";
+	unsigned int _weaponPicked = 0;
+	int _numberOfWeaponTypes = 0;
 
 	CurrentTarget _currentTarget = CurrentTarget::SlotFormation;
 };
