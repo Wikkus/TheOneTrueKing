@@ -12,12 +12,12 @@ bool IsOutOfDistance(Vector2<float> positionA, Vector2<float> positionB, float d
 	return Vector2<float>::distanceBetweenVectors(positionA, positionB) >= distance;;
 }
 
-bool OutOfBorderX(float positionX) {
-	return positionX < 0.f || positionX > windowWidth;
+bool OutOfBorderX(float positionX, float offset) {
+	return positionX - offset < 0.f || positionX + offset > windowWidth;
 }
 
-bool OutOfBorderY(float positionY) {
-	return positionY < 0.f || positionY > windowHeight;
+bool OutOfBorderY(float positionY, float offset) {
+	return positionY - offset < 0.f || positionY + offset > windowHeight;
 }
 
 Vector2<float> GetCursorPosition() {
@@ -33,6 +33,12 @@ Vector2<float> OrientationAsVector(float orientation) {
 	return  Vector2<float>(-sinf(orientation), cosf(orientation)).normalized();
 }
 
+Vector2<float> RotateDirection(float degree, Vector2<float> direction) {
+	Vector2 rotatedVector =
+		Vector2(direction.x * cos(degree) - direction.y * sin(degree),
+			direction.x * sin(degree) + direction.y * cos(degree));
+	return rotatedVector;
+}
 Vector2<float> RotateVector(float degree, Vector2<float> startPoint, Vector2<float> endPoint) {
 	Vector2 direction = endPoint - startPoint;
 	Vector2 rotatedVector =

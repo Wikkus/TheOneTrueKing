@@ -46,7 +46,7 @@ public:
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const = 0;
 	
-	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) = 0;
+	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) = 0;
 	virtual void DeactivateEnemy() = 0;
 	virtual void HandleAttack() = 0;
 	
@@ -58,6 +58,8 @@ public:
 
 
 protected:
+	std::shared_ptr<SlotAssignment> _currentSlotAssignment;
+
 	SteeringOutput _steeringOutput;
 
 	std::shared_ptr<BlendSteering> _blendSteering = nullptr;

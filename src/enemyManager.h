@@ -80,6 +80,7 @@ public:
 	void Render();
 
 	std::vector<std::shared_ptr<EnemyBase>> GetActiveEnemies();
+	const std::vector<std::shared_ptr<FormationManager>>  GetFormationManagers() const;
 
 	std::shared_ptr<WeaponComponent> AccessWeapon(WeaponType weaponType);
 
@@ -88,12 +89,13 @@ public:
 
 	void CreateWeapon(WeaponType weaponType);
 
-	void TacticalEnemySpawner();
-	void SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, FormationType formationType, SlotAttackType sloatAttackType);
+	void FormationEnemySpawner();
+	void SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType);
 	
 	void SurvivalEnemySpawner();
 
-	void SpawnEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position);
+	void SpawnEnemy(EnemyType enemyType, float orientation, 
+		Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
 
 	void RemoveAllEnemies();
 	void RemoveEnemy(EnemyType enemyType, unsigned int objectID);
@@ -112,6 +114,9 @@ public:
 	void QuickSort( int start, int end);
 
 private:
+	std::array<Vector2<float>, 4> _spawnPositions;
+
+	std::shared_ptr<AnchorPoint> _latestAnchorPoint = nullptr;
 	std::vector<std::shared_ptr<FormationManager>> _formationManagers;
 
 	std::shared_ptr<Timer> _spawnTimer = nullptr;
@@ -122,6 +127,17 @@ private:
 
 	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
 
+	unsigned int _currentSpawnAmount = 0;
+	SlotAttackType _currentAttackType = SlotAttackType::Count;
+	WeaponType _currentWeaponType = WeaponType::Count;
+	Vector2<float> _currentSpawnPosition;
+	Vector2<float> _currentSpawnDirection;
+
+	unsigned int _formationsSpawned = 1;
+	unsigned int _minCountSpawn = 9;
+	unsigned int _minRowSpawn = 1;
+	std::array<unsigned int, 2> _spawnCountPerRow = { 6, 1 };
+
 	int _latestEnemyIndex = -1;
 
 	unsigned int _enemyAmountLimit = 1000;
@@ -129,7 +145,6 @@ private:
 	unsigned int _numberOfEnemyTypes = 0;
 	unsigned int _numberOfWeaponTypes = 0;
 	unsigned int _spawnNumberOfEnemies = 5;
-	unsigned int _waveNumber = 0;
-	unsigned int _enemiesInFormation = 9;
+	unsigned int _waveNumber = 1;
 };
 

@@ -22,6 +22,13 @@ EnemyManager::EnemyManager() {
 	for (unsigned int i = 0; i < _numberOfWeaponTypes; i++) {
 		_weaponPools[(WeaponType)i] = std::make_shared<ObjectPool<std::shared_ptr<WeaponComponent>>>(_weaponAmountLimit);
 	}
+
+	_spawnPositions = {
+		Vector2<float>(windowWidth, windowHeight * 0.5f),
+		Vector2<float>(windowWidth * 0.5f, windowHeight),
+		Vector2<float>(0.f, windowHeight * 0.5f),
+		Vector2<float>(windowWidth * 0.5f, 0.f)
+	};
 }
 
 EnemyManager::~EnemyManager() {
@@ -50,14 +57,13 @@ void EnemyManager::UpdateSurvival() {
 		SurvivalEnemySpawner();
 	}	
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->SetTargetPosition(playerCharacter->GetPosition());
 		_activeEnemies[i]->Update();
 	}
 }
 
 void EnemyManager::UpdateFormation() {
 	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
-		TacticalEnemySpawner();
+		FormationEnemySpawner();
 	}	
 	for (unsigned int i = 0; i < _formationManagers.size(); i++) {
 		_formationManagers[i]->UpdateSlots();
@@ -75,6 +81,10 @@ void EnemyManager::Render() {
 
 std::vector<std::shared_ptr<EnemyBase>> EnemyManager::GetActiveEnemies() {
 	return _activeEnemies;
+}
+
+const std::vector<std::shared_ptr<FormationManager>> EnemyManager::GetFormationManagers() const {
+	return _formationManagers;
 }
 
 std::shared_ptr<WeaponComponent> EnemyManager::AccessWeapon(WeaponType weaponType) {
@@ -117,69 +127,88 @@ void EnemyManager::CreateWeapon(WeaponType weaponType) {
 	}
 }
 
-void EnemyManager::TacticalEnemySpawner() {
-	AnchorPoint anchorPoint;
-	anchorPoint.position = { windowWidth, windowHeight * 0.5f };
-	anchorPoint.orientation = 0.f;
-	
-	unsigned int spawnNumber = (_enemiesInFormation + (_waveNumber * 3));
-
-	SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::Count);
-
-	//anchorPoint.position.x += 32.f;
-	//SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::MeleeAttacker, WeaponType::Sword);
-	//
-	//anchorPoint.position.x += 32.f;	
-	//SpawnTactical(spawnNumber, anchorPoint, FormationType::VShape, SlotAttackType::MagicAttacker, WeaponType::Staff);
-
+void EnemyManager::FormationEnemySpawner() {
+	if (_waveNumber % 3 == 0) {
+		_spawnCountPerRow[1] += 1;
+		_spawnCountPerRow[0] = _minCountSpawn;
+	}
+	if (_waveNumber % 9 == 0 && _formationsSpawned < 4) {
+		_formationsSpawned += 1;
+		_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
+	}
+	for (unsigned int i = 0; i < _formationsSpawned; i++) {
+		std::uniform_int_distribution dist{ 0, (int)FormationType::Count - 1 };
+		_latestAnchorPoint = std::make_shared<AnchorPoint>();
+		_latestAnchorPoint->position = _spawnPositions[i];
+		_latestAnchorPoint->targetPosition = { windowWidth * 0.5f, windowHeight * 0.5f };
+		_latestAnchorPoint->direction = _latestAnchorPoint->targetPosition - _latestAnchorPoint->position;
+		_latestAnchorPoint->orientation = VectorAsOrientation(_latestAnchorPoint->direction);
+		SpawnFormation(_spawnCountPerRow, (FormationType)dist(randomEngine));
+	}
+	_spawnCountPerRow[0] += 2;
 	_spawnTimer->DeactivateTimer();
 }
 
-void EnemyManager::SpawnTactical(unsigned int spawnNumber, AnchorPoint anchorPoint, 
-	FormationType formationType, SlotAttackType sloatAttackType) {
-	_formationManagers.emplace_back(std::make_shared<FormationManager>(formationType,
-		spawnNumber, anchorPoint, true, sloatAttackType));
-	int enemiesSpawned = 0;
-	while (enemiesSpawned < spawnNumber) {
-		enemyManager->SpawnEnemy(EnemyType::Human, anchorPoint.orientation, Vector2<float>(0.f, 0.f), anchorPoint.position);
-		_activeEnemies.back()->SetFormationIndex(_formationManagers.size() - 1);
-		_formationManagers.back()->AddCharacter(_activeEnemies.back());
-		enemiesSpawned++;
+void EnemyManager::SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType) {
+	_formationManagers.emplace_back(std::make_shared<FormationManager>(formationType, spawnCountPerRow, _latestAnchorPoint, false));	
+	_currentWeaponType = WeaponType::Count;
+
+	for (unsigned int i = 0; i < (unsigned int)SlotAttackType::Count; i++) {
+		_currentAttackType = (SlotAttackType)i;
+		switch (_currentAttackType) {
+		case SlotAttackType::Defender:
+			_currentWeaponType = WeaponType::Shield;
+			break;
+ 
+		case SlotAttackType::Mage:
+			_currentWeaponType = WeaponType::Staff;
+			break;
+		
+		case SlotAttackType::Swordsman:
+			_currentWeaponType = WeaponType::Sword;
+			break;
+
+		default:
+			break;
+		}
+		_currentSpawnAmount = _formationManagers.back()->GetFormationPattern()->GetSlotsPerType()[_currentAttackType];
+		for (unsigned int k = 0; k < _currentSpawnAmount; k++) {
+			enemyManager->SpawnEnemy(EnemyType::Human, 0, Vector2<float>(0.f, 0.f), _latestAnchorPoint->position, _currentWeaponType);
+			_activeEnemies.back()->SetFormationIndex(_formationManagers.size() - 1);
+			_formationManagers.back()->AddCharacter(_activeEnemies.back());
+		}
 	}
 }
 
 void EnemyManager::SurvivalEnemySpawner() {
-	std::uniform_int_distribution dist{ 0, 3 };
-	unsigned int amountEnemies = (_spawnNumberOfEnemies + 4) + _waveNumber;
-	for (unsigned int i = 0; i < amountEnemies; i++) {
-		Vector2<float> spawnPosition = { 0.f, 0.f };
-		if (i < amountEnemies * 0.5f) {
-			float distX = 0.f;
+	std::uniform_int_distribution dist{ 0, 1 };
+	_currentSpawnAmount = _spawnNumberOfEnemies + (_waveNumber * 4);
+	for (unsigned int i = 0; i < _currentSpawnAmount; i++) {
+		if (i < _currentSpawnAmount * 0.5f) {
 			std::uniform_real_distribution<float> distY{ 0.f, windowHeight };
-			int temp = dist(randomEngine);
-			if (temp == 0) {
-				distX = 0;
+			if (dist(randomEngine) == 0) {
+				_currentSpawnPosition.x = 0.f;
 			} else {
-				distX = windowWidth;
+				_currentSpawnPosition.x = windowWidth;
 			}
-			spawnPosition = { distX, distY(randomEngine) };
+			_currentSpawnPosition.y = distY(randomEngine);
 
 		} else {
 			std::uniform_real_distribution<float> distX{ 0.f, windowWidth };
-			float distY = 0.f;
-			int temp = dist(randomEngine);
-			if (temp == 0) {
-				distY = 0;
+			if (dist(randomEngine) == 0) {
+				_currentSpawnPosition.y = 0.f;
 			} else {
-				distY = windowHeight;
+				_currentSpawnPosition.y = windowWidth;
 			}
-			spawnPosition = { distX(randomEngine), distY };
+			_currentSpawnPosition.x = distX(randomEngine);
 		}
-		Vector2<float> direction = (playerCharacter->GetPosition() - spawnPosition).normalized();
+		_currentSpawnDirection = (playerCharacter->GetPosition() - _currentSpawnPosition).normalized();
 		if (i % 3 == 0) {
-			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(direction), direction, spawnPosition);
-		} else {
-			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(direction), direction, spawnPosition);
+			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, WeaponType::Count);
+		} else {	
+			std::uniform_int_distribution decideWeapon{ 1, 2 };
+			unsigned int weaponPicked = decideWeapon(randomEngine);
+			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, (WeaponType)weaponPicked);
 		}
 	}
 	_waveNumber++;
@@ -187,13 +216,14 @@ void EnemyManager::SurvivalEnemySpawner() {
 }
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type
-void EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position) {
+void EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation, 
+	Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	if (_enemyPools[enemyType]->IsEmpty()) {
 		CreateNewEnemy(enemyType, orientation, direction, position);
 	}
 	//Then add the enemy to the active enemies vector which is called in Update
 	_activeEnemies.emplace_back(_enemyPools[enemyType]->SpawnObject());
-	_activeEnemies.back()->ActivateEnemy(orientation, direction, position);
+	_activeEnemies.back()->ActivateEnemy(orientation, direction, position, weaponType);
 }
 
 void EnemyManager::RemoveAllEnemies() {
@@ -214,10 +244,7 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 		_latestEnemyIndex = BinarySearch(0, _activeEnemies.size() - 1, objectID);
 		if (_latestEnemyIndex >= 0) {
 			if (_formationManagers.size() > 0) {
-				_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->RemoveCharacter(_activeEnemies[_latestEnemyIndex]);				
-				if (_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->GetNumberOfSlots() <= 0) {
-					_formationManagers.erase(_formationManagers.begin() + _activeEnemies[_latestEnemyIndex]->GetFormationIndex());
-				}
+				_formationManagers[_activeEnemies[_latestEnemyIndex]->GetFormationIndex()]->RemoveCharacter(_activeEnemies[_latestEnemyIndex]);
 			}
 			//Deactivate the enemy by setting its position to a far away place
 			_activeEnemies[_latestEnemyIndex]->DeactivateEnemy();
@@ -228,16 +255,22 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 	}
 	//Removes the enemy from active enemies
 	_activeEnemies.pop_back();
-	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
-		if (_activeEnemies.size() <= 0) {
-			_waveNumber++;
-			_spawnTimer->ResetTimer();
+	if (_activeEnemies.size() <= 0) {
+		_waveNumber++;
+		_spawnTimer->ResetTimer();
+		if (gameStateHandler->GetGameMode() == GameMode::Formation) {
+			_formationManagers.clear();
+			_latestAnchorPoint = nullptr;
 		}
 	}
 }
 
 void EnemyManager::Reset() {
-	_waveNumber = 0;
+	_waveNumber = 1;
+	_formationsSpawned = 1;
+	_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
+	_formationManagers.clear();
+	_latestAnchorPoint = nullptr;
 	RemoveAllEnemies();
 	_spawnTimer->ResetTimer();
 }

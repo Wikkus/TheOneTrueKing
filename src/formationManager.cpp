@@ -5,13 +5,14 @@
 #include "gameEngine.h"
 #include "playerCharacter.h"
 
-FormationManager::FormationManager(FormationType formationType, unsigned int maxAmountSlots, AnchorPoint anchorPoint, bool holdOrientation, SlotAttackType attackType) {
+FormationManager::FormationManager(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow,
+	std::shared_ptr<AnchorPoint> anchorPoint, bool posWithAnchorOri) {
 	switch (formationType) {
 	case FormationType::DefensiveCircle:
-		_formationPattern = std::make_shared<DefensiveCirclePattern>(holdOrientation);
+		_formationPattern = std::make_shared<DefensiveCirclePattern>();
 		break;
 	case FormationType::VShape:
-		_formationPattern = std::make_shared<VShapePattern>(attackType);
+		_formationPattern = std::make_shared<VShapePattern>();
 		break;
 	case FormationType::Count:
 		break;
@@ -19,18 +20,18 @@ FormationManager::FormationManager(FormationType formationType, unsigned int max
 		break;
 	}
 	_anchorPoint = anchorPoint;
-	_formationPattern->CreateSlots(maxAmountSlots, anchorPoint);
+	_posWithAnchorOri = posWithAnchorOri;
+	_formationPattern->CreateSlots(spawnCountPerRow, anchorPoint);
 }
 
 bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 	//Adds a new character to the first available slot in the formation
-	unsigned int occupiedSlots = _slotAssignments.size();
-	if (_formationPattern->SupportsSlots(occupiedSlots)) {
-		SlotAssignment slotAssignment;
-		slotAssignment.enemyCharacter = enemyCharacter;
-		slotAssignment.slotNumber = _slotAssignments.size();
+	_occupiedSlots = _slotAssignments.size();
+	if (_formationPattern->SupportsSlots(_occupiedSlots)) {
+		_slotAssignment.enemyCharacter = enemyCharacter;
+		_slotAssignment.slotNumber = _slotAssignments.size();
 		_numberOfSlots++;
-		_slotAssignments.emplace_back(slotAssignment);
+		_slotAssignments.emplace_back(_slotAssignment);
 		ReconstructSlotAssignments();
 		return true;
 	}
@@ -38,112 +39,111 @@ bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 	return false;
 }
 
-void FormationManager::UpdateSlots() {
-	Vector2<float> direction = Vector2<float>(playerCharacter->GetPosition() - _anchorPoint.position);
-	float distance = direction.absolute();
-	if (distance >= 200.f) {
-		direction.normalize();
-		_anchorPoint.position += direction * deltaTime * 50.f;
+void FormationManager::UpdateAnchorPoint() {
+	_anchorPoint->direction = Vector2<float>(_anchorPoint->targetPosition - _anchorPoint->position);
+	_anchorPoint->distance = _anchorPoint->direction.absolute();
+	_anchorPoint->orientation = VectorAsOrientation(playerCharacter->GetPosition() - _anchorPoint->position);
+	if(_inPosition || _slotAssignments.size() <= 0){
+		return;
+
+	} else if (_allSlotsOnScreen && _anchorPoint->distance <= 200.f) {
+		_inPosition = true;
+		return;
 	}
-	_anchorPoint.orientation = VectorAsOrientation(direction);
-	
-	debugDrawer->AddDebugCross(_anchorPoint.position, 25.f, { 255, 255, 255, 255 });
+	_anchorPoint->direction.normalize();
+	_anchorPoint->position += _anchorPoint->direction * deltaTime * _anchorPoint->movementSpeed;
+}
 
+void FormationManager::UpdateSlots() {
+	_slotsOnScreen = 0;
+	UpdateAnchorPoint();
 	//Offsets each character based on the anchor point and current slot location
-	for (unsigned int i = 0; i < _slotAssignments.size(); i++) {
-		unsigned int slotNumber = _slotAssignments[i].slotNumber;
-		AnchorPoint slot = _formationPattern->GetSlotLocation(_anchorPoint, slotNumber, _numberOfSlots);
-		AnchorPoint location;
-		location.position = _anchorPoint.position + slot.position;
+	for (unsigned int i = 0; i < _slotAssignments.size(); ++i) {
+		_slotNumber = _slotAssignments[i].slotNumber;
+		_slot = _formationPattern->GetSlotLocation(*_anchorPoint, _slotNumber, _numberOfSlots);
 
-		location.orientation = _anchorPoint.orientation + slot.orientation;
-		
-		location.position -= RotateVector(_anchorPoint.orientation, _anchorPoint.position, _anchorPoint.position + _driftOffset.position);
-		location.orientation -= _driftOffset.orientation;
-		_slotAssignments[i].enemyCharacter->SetTargetPosition(location.position);
-		_slotAssignments[i].enemyCharacter->SetTargetOrientation(location.orientation);
-		debugDrawer->AddDebugCross(location.position, 25.f, { 75, 255, 175, 255 });
+		if (_posWithAnchorOri) {
+			_location.position = _anchorPoint->position + RotateVector(_anchorPoint->orientation - _slot.orientation, 
+				_anchorPoint->position, _anchorPoint->position + _slot.position);
+			_location.position -= RotateVector(_anchorPoint->orientation - _slot.orientation, { 0.f, 0.f }, _driftOffset.position);
+
+		} else {
+			_location.position = _anchorPoint->position + _slot.position;
+			_location.position -= _driftOffset.position;
+		}
+		_location.orientation = _anchorPoint->orientation + _slot.orientation;	
+		_location.orientation -= _driftOffset.orientation;
+
+		_slotAssignments[i].enemyCharacter->SetTargetPosition(_location.position);
+		_slotAssignments[i].enemyCharacter->SetTargetOrientation(_location.orientation);
+		if (!_slotAssignments[i].isOnScreen) {
+			if (!OutOfBorderX(_location.position.x, 25.f) && !OutOfBorderY(_location.position.y, 25.f)) {
+				_slotAssignments[i].isOnScreen = true;
+			}
+		}
+		if (_slotAssignments[i].isOnScreen) {
+			_slotsOnScreen++;
+		}
+	}
+	if (_slotsOnScreen >= _slotAssignments.size() - 1) {
+		_allSlotsOnScreen = true;
+	} else {
+		_allSlotsOnScreen = false;
 	}
 }
 
 void FormationManager::ReconstructSlotAssignments() {
-	std::vector<CharacterAndSlots> characterAndSlots;
+	_characterAndSlots.clear();
 	for (unsigned int i = 0; i < _slotAssignments.size(); ++i) {
+		_datum.assignmentEase = 0.f;
+		_datum.costAndSlots.clear();
+		_datum.enemyCharacter = _slotAssignments[i].enemyCharacter;
+		_datum.isAssigned = false;
+
 		//Checks which slots are valid based on the slots class type
-		CharacterAndSlots datum;
-		datum.enemyCharacter = _slotAssignments[i].enemyCharacter;	
 		for (unsigned int k = 0; k < _formationPattern->GetNumberOfSlots(); ++k) {
-			float slotCost = _formationPattern->GetSlotCost(
+			_slotCost = _formationPattern->GetSlotCost(
 				_slotAssignments[i].enemyCharacter->GetWeaponComponent()->GetWeaponType(), k);
-			if (slotCost >= _costLimit) {
+			if (_slotCost > _costLimit) {
 				continue;
 			}
-			CostAndSlot slotDatum;
-			slotDatum.slotNumber = k;
-			slotDatum.cost = slotCost;
-			datum.costAndSlots.emplace_back(slotDatum);
+			_slotDatum.slotNumber = k;
+			_slotDatum.cost = _slotCost;
+			_datum.costAndSlots.emplace_back(_slotDatum);
 			//Saves how difficult it would be for the character to be assigned to this slot based on the cost
-			datum.assignmentEase += 1 / (1 + slotCost);
+			_datum.assignmentEase += 1 / (1 + _slotCost);
 		}
 		//Sorts based on the cost using quicksort
-		datum.costAndSlots = SortByCost(datum.costAndSlots);
-		characterAndSlots.emplace_back(datum);
+		_datum.costAndSlots = SortByCost(_datum.costAndSlots);
+		_characterAndSlots.emplace_back(_datum);
 	}
 	//Sorts based on assignment ease using quicksort
-	characterAndSlots = SortByAssignmentEase(characterAndSlots);
-	
-	//Create a vector of bools which will keep track of which slot is available
-	std::vector<bool> filledSlots;
-	for (unsigned int i = 0; i < _formationPattern->GetNumberOfSlots(); i++) {
-		filledSlots.emplace_back(false);
-	}
+	_characterAndSlots = SortByAssignmentEase(_characterAndSlots);
+	_filledSlots.clear();
+	for (unsigned int i = 0; i < _formationPattern->GetNumberOfSlots(); ++i) {
+		_filledSlots.emplace_back(false);
+	}	
+	_slotAssignments.clear();
 	//Loop through the characters, the cost for each slot and assign a character to the best suited slot
-	std::vector<SlotAssignment> slotAssignments;
-	std::vector<CharacterAndSlots> unassignedSlots;
-	for (unsigned int i = 0; i < characterAndSlots.size(); i++) {
-		for (unsigned int k = 0; k < characterAndSlots[i].costAndSlots.size(); k++) {
+	for (unsigned int i = 0; i < _characterAndSlots.size(); ++i) {
+		for (unsigned int k = 0; k < _characterAndSlots[i].costAndSlots.size(); ++k) {
 			//If the slot is not filled, assign a character to that slot
-			if (!filledSlots[characterAndSlots[i].costAndSlots[k].slotNumber]) {
-				SlotAssignment assignment;
-				assignment.enemyCharacter = characterAndSlots[i].enemyCharacter;
- 				assignment.slotNumber = characterAndSlots[i].costAndSlots[k].slotNumber;
-				filledSlots[characterAndSlots[i].costAndSlots[k].slotNumber] = true;
-				characterAndSlots[i].isAssigned = true;
-				slotAssignments.emplace_back(assignment);
-				break;
-			}
-		}
-		if (!characterAndSlots[i].isAssigned) {
-			unassignedSlots.emplace_back(characterAndSlots[i]);
-		}
-	}
-	//See if any of the slot assignments has not been assigned
-	while (unassignedSlots.size() > 0) {
-		if (filledSlots.size() < 1) {
-			break;
-		}
-		for (unsigned int i = 0; i < filledSlots.size(); ++i) {
-			//If a slot is not assigned, assign it to the first available slot
-			if (!filledSlots[i]) {
-				SlotAssignment assignment;
-				assignment.enemyCharacter = unassignedSlots.back().enemyCharacter;
-				assignment.slotNumber = i;
-				slotAssignments.emplace_back(assignment);
-				unassignedSlots.pop_back();
-				filledSlots[i] = true;
+			if (!_filledSlots[_characterAndSlots[i].costAndSlots[k].slotNumber]) {
+				_slotAssignment.enemyCharacter = _characterAndSlots[i].enemyCharacter;
+ 				_slotAssignment.slotNumber = _characterAndSlots[i].costAndSlots[k].slotNumber;
+				_filledSlots[_characterAndSlots[i].costAndSlots[k].slotNumber] = true;
+				_characterAndSlots[i].isAssigned = true;
+				_slotAssignments.emplace_back(_slotAssignment);
 				break;
 			}
 		}
 	}
-	//Overwrite the current slot assignments with the updated ones
-	_slotAssignments = slotAssignments;
 	//Update the driftoffset to match the current formation
-	_driftOffset = _formationPattern->GetDriftOffset(_anchorPoint, _slotAssignments);
+	_driftOffset = _formationPattern->GetDriftOffset(*_anchorPoint, _slotAssignments);
 }
 
 void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
-	SlotAssignment slotAssignment;
-	for (unsigned int i = 0; i < _slotAssignments.size(); i++) {
+	for (unsigned int i = 0; i < _slotAssignments.size(); ++i) {
 		if (_slotAssignments[i].enemyCharacter->GetObjectID() == enemyCharacter->GetObjectID()) {
 			_slotAssignments[i] = _slotAssignments.back();	
 			_slotAssignments.pop_back();
@@ -152,68 +152,188 @@ void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter
 			break;
 		}
 	}
-	ReconstructSlotAssignments();
+	//ReconstructSlotAssignments();
 }
 
 std::vector<SlotAssignment> FormationManager::GetSlotAssignments() {
 	return _slotAssignments;
 }
 
+std::shared_ptr<FormationPattern> FormationManager::GetFormationPattern() {
+	return _formationPattern;
+}
+
+const bool FormationManager::GetInPosition() const {
+	return _inPosition;
+}
+
 const unsigned int FormationManager::GetNumberOfSlots() const {
 	return _numberOfSlots;
 }
 
-DefensiveCirclePattern::DefensiveCirclePattern(bool holdOrientation) {
-	_holdOrientation = holdOrientation;
+DefensiveCirclePattern::DefensiveCirclePattern() {}
+
+void DefensiveCirclePattern::CreateSlots(std::array<unsigned int, 2> spawnCountPerRow, std::shared_ptr<AnchorPoint> anchorPoint) {
+	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
+
+	//When there is only one layer, every other slot roles created are mages and the others are swordsmen
+	if (spawnCountPerRow[1] == 1) {
+		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _characterRadius,
+			SlotAttackType::Count, false);
+
+	} else if (spawnCountPerRow[1] % 2 == 0) {
+		//If there are an even amout of layers, the outer slot roles are swordsmen and the inner are mages
+		unsigned int amountSlots = std::round(spawnCountPerRow[0] * 1.25f);
+		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
+			if (i < std::round(spawnCountPerRow[1] * 0.5f)) {
+				CreateSlotsOfType(anchorPoint, amountSlots, _characterRadius,
+					SlotAttackType::Defender, true);
+			} else {
+				CreateSlotsOfType(anchorPoint, (spawnCountPerRow[0] * 2) - amountSlots, _characterRadius,
+					SlotAttackType::Mage, false);
+			}
+			//When a layer has been created, I subtract a characterRadius from the distanceBetweenSlots,
+			// which creates the next layer of slots in a smaller circle
+		}
+	} else {
+		//If there are an odd amount of layers(at least 3) the outer layers are defenders, 
+		// middle are swordsmen and inner are mages
+		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
+			if (i < std::round(spawnCountPerRow[1] * 0.33f)) {
+				CreateSlotsOfType(anchorPoint, std::round(spawnCountPerRow[0] * 1.5f), _characterRadius,
+					SlotAttackType::Defender, true);
+
+			} else if (i < std::round(spawnCountPerRow[1] * 0.66f)) {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _characterRadius,
+					SlotAttackType::Swordsman, true);
+
+			} else {
+				CreateSlotsOfType(anchorPoint, std::round(spawnCountPerRow[0] * 0.5f), _characterRadius,
+					SlotAttackType::Mage, false);
+			}
+		}
+	}
 }
 
-void DefensiveCirclePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {
-	_numberOfSlots = slotCount;	
+void DefensiveCirclePattern::CreateSlotsOfType(std::shared_ptr<AnchorPoint> anchorPoint, unsigned int amountSlots, float rad,
+	SlotAttackType attackType, bool lockOrientation) {
+	for (unsigned int i = 0; i < amountSlots; ++i) {
+		//I'm setting the slots orientation based on the current slot number compared to the amount of slots with the help of PI * 2,
+		//  which makes the slots orientation point away from the anchorPoint from where it will be positioned
+		_angleAroundCircle = (i / (float)amountSlots * PI * 2);
+		_radius = rad / sin(PI / (float)amountSlots);
+
+		//Using sin and cos to set the position of the slot based on the orientation
+		_result.position.x = _radius * sin(_angleAroundCircle);
+		_result.position.y = _radius * -cos(_angleAroundCircle);
+
+		//If the orientation is locked, then I keep the angleAroundCircle as it is currently
+		if (!lockOrientation) {
+			//If the orientation is not locked, I set the angleAroundCircle based on the slots position compared to the anchorPoints
+			_angleAroundCircle = VectorAsOrientation(anchorPoint->position - _result.position) - PI * 0.5f;
+		}
+		_result.orientation = WrapMinMax(_angleAroundCircle, -PI, PI);
+		if (attackType == SlotAttackType::Count) {
+			if (i % 2 == 0) {
+				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
+					_result.orientation, _result.position, SlotAttackType::Swordsman));
+				_amountSlotsPerType[SlotAttackType::Swordsman] += 1;
+			} else {
+				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
+					_result.orientation, _result.position, SlotAttackType::Mage));
+				_amountSlotsPerType[SlotAttackType::Mage] += 1;
+			}
+
+		} else {
+			_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
+				_result.orientation, _result.position, attackType));
+			_amountSlotsPerType[attackType] += 1;
+		}
+	}
 }
 
 unsigned int DefensiveCirclePattern::CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) {
-	unsigned int filledSlots = 0;
-	for (unsigned int i = 0; i < slotAssignments.size(); i++) {
-		if (slotAssignments[i].slotNumber >= filledSlots) {
-			filledSlots = slotAssignments[i].slotNumber;
+	_filledSlots = 0;
+	for (unsigned int i = 0; i < slotAssignments.size(); ++i) {
+		if (slotAssignments[i].slotNumber >= _filledSlots) {
+			_filledSlots = slotAssignments[i].slotNumber;
 		}
 	}
-	return filledSlots + 1;
+	return _filledSlots + 1;
 }
 
-AnchorPoint DefensiveCirclePattern::GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) {
-	AnchorPoint result;
-	for (unsigned int i = 0; i < slotAssignments.size(); i++) {
-		AnchorPoint location = GetSlotLocation(anchorPoint, slotAssignments[i].slotNumber, slotAssignments.size());
-		result.position += location.position;
-		result.orientation += location.orientation;
+StaticCharacter DefensiveCirclePattern::GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) {
+	//For now, I don't want a drift offset for the defensive circle formation
+	//return StaticCharacter();
+	
+	_result.orientation = 0.f;
+	_result.position = { 0.f, 0.f };
+	for (unsigned int i = 0; i < slotAssignments.size(); ++i) {
+		_location = GetSlotLocation(anchorPoint, slotAssignments[i].slotNumber, slotAssignments.size());
+		_result.position += _location.position;
+		_result.orientation += _location.orientation;
 	}
-	result.position /= slotAssignments.size();
-	result.orientation /= slotAssignments.size();
-	return result;
+	_result.position /= slotAssignments.size();
+	_result.orientation /= slotAssignments.size();
+	return _result;
 }
 
-AnchorPoint DefensiveCirclePattern::GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) {
-	float angleAroundCircle = (float)slotNumber / (float)numberOfSlots * PI * 2;
-
-	float radius = _characterRadius / sin(PI / (float)numberOfSlots);
-
-	AnchorPoint result;
-	result.position.x = radius * sin(angleAroundCircle);
-	result.position.y = radius * -cos(angleAroundCircle);
-
-	if (_holdOrientation) {
-		angleAroundCircle -= anchorPoint.orientation;
-	} else {
-		angleAroundCircle = VectorAsOrientation(anchorPoint.position - result.position);
+StaticCharacter DefensiveCirclePattern::GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) {
+	StaticCharacter temp;
+	temp.position = _slotPositionAndType[slotNumber].position;
+	temp.orientation = _slotPositionAndType[slotNumber].orientation;
+	if (_slotPositionAndType[slotNumber].lockOrientation) {
+		temp.orientation -= anchorPoint.orientation;
 	}
+	temp.orientation = WrapMinMax(temp.orientation, -PI, PI);
+	return temp;
+}
 
-	result.orientation = WrapMinMax(angleAroundCircle, -PI, PI);
-	return result;
+std::unordered_map<SlotAttackType, unsigned int> DefensiveCirclePattern::GetSlotsPerType() {
+	return _amountSlotsPerType;
 }
 
 float DefensiveCirclePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
-	return 0.0f;
+	switch (weaponType) {
+	case WeaponType::Shield:
+		switch (_slotPositionAndType[index].slotAttackType) {
+		case SlotAttackType::Defender:
+			return 0.f;
+		case SlotAttackType::Mage:
+			return 2000.f;
+		case SlotAttackType::Swordsman:
+			return 500.f;
+		default:
+			break;
+		}
+		break;
+	case WeaponType::Staff:
+		switch (_slotPositionAndType[index].slotAttackType) {
+		case SlotAttackType::Defender:
+			return 2000.f;
+		case SlotAttackType::Mage:
+			return 0.f;
+		case SlotAttackType::Swordsman:
+			return 1000.f;
+		default:
+			break;
+		}
+		break;
+	case WeaponType::Sword:
+		switch (_slotPositionAndType[index].slotAttackType) {
+		case SlotAttackType::Defender:
+			return 500.f;
+		case SlotAttackType::Mage:
+			return 1500.f;
+		case SlotAttackType::Swordsman:
+			return 0.f;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 const unsigned int DefensiveCirclePattern::GetNumberOfSlots() const {
@@ -221,7 +341,10 @@ const unsigned int DefensiveCirclePattern::GetNumberOfSlots() const {
 }
 
 bool DefensiveCirclePattern::SupportsSlots(unsigned int slotCount) {
-	return true;
+	if (slotCount <= _numberOfSlots) {
+		return true;
+	}
+	return false;
 }
 
 void DefensiveCirclePattern::SetNumberOfSlots(unsigned int numberOfSlots) {
@@ -238,31 +361,54 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 	return characterAndSlots;
 }
 
-VShapePattern::VShapePattern(SlotAttackType attackType) {
-	_attackType = attackType;
-}
+VShapePattern::VShapePattern() {}
 
-void VShapePattern::CreateSlots(unsigned int slotCount, AnchorPoint anchorPoint) {
-	_numberOfSlots = slotCount;
+void VShapePattern::CreateSlots(std::array<unsigned int, 2> spawnCountPerRow, std::shared_ptr<AnchorPoint> anchorPoint) {
+	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
 
-	if (_attackType == SlotAttackType::Count) {
-		std::uniform_real_distribution range{ 0.33f, 0.5f };
-		float number = range(randomEngine);
-		CreateSlotsOfType(anchorPoint, _numberOfSlots * number, _frontPosition, SlotAttackType::Defender);
-		
-		std::uniform_real_distribution range2{ 0.1f, 1.f - number};
-		number = range2(randomEngine);
-		CreateSlotsOfType(anchorPoint, _numberOfSlots * number, _frontPosition + (_rowDistance * 2.f), SlotAttackType::MagicAttacker);
-		
-		CreateSlotsOfType(anchorPoint, _numberOfSlots - _slotPositionAndType.size(), _frontPosition + _rowDistance, SlotAttackType::MeleeAttacker);
+	//Creates the slots with a role based on the amounts of rows the circle will have
+	//At one row, every other slot role will be for a swordsman and mages
+	if (spawnCountPerRow[1] == 1) {
+		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Count);
 
+	} else if (spawnCountPerRow[1] % 2 == 0) {
+		//If there are an even amount of rows, the slot roles in rows further out will be defenders, 
+		// the inner rows roles will be meages
+		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
+			if (i < spawnCountPerRow[1] / 2) {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender);
+				_frontPosition.y += _rowDistance;
+
+			} else {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage);
+				_frontPosition.y += _rowDistance;
+			}
+		}
 	} else {
-		CreateSlotsOfType(anchorPoint, _numberOfSlots, _frontPosition, _attackType);
+		//Otherwise all three roles will be created with defenders at the outer rows, 
+		// swordsmen in the middle row and mages in the inner row
+		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
+			if (i < std::round(spawnCountPerRow[1] * 0.33f)) {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender);
+				_frontPosition.y += _rowDistance;
+
+			} else if (i < std::round(spawnCountPerRow[1] * 0.66f)) {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Swordsman);
+				_frontPosition.y += _rowDistance;
+
+			} else {
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage);
+				_frontPosition.y += _rowDistance;
+			}
+		}
 	}
+	_frontPosition.y = 0.f;
 }
 
-void VShapePattern::CreateSlotsOfType(AnchorPoint anchorPoint, unsigned int amountSlots, Vector2<float> frontSlotPosition, SlotAttackType attackType) {
-	_multiplier = 0.f;
+void VShapePattern::CreateSlotsOfType(std::shared_ptr<AnchorPoint> anchorPoint, unsigned int amountSlots,
+	Vector2<float> frontSlotPosition, SlotAttackType attackType) {
+	//Creates a V-shaped row based on the offset multiplied by the current amount of slots 
+	// and adds it to the vector of slots
 	for (unsigned int i = 0; i < amountSlots; ++i) {
 		if (i % 2 == 0) {
 			_positionOffset = _slotOffsetA * _multiplier;
@@ -270,35 +416,58 @@ void VShapePattern::CreateSlotsOfType(AnchorPoint anchorPoint, unsigned int amou
 		} else {
 			_positionOffset = _slotOffsetB * _multiplier;
 		}
-		_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(),
-			anchorPoint.orientation, frontSlotPosition + _positionOffset, attackType));
+		Vector2<float> position = frontSlotPosition + _positionOffset;
+		position = RotateVector(anchorPoint->orientation, anchorPoint->position, anchorPoint->position + position);
+
+		if (attackType == SlotAttackType::Count) {
+			if (_multiplier % 2 == 0) {
+				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), false, 
+					anchorPoint->orientation, position, SlotAttackType::Mage));
+				_amountSlotsPerType[SlotAttackType::Mage] += 1;
+
+			} else {
+				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), false, 
+					anchorPoint->orientation, position, SlotAttackType::Swordsman));
+				_amountSlotsPerType[SlotAttackType::Swordsman] += 1;
+			}
+		} else {
+			_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), false, 
+				anchorPoint->orientation, position, attackType));
+			_amountSlotsPerType[attackType] += 1;
+		}
 	}
+	_multiplier = 0;
 }
 
 unsigned int VShapePattern::CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) {
 	return slotAssignments.size();
 }
 
-AnchorPoint VShapePattern::GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) {
-	AnchorPoint result;
-	for (unsigned int i = 0; i < slotAssignments.size(); i++) {
-		AnchorPoint location = GetSlotLocation(anchorPoint, slotAssignments[i].slotNumber, slotAssignments.size());
-		result.position += location.position;
-		result.orientation += WrapMinMax(_slotPositionAndType[i].orientation, -PI, PI);
+StaticCharacter VShapePattern::GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) {
+	_result.position = { 0.f, 0.f };
+	_result.orientation = 0.f;
+
+	//Calculates the drift offset of the slots which will make them evenly centered around the anchor point
+	for (unsigned int i = 0; i < slotAssignments.size(); ++i) {
+		_location = GetSlotLocation(anchorPoint, slotAssignments[i].slotNumber, slotAssignments.size());
+		_result.position += _location.position;
+		_result.orientation += _location.orientation;
 	}
-	result.position = RotateVector(-anchorPoint.orientation, anchorPoint.position, anchorPoint.position + result.position);
-	
-	result.position /= slotAssignments.size();
-	result.orientation /= slotAssignments.size();
-	return result;
+	_result.position /= slotAssignments.size();
+	_result.orientation /= slotAssignments.size();
+	return _result;
 }
 
-AnchorPoint VShapePattern::GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) {
-	AnchorPoint result;
-	result.position = RotateVector(anchorPoint.orientation, anchorPoint.position, anchorPoint.position + _slotPositionAndType[slotNumber].position);
-	
-	result.orientation = WrapMinMax(_slotPositionAndType[slotNumber].orientation, -PI, PI);
-	return result;
+StaticCharacter VShapePattern::GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) {
+	StaticCharacter temp;
+	temp.position = _slotPositionAndType[slotNumber].position;
+	temp.orientation = WrapMinMax(_slotPositionAndType[slotNumber].orientation, -PI, PI);	
+	//temp.position = RotateVector(anchorPoint.orientation - temp.orientation, anchorPoint.position, anchorPoint.position + temp.position);	
+	return temp;
+}
+
+std::unordered_map<SlotAttackType, unsigned int> VShapePattern::GetSlotsPerType() {
+	return _amountSlotsPerType;
 }
 
 float VShapePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
@@ -307,9 +476,9 @@ float VShapePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 		switch (_slotPositionAndType[index].slotAttackType) {
 		case SlotAttackType::Defender:
 			return 0.f;
-		case SlotAttackType::MagicAttacker:
+		case SlotAttackType::Mage:
 			return 2000.f;
-		case SlotAttackType::MeleeAttacker:
+		case SlotAttackType::Swordsman:
 			return 500.f;
 		default:
 			break;
@@ -319,9 +488,9 @@ float VShapePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 		switch (_slotPositionAndType[index].slotAttackType) {
 		case SlotAttackType::Defender:
 			return 2000.f;
-		case SlotAttackType::MagicAttacker:
+		case SlotAttackType::Mage:
 			return 0.f;
-		case SlotAttackType::MeleeAttacker:
+		case SlotAttackType::Swordsman:
 			return 1000.f;
 		default:
 			break;
@@ -331,9 +500,9 @@ float VShapePattern::GetSlotCost(WeaponType weaponType, unsigned int index) {
 		switch (_slotPositionAndType[index].slotAttackType) {
 		case SlotAttackType::Defender:
 			return 500.f;
-		case SlotAttackType::MagicAttacker:
+		case SlotAttackType::Mage:
 			return 1500.f;
-		case SlotAttackType::MeleeAttacker:
+		case SlotAttackType::Swordsman:
 			return 0.f;
 		default:
 			break;

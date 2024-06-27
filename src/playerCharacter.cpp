@@ -77,8 +77,13 @@ void PlayerCharacter::ExecuteDeath() {
 }
 
 void PlayerCharacter::FireProjectile() {
-	projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), 
-		_orientation, _attackDamage, _projectileSpeed, _direction, _position);
+	_multiShotAngle = -PI * 0.0625f;
+	for (unsigned int i = 0; i < _multiShotAmount; i++) {
+		_multiShotDirection = RotateDirection(_multiShotAngle, _direction);
+		projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), 
+			_orientation + _multiShotAngle, _attackDamage, _projectileSpeed, _multiShotDirection, _position);
+		_multiShotAngle += PI * 0.0625f;
+	}
 }
 
 void PlayerCharacter::Respawn() {
@@ -134,10 +139,10 @@ void PlayerCharacter::UpdateMovement() {
 	}
 	_position += _velocity * deltaTime;
 
-	if (OutOfBorderX(_position.x)) {
+	if (OutOfBorderX(_position.x, 0.f)) {
 		_position.x = _oldPosition.x;
 	}
-	if (OutOfBorderY(_position.y)) {
+	if (OutOfBorderY(_position.y, 0.f)) {
 		_position.y = _oldPosition.y;
 	}
 	_circleCollider->SetPosition(_position);

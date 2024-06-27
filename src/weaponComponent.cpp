@@ -4,6 +4,7 @@
 #include "dataStructuresAndMethods.h"
 #include "enemyBase.h"
 #include "gameEngine.h"
+#include "stateStack.h"
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "sprite.h"
@@ -108,7 +109,8 @@ void StaffComponent::Attack(Vector2<float> position, float orientation) {
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
 
-	} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
+	} else if ((!_isAttacking && gameStateHandler->GetGameMode() == GameMode::Formation) ||
+		(!_isAttacking && IsInDistance(playerCharacter->GetPosition(), position, _attackRange))) {
 		_chargeAttackTimer->ResetTimer();
 		_isAttacking = true;
 	}

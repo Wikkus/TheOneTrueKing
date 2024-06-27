@@ -51,11 +51,15 @@ private:
 	float _movementSpeed = 100.f;
 	float _projectileSpeed = 300;
 
-	float _attackCooldown = 0.1f;
-	float _regenerationTime = 0.05f;
+	float _attackCooldown = 0.25f;
+	float _regenerationTime = 0.5f;
 
 	int _maxHealth = 1000;
 	int _currentHealth = 0;
+
+	unsigned int _multiShotAmount = 3;
+	float _multiShotAngle = 0.f;
+	Vector2<float> _multiShotDirection = 0.f;
 
 	std::shared_ptr<Projectile> _collidedProjectile = nullptr;
 

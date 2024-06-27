@@ -20,9 +20,7 @@ ProjectileManager::~ProjectileManager() {}
 
 void ProjectileManager::Init() {
 	for (unsigned int i = 0; i < _projectileAmountLimit; i++) {
-		if (i % 5 == 0) {
-			CreateNewProjectile(ProjectileType::PlayerProjectile, _playerProjectileSprite, 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
-		}
+		CreateNewProjectile(ProjectileType::PlayerProjectile, _playerProjectileSprite, 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
 		CreateNewProjectile(ProjectileType::EnemyProjectile, _enemyProjectileSprite, 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
 	}
 }
@@ -33,8 +31,8 @@ void ProjectileManager::Update() {
 		if (CheckCollision(_activeProjectiles[i]->GetProjectileType(), i)) {
 			continue;
 		}
-		if (OutOfBorderX(_activeProjectiles[i]->GetPosition().x) ||
-			OutOfBorderY(_activeProjectiles[i]->GetPosition().y)) {
+		if (OutOfBorderX(_activeProjectiles[i]->GetPosition().x, 0.f) ||
+			OutOfBorderY(_activeProjectiles[i]->GetPosition().y, 0.f)) {
 			RemoveProjectile(_activeProjectiles[i]->GetProjectileType(), _activeProjectiles[i]->GetObjectID());
 		}
 	}
@@ -58,7 +56,7 @@ void ProjectileManager::SpawnProjectile(ProjectileType projectileType, const cha
 		CreateNewProjectile(projectileType, spritePath, orientation, direction, position);
 	}
 	_activeProjectiles.emplace_back(_projectilePools[projectileType]->SpawnObject());
-	_activeProjectiles.back()->ActivateProjectile(orientation, projectileDamage, projectileSpeed,direction, position);
+	_activeProjectiles.back()->ActivateProjectile(orientation, projectileDamage, projectileSpeed, direction, position);
 }
 
 bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {

@@ -30,8 +30,8 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_behaviorData.velocity = _velocity;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
-	_behaviorData.angularTargetRadius = PI * 0.005f;
-	_behaviorData.maxAngularAcceleration = PI * 3.f;
+	_behaviorData.angularTargetRadius = FLT_EPSILON;
+	_behaviorData.maxAngularAcceleration = PI * 2.f;
 	_behaviorData.maxRotation = PI * 2.f;
 	
 	_behaviorData.timeToTarget = 0.1f;
@@ -50,11 +50,6 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 
 	_faceBehavior.steeringBehaviour = std::make_shared<FaceBehavior>();
 	_faceBehavior.weight = 1.f;
-
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(_alignBehavior);
-	_prioritySteering->AddGroup(*_blendSteering);
 }
 
 EnemyHuman::~EnemyHuman() {}
@@ -64,6 +59,29 @@ void EnemyHuman::Init() {
 	_direction = Vector2<float>(_behaviorData.targetPosition - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
 	_behaviorData.velocity = _velocity;
+
+	_prioritySteering->ClearGroups();
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
+
+	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
+		_blendSteering->AddSteeringBehaviour(_alignBehavior);
+
+	} else {
+		if (_weaponComponent->GetWeaponType() == WeaponType::Staff) {
+			std::uniform_real_distribution dist{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
+			_linearTargetRadius = dist(randomEngine);
+			_behaviorData.linearTargetRadius = _linearTargetRadius;
+			_behaviorData.linearSlowDownRadius = _linearTargetRadius * 1.5f;
+
+		} else {
+			_behaviorData.linearTargetRadius = 5.f;
+			_behaviorData.linearSlowDownRadius = 20.f;
+
+		}
+		_blendSteering->AddSteeringBehaviour(_faceBehavior);
+	}
+	_prioritySteering->AddGroup(*_blendSteering);
 }
 
 void EnemyHuman::Update() {
@@ -137,23 +155,13 @@ const std::shared_ptr<WeaponComponent> EnemyHuman::GetWeaponComponent() const {
 	return _weaponComponent;
 }
 
-void EnemyHuman::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) {
+void EnemyHuman::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	_orientation = orienation;
 	_direction = direction;
 	_position = position;
 	_circleCollider->SetPosition(position);
+	PickWeapon(weaponType);
 	Init();
-
-	switch (gameStateHandler->GetGameMode()) {
-	case GameMode::Formation:
-		PickWeaponFormation();
-		break;
-	case GameMode::Survival:
-		PickWeaponSurvival();
-		break;
-	default:
-		break;
-	}
 }
 
 void EnemyHuman::DeactivateEnemy() {
@@ -222,78 +230,33 @@ void EnemyHuman::UpdateMovement() {
 
 void EnemyHuman::UpdateTarget() {
 	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
-		switch (_currentTarget) {
-		case CurrentTarget::Player:
-			_behaviorData.targetPosition = playerCharacter->GetPosition();
-			if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 250.f, false)) {
-				_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Face,
-					BehaviorAndWeight(std::make_shared<LookAtDirectionBehavior>(), 1.f), 0);
-				_currentTarget = CurrentTarget::Travelling;
+		if (_weaponComponent->GetWeaponType() == WeaponType::Sword) {
+			//When the formation is at the target position, the swordfighters will change target and run to the player
+			switch (_currentTarget) {
+			case CurrentTarget::Player:
+				_behaviorData.targetPosition = playerCharacter->GetPosition();
+				break;
+			case CurrentTarget::SlotFormation:
+				if (enemyManager->GetFormationManagers()[_formationIndex]->GetInPosition()) {
+					if (!_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Align, BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0)) {
+						_prioritySteering->AddBehaviorInGroup(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0);
+					}
+					_currentTarget = CurrentTarget::Player;
+				}
+				break;
+			case CurrentTarget::Count:
+				break;
+			default:
+				break;
 			}
-			break;
-		case CurrentTarget::SlotFormation:
-			if (_weaponComponent->AtTargetDistance(_position, playerCharacter->GetPosition(), 200.f, true)) {
-				_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Align,
-					BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0);
-				_currentTarget = CurrentTarget::Player;
-			}
-			break;
-		case CurrentTarget::Travelling:
-			if (_weaponComponent->AtTargetDistance(_position, _behaviorData.targetPosition, 50.f, true)) {
-				_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::LookAtDirection,
-					BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f), 0);
-				_currentTarget = CurrentTarget::SlotFormation;
-			}	
-			break;
-		case CurrentTarget::Count:
-			break;
-		default:
-			break;
 		}
 	} else {
 		_behaviorData.targetPosition = playerCharacter->GetPosition();
 	}
 }
 
-void EnemyHuman::PickWeapon() {
-	switch (gameStateHandler->GetGameMode()) {
-	case GameMode::Formation:
-		PickWeaponFormation();
-		break;
-	case GameMode::Survival:
-		PickWeaponSurvival();
-		break;
-	default:
-		break;
-	}
-}
-
-void EnemyHuman::PickWeaponFormation() {
-	std::uniform_int_distribution decideWeapon{ 0, _numberOfWeaponTypes - 1 };
-	_weaponPicked = decideWeapon(randomEngine);
-
-	_weaponComponent = enemyManager->AccessWeapon((WeaponType)_weaponPicked);
-
+void EnemyHuman::PickWeapon(WeaponType weaponType) {
+	_weaponComponent = enemyManager->AccessWeapon(weaponType);
 	_maxHealth += _weaponComponent->GetHealthModifier();
 	_currentHealth = _maxHealth;
-
-	_behaviorData.linearTargetRadius = 0.05f;
-	_behaviorData.linearSlowDownRadius = 10.f;
-	
-}
-
-void EnemyHuman::PickWeaponSurvival() {
-	std::uniform_int_distribution decideWeapon{ 1, 2 };
-	_weaponPicked = decideWeapon(randomEngine);
-	_weaponComponent = enemyManager->AccessWeapon((WeaponType)_weaponPicked);
-
-	_prioritySteering->ReplaceSteeringBheavior(_alignBehavior.steeringBehaviour->GetBehaviorType(), _faceBehavior, 0);
-
-	_maxHealth += _weaponComponent->GetHealthModifier();
-	_currentHealth = _maxHealth;
-
-	std::uniform_real_distribution range{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
-	float attackRange = range(randomEngine);
-	_behaviorData.linearTargetRadius = attackRange;
-	_behaviorData.linearSlowDownRadius = attackRange + 100.f;
 }

@@ -40,7 +40,7 @@ public:
 
 	const std::shared_ptr<WeaponComponent> GetWeaponComponent() const override;
 
-	void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position) override;
+	void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) override;
 	void DeactivateEnemy() override;
 	void HandleAttack() override;
 
