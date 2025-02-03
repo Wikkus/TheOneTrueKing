@@ -266,11 +266,23 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 }
 
 void EnemyManager::Reset() {
+	switch (gameStateHandler->GetGameMode())
+	{
+	case GameMode::Formation:
+		_formationsSpawned = 1;
+		_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
+		_formationManagers.clear();
+		_latestAnchorPoint = nullptr;
+
+		break;
+	case GameMode::Survival:
+
+		break;
+
+	default:
+		break;
+	}
 	_waveNumber = 1;
-	_formationsSpawned = 1;
-	_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
-	_formationManagers.clear();
-	_latestAnchorPoint = nullptr;
 	RemoveAllEnemies();
 	_spawnTimer->ResetTimer();
 }

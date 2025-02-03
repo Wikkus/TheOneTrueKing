@@ -63,6 +63,8 @@ void EnemyHuman::Init() {
 	_prioritySteering->ClearGroups();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
+	_behaviorData.linearTargetRadius = 5.f;
+	_behaviorData.linearSlowDownRadius = 20.f;
 
 	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
 		_blendSteering->AddSteeringBehaviour(_alignBehavior);
@@ -73,11 +75,6 @@ void EnemyHuman::Init() {
 			_linearTargetRadius = dist(randomEngine);
 			_behaviorData.linearTargetRadius = _linearTargetRadius;
 			_behaviorData.linearSlowDownRadius = _linearTargetRadius * 1.5f;
-
-		} else {
-			_behaviorData.linearTargetRadius = 5.f;
-			_behaviorData.linearSlowDownRadius = 20.f;
-
 		}
 		_blendSteering->AddSteeringBehaviour(_faceBehavior);
 	}

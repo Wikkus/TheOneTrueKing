@@ -135,7 +135,9 @@ void InGameState::RenderText() {
 	playerCharacter->RenderText();
 }
 
-SurvivalGameState::SurvivalGameState() {}
+SurvivalGameState::SurvivalGameState() {
+	InGameState();
+}
 
 void SurvivalGameState::SetButtonPositions() {
 	InGameState::SetButtonPositions();
@@ -154,7 +156,9 @@ void SurvivalGameState::RenderText() {
 	InGameState::RenderText();
 }
 
-FormationGameState::FormationGameState() {}
+FormationGameState::FormationGameState() {
+	InGameState();
+}
 
 void FormationGameState::SetButtonPositions() {
 	InGameState::SetButtonPositions();
