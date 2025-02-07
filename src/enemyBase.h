@@ -31,7 +31,6 @@ public:
 	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
 	virtual const EnemyType GetEnemyType() const = 0;
 	 
-
 	virtual const float GetRotation() const = 0;
 
 	virtual const int GetCurrentHealth() const = 0;
@@ -46,9 +45,11 @@ public:
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const = 0;
 	
+	virtual bool HandleAttack() = 0;
+	virtual bool UpdateMovement() = 0;
+
 	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) = 0;
 	virtual void DeactivateEnemy() = 0;
-	virtual void HandleAttack() = 0;
 	
 	virtual void SetFormationIndex(int formationIndex) = 0;
 	virtual void SetPosition(Vector2<float> position) = 0;

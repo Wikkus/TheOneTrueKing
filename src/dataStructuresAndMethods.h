@@ -35,7 +35,9 @@ Vector2<float> RotateVector(float degree, Vector2<float> startPoint, Vector2<flo
 
 Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration);
 
-float RandomBinomal(float a, float b);
+float RandomBinomalFloat(float a, float b);
+int RandomBinomalInt(int a, int b);
+
 float VectorAsOrientation(Vector2<float> direction);
 
 float WrapMax(float rotation, float maxValue);

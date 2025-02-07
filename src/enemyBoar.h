@@ -40,9 +40,11 @@ public:
 
 	const std::shared_ptr<WeaponComponent> GetWeaponComponent() const override;
 
+	bool HandleAttack() override;
+	bool UpdateMovement() override;
+	
 	void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) override;
 	void DeactivateEnemy() override;
-	void HandleAttack() override;
 
 	void SetFormationIndex(int formationIndex) override;
 	void SetPosition(Vector2<float> position) override;
@@ -50,9 +52,7 @@ public:
 	void SetTargetOrientation(float targetOrientation) override;
 	void SetVelocity(Vector2<float> velocity) override;
 
-private:
-	void UpdateMovement();
-	
+private:	
 	const char* _boarSprite = "res/sprites/MadBoar.png";
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;

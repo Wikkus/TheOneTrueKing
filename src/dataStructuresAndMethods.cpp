@@ -54,10 +54,14 @@ Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration) {
 	return velocity;
 }
 
-float RandomBinomal(float a, float b) {
+float RandomBinomalFloat(float a, float b) {
 	std::uniform_real_distribution<float> dist(a, b);
-	float randomNumber = dist(randomEngine);
-	return randomNumber;
+	return dist(randomEngine);
+}
+
+int RandomBinomalInt(int a, int b) {
+	std::uniform_int_distribution<int> dist(a, b);	
+	return dist(randomEngine);
 }
 
 float VectorAsOrientation(Vector2<float> direction) {

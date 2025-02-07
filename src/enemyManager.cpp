@@ -1,5 +1,6 @@
 #include "enemyManager.h"
 
+#include "bossBoar.h"
 #include "enemyBase.h"
 #include "enemyBoar.h"
 #include "enemyHuman.h"
@@ -52,6 +53,12 @@ void EnemyManager::Init() {
 
 void EnemyManager::Update() {}
 
+void EnemyManager::UpdateBossRush() {
+	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
+		_activeEnemies[i]->Update();
+	}
+}
+
 void EnemyManager::UpdateSurvival() {
 	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
 		SurvivalEnemySpawner();
@@ -76,6 +83,7 @@ void EnemyManager::UpdateFormation() {
 void EnemyManager::Render() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
 		_activeEnemies[i]->Render();
+		_activeEnemies[i]->RenderText();
 	}
 }
 
@@ -125,6 +133,11 @@ void EnemyManager::CreateWeapon(WeaponType weaponType) {
 	default:
 		break;
 	}
+}
+
+void EnemyManager::SpawnBoss() {
+	_activeEnemies.emplace_back(std::make_shared<BoarBoss>(objectID, EnemyType::Boar));
+	_activeEnemies.back()->Init();
 }
 
 void EnemyManager::FormationEnemySpawner() {

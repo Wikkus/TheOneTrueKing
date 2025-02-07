@@ -75,6 +75,7 @@ public:
 
 	void Init();
 	void Update();
+	void UpdateBossRush();
 	void UpdateSurvival();
 	void UpdateFormation();
 	void Render();
@@ -88,6 +89,8 @@ public:
 		Vector2<float> direction, Vector2<float> position);
 
 	void CreateWeapon(WeaponType weaponType);
+
+	void SpawnBoss();
 
 	void FormationEnemySpawner();
 	void SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType);

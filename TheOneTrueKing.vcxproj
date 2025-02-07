@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bossBoar.cpp" />
     <ClCompile Include="include\ImGui\example.cpp" />
     <ClCompile Include="include\ImGui\imgui.cpp" />
     <ClCompile Include="include\ImGui\imgui_demo.cpp" />
@@ -29,9 +30,11 @@
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\behaviorTree.cpp" />
     <ClCompile Include="src\collision.cpp" />
     <ClCompile Include="src\dataStructuresAndMethods.cpp" />
     <ClCompile Include="src\debugDrawer.cpp" />
+    <ClCompile Include="src\decisionTree.cpp" />
     <ClCompile Include="src\enemyBase.cpp" />
     <ClCompile Include="src\enemyManager.cpp" />
     <ClCompile Include="src\enemyHuman.cpp" />
@@ -50,6 +53,7 @@
     <ClCompile Include="src\rayCast.cpp" />
     <ClCompile Include="src\sprite.cpp" />
     <ClCompile Include="src\spriteSheet.cpp" />
+    <ClCompile Include="src\stateMachine.cpp" />
     <ClCompile Include="src\stateStack.cpp" />
     <ClCompile Include="src\steeringBehavior.cpp" />
     <ClCompile Include="src\textSprite.cpp" />
@@ -161,9 +165,12 @@
     <ClInclude Include="include\SDL2\SDL_version.h" />
     <ClInclude Include="include\SDL2\SDL_video.h" />
     <ClInclude Include="include\SDL2\SDL_vulkan.h" />
+    <ClInclude Include="src\behaviorTree.h" />
+    <ClInclude Include="src\bossBoar.h" />
     <ClInclude Include="src\collision.h" />
     <ClInclude Include="src\dataStructuresAndMethods.h" />
     <ClInclude Include="src\debugDrawer.h" />
+    <ClInclude Include="src\decisionTree.h" />
     <ClInclude Include="src\enemyBase.h" />
     <ClInclude Include="src\enemyManager.h" />
     <ClInclude Include="src\enemyHuman.h" />
@@ -182,6 +189,7 @@
     <ClInclude Include="src\rayCast.h" />
     <ClInclude Include="src\sprite.h" />
     <ClInclude Include="src\spriteSheet.h" />
+    <ClInclude Include="src\stateMachine.h" />
     <ClInclude Include="src\stateStack.h" />
     <ClInclude Include="src\steeringBehavior.h" />
     <ClInclude Include="src\textSprite.h" />

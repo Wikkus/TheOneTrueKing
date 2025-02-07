@@ -19,8 +19,8 @@ Projectile::~Projectile() {}
 void Projectile::Init() {}
 
 void Projectile::Update() {
-	_velocity = _direction * _projectileSpeed;
 	_position += _velocity * deltaTime;
+	_velocity = _direction * _projectileSpeed;
 	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 

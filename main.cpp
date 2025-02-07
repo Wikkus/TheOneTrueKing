@@ -28,6 +28,7 @@
 #include "src/timerManager.h"
 #include "src/textSprite.h"
 #include "src/vector2.h"
+#include "src/bossBoar.h"
 
 int main(int argc, char* argv[]) {
 	HWND windowHandle = GetConsoleWindow();
@@ -63,8 +64,6 @@ int main(int argc, char* argv[]) {
 	imGuiHandler->Init();
 	playerCharacter->Init();
 	projectileManager->Init();
-
-	//objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCircleCollider());
 
 	gameStateHandler->AddState(std::make_shared<MenuState>());
 

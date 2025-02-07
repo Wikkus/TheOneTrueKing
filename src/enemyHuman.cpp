@@ -173,9 +173,10 @@ void EnemyHuman::DeactivateEnemy() {
 	_formationIndex = -1;
 }
 
-void EnemyHuman::HandleAttack() {
+bool EnemyHuman::HandleAttack() {
 	//Depending on the weapon, the attack works differently
 	_weaponComponent->Attack(_position, _orientation);
+	return true;
 }
 
 void EnemyHuman::SetFormationIndex(int formationIndex) {
@@ -196,6 +197,7 @@ void EnemyHuman::SetTargetOrientation(float targetOrientation) {
 
 void EnemyHuman::SetVelocity(Vector2<float> velocity) {
 	_velocity = velocity;
+	_behaviorData.velocity = _velocity;
 }
 
 bool EnemyHuman::TakeDamage(unsigned int damageAmount) {
@@ -206,7 +208,7 @@ bool EnemyHuman::TakeDamage(unsigned int damageAmount) {
 	return false;
 }
 
-void EnemyHuman::UpdateMovement() {
+bool EnemyHuman::UpdateMovement() {
 	_position += _velocity * deltaTime;
 	_orientation += _rotation * deltaTime;
 
@@ -223,6 +225,7 @@ void EnemyHuman::UpdateMovement() {
 		_velocity = { 0.f, 0.f };
 	}
 	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
+	return true;
 }
 
 void EnemyHuman::UpdateTarget() {

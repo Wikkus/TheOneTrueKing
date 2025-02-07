@@ -376,7 +376,7 @@ WanderBehavior::WanderBehavior() {
 
 SteeringOutput WanderBehavior::Steering(BehaviorData behaviorData, const ObjectBase& objectBase) {
 	//Set the current wander orientation based on a random value combined with the wander rate
-	_wanderOrientation += RandomBinomal(-1, 1) * behaviorData.wanderRate;
+	_wanderOrientation += RandomBinomalFloat(-1, 1) * behaviorData.wanderRate;
 
 	//Calculates the combined orientation between the enemy and the current wanderOrientation
 	behaviorData.targetOrientation = _wanderOrientation + objectBase.GetOrientation();

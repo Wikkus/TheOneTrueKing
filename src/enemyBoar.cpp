@@ -11,8 +11,7 @@
 
 #include <memory>
 
-EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) :
-	EnemyBase(objectID, enemyType) {
+EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_boarSprite);
 
@@ -180,9 +179,9 @@ bool EnemyBoar::TakeDamage(unsigned int damageAmount) {
 	return false;
 }
 
-void EnemyBoar::HandleAttack() {
+bool EnemyBoar::HandleAttack() {
 	if (_attackCooldownTimer->GetTimerActive()) {
-		return;
+		return true;
 	}
 	if (!_playerInRange) {
 		if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius->GetRadius())) {
@@ -212,6 +211,7 @@ void EnemyBoar::HandleAttack() {
 		_chargeAttackTimer->ResetTimer();
 		_velocity = { 0.f, 0.f };
 	}
+	return true;
 }
 
 void EnemyBoar::SetFormationIndex(int formationIndex) {
@@ -234,7 +234,7 @@ void EnemyBoar::SetVelocity(Vector2<float> velocity) {
 	_velocity = velocity;
 }
 
-void EnemyBoar::UpdateMovement() {
+bool EnemyBoar::UpdateMovement() {
 	_behaviorData.targetPosition = playerCharacter->GetPosition();
 
 	_position += _velocity * deltaTime;
@@ -252,5 +252,6 @@ void EnemyBoar::UpdateMovement() {
 		_velocity = { 0.f, 0.f };
 	}
 	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
+	return true;
 }
 

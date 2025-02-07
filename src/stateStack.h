@@ -11,6 +11,7 @@
 class TextSprite;
 
 enum class GameMode {
+	BossRush,
 	Formation,
 	Survival,
 	Count
@@ -18,6 +19,7 @@ enum class GameMode {
 
 enum class ButtonType {
 	MainMenu,
+	BossRush,
 	FormationGame,
 	SurvivalGame,
 	Quit,
@@ -78,6 +80,7 @@ public:
 
 private:
 	const char* _mainMenuText = "Main Menu";
+	const char* _bossRushText = "Boss Rush";
 	const char* _formationText = "Formation";
 	const char* _survivalText = "Survival";
 	const char* _quitText = "Quit";
@@ -113,16 +116,15 @@ public:
 	void Render() override;
 	void RenderText() override;
 };
-class SurvivalGameState : public InGameState {
+class BossRushGameState : public InGameState {
 public:
-	SurvivalGameState();
-	~SurvivalGameState() {}
+	BossRushGameState();
+	~BossRushGameState() {}
 
 	void SetButtonPositions() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
-
 };
 class FormationGameState : public InGameState {
 public:
@@ -135,6 +137,18 @@ public:
 	void RenderText() override;
 
 };
+class SurvivalGameState : public InGameState {
+public:
+	SurvivalGameState();
+	~SurvivalGameState() {}
+
+	void SetButtonPositions() override;
+	void Update() override;
+	void Render() override;
+	void RenderText() override;
+
+};
+
 class MenuState : public State {
 public:
 	MenuState();

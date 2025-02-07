@@ -113,6 +113,18 @@
     <ClCompile Include="src\formationManager.cpp">
       <Filter>FormationManager</Filter>
     </ClCompile>
+    <ClCompile Include="bossBoar.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\decisionTree.cpp">
+      <Filter>DecisionMaking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\behaviorTree.cpp">
+      <Filter>DecisionMaking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stateMachine.cpp">
+      <Filter>DecisionMaking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL2\begin_code.h" />
@@ -501,6 +513,18 @@
     <ClInclude Include="src\formationManager.h">
       <Filter>FormationManager</Filter>
     </ClInclude>
+    <ClInclude Include="src\bossBoar.h">
+      <Filter>Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="src\decisionTree.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\behaviorTree.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stateMachine.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\SDL2\SDL_config.h.cmake">
@@ -549,6 +573,9 @@
     </Filter>
     <Filter Include="FormationManager">
       <UniqueIdentifier>{a570b2ee-a21a-46fd-977c-bb412b77d7e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DecisionMaking">
+      <UniqueIdentifier>{ef891053-09ce-4151-ae9e-be9d83df221a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
