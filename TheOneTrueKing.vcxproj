@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bossBoar.cpp" />
     <ClCompile Include="include\ImGui\example.cpp" />
     <ClCompile Include="include\ImGui\imgui.cpp" />
     <ClCompile Include="include\ImGui\imgui_demo.cpp" />
@@ -31,6 +30,7 @@
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\behaviorTree.cpp" />
+    <ClCompile Include="src\bossBoar.cpp" />
     <ClCompile Include="src\collision.cpp" />
     <ClCompile Include="src\dataStructuresAndMethods.cpp" />
     <ClCompile Include="src\debugDrawer.cpp" />

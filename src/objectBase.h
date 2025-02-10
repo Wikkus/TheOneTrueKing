@@ -2,7 +2,6 @@
 #include "sprite.h"
 #include "vector2.h"
 
-class Timer;
 
 enum class ObjectType {
 	Enemy,
@@ -13,24 +12,31 @@ enum class ObjectType {
 };
 
 class Collider;
+class Timer;
 
 class ObjectBase {
 public:
 	ObjectBase(unsigned int objectID, ObjectType objectType) : _objectID(objectID), _objectType(objectType) {}
 	~ObjectBase() {}
 
-	virtual void Init() = 0;
-	virtual void Update() = 0;
-	virtual void Render() = 0;
-	virtual void RenderText() = 0;
+	virtual void Init() {}
+	virtual void Update() {}
+	virtual void Render() {}
+	virtual void RenderText() {}
 
-	virtual const unsigned int GetObjectID() const = 0;	
-	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
-	virtual const float GetOrientation() const = 0;
-	virtual const ObjectType GetObjectType() const = 0;
-	virtual const std::shared_ptr<Sprite> GetSprite() const = 0;
-	virtual const Vector2<float> GetPosition() const = 0;
-	virtual const Vector2<float> GetVelocity() const = 0;
+	virtual const unsigned int GetObjectID() const;	
+	virtual const std::shared_ptr<Collider> GetCollider() const;
+	virtual const float GetOrientation() const;
+	virtual const ObjectType GetObjectType() const;
+	
+	const std::shared_ptr<Sprite> GetSprite() const;
+
+	virtual const Vector2<float> GetPosition() const;
+	virtual const Vector2<float> GetVelocity() const;
+
+	virtual void SetOrientation(float orientation);
+	virtual void SetPosition(Vector2<float> position);
+	virtual void SetVelocity(Vector2<float> velocity);
 
 
 protected:

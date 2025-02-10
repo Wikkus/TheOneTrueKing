@@ -36,30 +36,6 @@ void Wall::Render() {
 
 void Wall::RenderText() {}
 
-const Vector2<float> Wall::GetPosition() const {
-	return _position;
-}
-
-const std::shared_ptr<Sprite> Wall::GetSprite() const {
-	return nullptr;
-}
-
-const Vector2<float> Wall::GetVelocity() const {
-	return Vector2<float>();
-}
-
-const unsigned int Wall::GetObjectID() const {
-	return _objectID;
-}
-
 const std::shared_ptr<Collider> Wall::GetCollider() const {
 	return _boxCollider;
-}
-
-const float Wall::GetOrientation() const {
-	return _orientation;
-}
-
-const ObjectType Wall::GetObjectType() const {
-	return _objectType;
 }

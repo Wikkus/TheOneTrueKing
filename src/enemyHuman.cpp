@@ -50,6 +50,13 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 
 	_faceBehavior.steeringBehaviour = std::make_shared<FaceBehavior>();
 	_faceBehavior.weight = 1.f;
+
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
+	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
+	_behaviorData.linearTargetRadius = 5.f;
+	_behaviorData.linearSlowDownRadius = 20.f;
+
+
 }
 
 EnemyHuman::~EnemyHuman() {}
@@ -60,6 +67,8 @@ void EnemyHuman::Init() {
 	_orientation = VectorAsOrientation(_direction);
 	_behaviorData.velocity = _velocity;
 
+	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();
+	
 	_prioritySteering->ClearGroups();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
@@ -94,118 +103,10 @@ void EnemyHuman::Render() {
 	_weaponComponent->Render(_position, _orientation);
 }
 
-void EnemyHuman::RenderText() {}
-
-const std::shared_ptr<Collider> EnemyHuman::GetCollider() const {
-	return _circleCollider;
-}
-
-const EnemyType EnemyHuman::GetEnemyType() const {
-	return _enemyType;
-}
-
-const ObjectType EnemyHuman::GetObjectType() const {
-	return _objectType;
-}
-
-const float EnemyHuman::GetOrientation() const {
-	return _orientation;
-}
-
-const float EnemyHuman::GetRotation() const {
-	return _rotation;
-}
-
-const int EnemyHuman::GetCurrentHealth() const {
-	return _currentHealth;
-}
-
-const unsigned int EnemyHuman::GetObjectID() const {
-	return _objectID;
-}
-
-const int EnemyHuman::GetFormationIndex() const {
-	return _formationIndex;
-}
-
-const std::shared_ptr<Sprite> EnemyHuman::GetSprite() const {
-	return _sprite;
-}
-
-const BehaviorData EnemyHuman::GetBehaviorData() const {
-	return _behaviorData;
-}
-
-const Vector2<float> EnemyHuman::GetPosition() const {
-	return _position;
-}
-
-const Vector2<float> EnemyHuman::GetVelocity() const {
-	return _velocity;
-}
-
-const std::vector<std::shared_ptr<ObjectBase>> EnemyHuman::GetQueriedObjects() const {
-	return _behaviorData.queriedObjects;
-}
-
-const std::shared_ptr<WeaponComponent> EnemyHuman::GetWeaponComponent() const {
-	return _weaponComponent;
-}
-
-void EnemyHuman::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
-	_orientation = orienation;
-	_direction = direction;
-	_position = position;
-	_circleCollider->SetPosition(position);
-	PickWeapon(weaponType);
-	Init();
-}
-
-void EnemyHuman::DeactivateEnemy() {
-	_orientation = 0.f;
-	_direction = Vector2<float>(0.f, 0.f);
-	_position = Vector2<float>(-10000.f, -10000.f);
-	_behaviorData.rotation = 0.f;
-	_circleCollider->SetPosition(_position);
-	_velocity = { 0.f, 0.f };
-	_behaviorData.velocity = _velocity;
-	_weaponComponent->DeactivateTimers();
-	_formationIndex = -1;
-}
-
 bool EnemyHuman::HandleAttack() {
 	//Depending on the weapon, the attack works differently
 	_weaponComponent->Attack(_position, _orientation);
 	return true;
-}
-
-void EnemyHuman::SetFormationIndex(int formationIndex) {
-	_formationIndex = formationIndex;
-}
-
-void EnemyHuman::SetPosition(Vector2<float> position) {
-	_position = position;
-}
-
-void EnemyHuman::SetTargetPosition(Vector2<float> targetPosition) {
-	_behaviorData.targetPosition = targetPosition;
-}
-
-void EnemyHuman::SetTargetOrientation(float targetOrientation) {
-	_behaviorData.targetOrientation = targetOrientation;
-}
-
-void EnemyHuman::SetVelocity(Vector2<float> velocity) {
-	_velocity = velocity;
-	_behaviorData.velocity = _velocity;
-}
-
-bool EnemyHuman::TakeDamage(unsigned int damageAmount) {
-	_currentHealth -= damageAmount;
-	if (_currentHealth <= 0) {	
-		return true;
-	}
-	return false;
 }
 
 bool EnemyHuman::UpdateMovement() {
@@ -253,10 +154,4 @@ void EnemyHuman::UpdateTarget() {
 	} else {
 		_behaviorData.targetPosition = playerCharacter->GetPosition();
 	}
-}
-
-void EnemyHuman::PickWeapon(WeaponType weaponType) {
-	_weaponComponent = enemyManager->AccessWeapon(weaponType);
-	_maxHealth += _weaponComponent->GetHealthModifier();
-	_currentHealth = _maxHealth;
 }

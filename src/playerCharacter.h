@@ -19,21 +19,13 @@ public:
 
 	void RenderText() override;
 
-	const unsigned int GetObjectID() const override;
 	const std::shared_ptr<Collider> GetCollider() const override;
-	const ObjectType GetObjectType() const override;
-
-	const std::shared_ptr<Sprite> GetSprite() const override;
-	const Vector2<float> GetPosition() const override;
-	const Vector2<float> GetVelocity() const override;
 
 	void ExecuteDeath();
 	void FireProjectile();
 	void Respawn();
 
 	void TakeDamage(unsigned int damageAmount);
-
-	const float GetOrientation() const;	
 
 	const int GetCurrentHealth() const;
 

@@ -113,9 +113,6 @@
     <ClCompile Include="src\formationManager.cpp">
       <Filter>FormationManager</Filter>
     </ClCompile>
-    <ClCompile Include="bossBoar.cpp">
-      <Filter>Enemies</Filter>
-    </ClCompile>
     <ClCompile Include="src\decisionTree.cpp">
       <Filter>DecisionMaking</Filter>
     </ClCompile>
@@ -125,10 +122,11 @@
     <ClCompile Include="src\stateMachine.cpp">
       <Filter>DecisionMaking</Filter>
     </ClCompile>
+    <ClCompile Include="src\bossBoar.cpp">
+      <Filter>Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\SDL2\begin_code.h" />
-    <ClInclude Include="include\SDL2\close_code.h" />
     <ClInclude Include="include\SDL2\SDL_vulkan.h">
       <Filter>SDLIncludes</Filter>
     </ClInclude>
@@ -524,6 +522,12 @@
     </ClInclude>
     <ClInclude Include="src\stateMachine.h">
       <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\begin_code.h">
+      <Filter>SDLIncludes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SDL2\close_code.h">
+      <Filter>SDLIncludes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

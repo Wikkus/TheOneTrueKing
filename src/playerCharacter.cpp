@@ -50,16 +50,8 @@ void PlayerCharacter::RenderText() {
 	_healthTextSprite->Render();
 }
 
-const unsigned int PlayerCharacter::GetObjectID() const {
-	return _objectID;
-}
-
 const std::shared_ptr<Collider> PlayerCharacter::GetCollider() const {
 	return _circleCollider;
-}
-
-const ObjectType PlayerCharacter::GetObjectType() const {
-	return _objectType;
 }
 
 void PlayerCharacter::TakeDamage(unsigned int damageAmount) {
@@ -153,22 +145,6 @@ void PlayerCharacter::UpdateTarget() {
 	_orientation = VectorAsOrientation(_direction);
 }
 
-const std::shared_ptr<Sprite> PlayerCharacter::GetSprite() const {
-	return _sprite;
-}
-
-const float PlayerCharacter::GetOrientation() const {
-	return _orientation;
-}
-
 const int PlayerCharacter::GetCurrentHealth() const {
 	return _currentHealth;
-}
-
-const Vector2<float> PlayerCharacter::GetPosition() const {
-	return _position;
-}
-
-const Vector2<float> PlayerCharacter::GetVelocity() const {
-	return _velocity;
 }

@@ -15,48 +15,33 @@ public:
 	EnemyBase(int objectID, EnemyType enemyType) : ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {}
 	~EnemyBase() {}
 
-	void Init() override = 0;
-	void Update() override = 0;
-	void Render() override = 0;
-	void RenderText() override = 0;
+	const std::shared_ptr<Collider> GetCollider() const override;
 
-	const ObjectType GetObjectType() const override = 0;
-	const std::shared_ptr<Sprite> GetSprite() const override = 0;
-	const float GetOrientation() const override = 0;
-	const unsigned int GetObjectID() const override = 0;
-	const Vector2<float> GetPosition() const override = 0;
+	virtual bool TakeDamage(unsigned int damageAmount);
 
-	virtual bool TakeDamage(unsigned int damageAmount) = 0;
-
-	virtual const std::shared_ptr<Collider> GetCollider() const = 0;
-	virtual const EnemyType GetEnemyType() const = 0;
+	virtual const EnemyType GetEnemyType() const;
 	 
-	virtual const float GetRotation() const = 0;
+	virtual const float GetRotation() const;
 
-	virtual const int GetCurrentHealth() const = 0;
+	virtual const int GetCurrentHealth() const;
 
-	virtual const int GetFormationIndex() const = 0;
+	virtual const int GetFormationIndex() const;
 
-	virtual const BehaviorData GetBehaviorData() const = 0;
+	virtual const BehaviorData GetBehaviorData() const;	
+
+	virtual const std::vector<std::shared_ptr<ObjectBase>> GetQueriedObjects() const;
+
+	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
 	
-	virtual const Vector2<float> GetVelocity() const = 0;
+	virtual bool HandleAttack();
+	virtual bool UpdateMovement();
 
-	virtual const std::vector<std::shared_ptr<ObjectBase>> GetQueriedObjects() const = 0;
-
-	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const = 0;
+	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
+	virtual void DeactivateEnemy();
 	
-	virtual bool HandleAttack() = 0;
-	virtual bool UpdateMovement() = 0;
-
-	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) = 0;
-	virtual void DeactivateEnemy() = 0;
-	
-	virtual void SetFormationIndex(int formationIndex) = 0;
-	virtual void SetPosition(Vector2<float> position) = 0;
-	virtual void SetTargetPosition(Vector2<float> targetPosition) = 0;
-	virtual void SetTargetOrientation(float targetOrientation) = 0;
-	virtual void SetVelocity(Vector2<float> velocity) = 0;
-
+	virtual void SetFormationIndex(int formationIndex);
+	virtual void SetTargetPosition(Vector2<float> targetPosition);
+	virtual void SetTargetOrientation(float targetOrientation);
 
 protected:
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment;

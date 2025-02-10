@@ -28,7 +28,6 @@ void Projectile::Render() {
 	_sprite->RenderWithOrientation(_position, _orientation);
 }
 
-void Projectile::RenderText() {}
 
 const std::shared_ptr<Collider> Projectile::GetCollider() const {
 	return _circleCollider;
@@ -38,40 +37,12 @@ const ProjectileType Projectile::GetProjectileType() const {
 	return _projectileType;
 }
 
-const ObjectType Projectile::GetObjectType() const {
-	return _objectType;
-}
-
-const unsigned int Projectile::GetObjectID() const {
-	return _objectID;
-}
-
-const std::shared_ptr<Sprite> Projectile::GetSprite() const {
-	return _sprite;
-}
-
-const float Projectile::GetOrientation() const {
-	return _orientation;
-}
-
 const unsigned int Projectile::GetProjectileDamage() const {
 	return _projectileDamage;
 }
 
-const Vector2<float> Projectile::GetPosition() const {
-	return _position;
-}
-
-const Vector2<float> Projectile::GetVelocity() const {
-	return _direction;
-}
-
 void Projectile::SetDirection(Vector2<float> direction) {
 	_direction = direction;
-}
-
-void Projectile::SetOrientation(float orientation) {
-	_orientation = orientation;
 }
 
 void Projectile::SetPosition(Vector2<float> position) {

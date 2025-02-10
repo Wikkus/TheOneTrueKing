@@ -67,7 +67,13 @@ void EnemyBoar::Init() {
 	_behaviorData.targetPosition = playerCharacter->GetPosition();
 	_direction = _behaviorData.targetPosition - _position;
 
-	_behaviorData.velocity = _velocity;
+	_behaviorData.velocity = _velocity;	
+	
+	_isAttacking = false;
+	_damagedPlayer = false;
+	_playerInRange = false;
+	_chargeAttackTimer->DeactivateTimer();
+	_attackCooldownTimer->DeactivateTimer();
 }
 
 void EnemyBoar::Update() {
@@ -87,96 +93,6 @@ void EnemyBoar::Update() {
 
 void EnemyBoar::Render() {
 	_sprite->RenderWithOrientation(_position, _orientation);
-}
-
-void EnemyBoar::RenderText() {}
-
-const std::shared_ptr<Collider> EnemyBoar::GetCollider() const {
-	return _circleCollider;
-}
-
-const EnemyType EnemyBoar::GetEnemyType() const {
-	return _enemyType;
-}
-
-const ObjectType EnemyBoar::GetObjectType() const {
-	return _objectType;
-}
-
-const BehaviorData EnemyBoar::GetBehaviorData() const {
-	return _behaviorData;
-}
-
-const float EnemyBoar::GetOrientation() const {
-	return _orientation;
-}
-
-const float EnemyBoar::GetRotation() const {
-	return _rotation;
-}
-
-const int EnemyBoar::GetCurrentHealth() const {
-	return _currentHealth;
-}
-
-const unsigned int EnemyBoar::GetObjectID() const {
-	return _objectID;
-}
-
-const int EnemyBoar::GetFormationIndex() const {
-	return _formationIndex;
-}
-
-const std::shared_ptr<Sprite> EnemyBoar::GetSprite() const {
-	return _sprite;
-}
-
-const Vector2<float> EnemyBoar::GetPosition() const {
-	return _position;
-}
-
-const Vector2<float> EnemyBoar::GetVelocity() const {
-	return _velocity;
-}
-
-const std::vector<std::shared_ptr<ObjectBase>> EnemyBoar::GetQueriedObjects() const {
-	return _behaviorData.queriedObjects;
-}
-
-const std::shared_ptr<WeaponComponent> EnemyBoar::GetWeaponComponent() const {
-	return _weaponComponent;
-}
-
-void EnemyBoar::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
-	_orientation = orienation;
-	_direction = direction;
-	_position = position;
-	_circleCollider->SetPosition(_position);
-	Init();
-}
-
-void EnemyBoar::DeactivateEnemy() {
-	_orientation = 0.f;
-	_direction = Vector2<float>(0.f, 0.f);
-	_position = Vector2<float>(-10000.f, -10000.f);
-	_circleCollider->SetPosition(_position);
-	_behaviorData.rotation = 0.f;
-	_velocity = { 0.f, 0.f };
-
-	_isAttacking = false;
-	_damagedPlayer = false;
-	_playerInRange = false;
-	_chargeAttackTimer->DeactivateTimer();
-	_attackCooldownTimer->DeactivateTimer();
-	_formationIndex = -1;
-}
-
-bool EnemyBoar::TakeDamage(unsigned int damageAmount) {
-	_currentHealth -= damageAmount;
-	if (_currentHealth <= 0) {
-		return true;
-	}
-	return false;
 }
 
 bool EnemyBoar::HandleAttack() {
@@ -212,26 +128,6 @@ bool EnemyBoar::HandleAttack() {
 		_velocity = { 0.f, 0.f };
 	}
 	return true;
-}
-
-void EnemyBoar::SetFormationIndex(int formationIndex) {
-	_formationIndex = formationIndex;
-}
-
-void EnemyBoar::SetPosition(Vector2<float> position) {
-	_position = position;
-}
-
-void EnemyBoar::SetTargetPosition(Vector2<float> targetPosition) {
-	_behaviorData.targetPosition = targetPosition;
-}
-
-void EnemyBoar::SetTargetOrientation(float targetOrientation) {	
-	_behaviorData.targetOrientation = targetOrientation;
-}
-
-void EnemyBoar::SetVelocity(Vector2<float> velocity) {
-	_velocity = velocity;
 }
 
 bool EnemyBoar::UpdateMovement() {

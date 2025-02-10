@@ -58,7 +58,6 @@ int main(int argc, char* argv[]) {
 	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 35);
 	enemyBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<EnemyBase>>>(quadTreeNode, 25);
 
-
 	//Init here
 	enemyManager->Init();
 	imGuiHandler->Init();
