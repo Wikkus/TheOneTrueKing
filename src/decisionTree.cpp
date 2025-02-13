@@ -4,6 +4,7 @@
 #include "gameEngine.h"
 #include "enemyBase.h"
 #include "playerCharacter.h"
+#include "collision.h"
 
 DecisionTreeNode::DecisionTreeNode() {}
 
@@ -19,36 +20,48 @@ const NodeType DecisionTreeNode::GetNodeType() const {
 }
 
 Action::Action() {
-	_nodeType = NodeType::AttackNode;
+	_nodeType = NodeType::ActionNode;
 }
 
 std::shared_ptr<DecisionTreeNode> Action::MakeDecision(EnemyBase& owner) {	
 	return shared_from_this();
 }
 
-bool Action::ExecuteAction(EnemyBase& owner) {
-	return false;
+
+void Action::SetActionFinished(bool actionFinished) {
+	_actionFinished = actionFinished;
 }
 
-AttackAction::AttackAction() {
+const bool Action::GetActionFinished() const {
+	return _actionFinished;
 }
+
+AttackAction::AttackAction() {}
 
 std::shared_ptr<DecisionTreeNode> AttackAction::MakeDecision(EnemyBase& owner) {
 	return shared_from_this();
 }
 
-bool AttackAction::ExecuteAction(EnemyBase& owner) {
-	return owner.HandleAttack();
+void AttackAction::ExecuteAction(EnemyBase& owner) {
+	owner.HandleAttack();
 }
 
-MoveAction::MoveAction() {}
+MoveAction::MoveAction() {
+	_moveDuration = timerManager->CreateTimer(1.f);
+}
 
 std::shared_ptr<DecisionTreeNode> MoveAction::MakeDecision(EnemyBase& owner) {
+	_moveDuration->ResetTimer();
 	return shared_from_this();
 }
 
-bool MoveAction::ExecuteAction(EnemyBase& owner) {
-	return owner.UpdateMovement();
+void MoveAction::ExecuteAction(EnemyBase& owner) {
+	if (IsInDistance(owner.GetBehaviorData().targetPosition, owner.GetPosition(), owner.GetAttackRange() - 5.f) 
+		|| _moveDuration->GetTimerFinished()) {
+		_actionFinished = true;
+		_moveDuration->DeactivateTimer();
+	}
+	owner.UpdateMovement();
 }
 
 
@@ -89,21 +102,6 @@ float WithinRangeDecision::TestValue(Vector2<float> position, Vector2<float> tar
 	return Vector2<float>::distanceBetweenVectors(targetPosition, position);
 }
 
-MultiDecision::MultiDecision() {
-}
-
-std::shared_ptr<DecisionTreeNode> MultiDecision::GetBranch(EnemyBase& owner) {
-	return _daughterNodes[TestValue()];
-}
-
-std::shared_ptr<DecisionTreeNode> MultiDecision::MakeDecision(EnemyBase& owner) {
-	return GetBranch(owner)->MakeDecision(owner);
-}
-
-int MultiDecision::TestValue() {
-	return 0;
-}
-
 RandomDecision::RandomDecision() {}
 
 bool RandomDecision::TestValue() {
@@ -116,3 +114,26 @@ bool RandomDecision::TestValue() {
 	return _currentDecision;
 }
 
+MultiDecision::MultiDecision() {}
+
+std::shared_ptr<DecisionTreeNode> MultiDecision::GetBranch(EnemyBase& owner) {
+	return _daughterNodes[TestValue()];
+}
+
+std::shared_ptr<DecisionTreeNode> MultiDecision::MakeDecision(EnemyBase& owner) {
+	return GetBranch(owner)->MakeDecision(owner);
+}
+
+void MultiDecision::AddNode(std::shared_ptr<DecisionTreeNode> node) {
+	_daughterNodes.emplace_back(node);
+}
+
+int MultiDecision::TestValue() { 
+	return 0;
+}
+
+RandomMultiDecision::RandomMultiDecision() {}
+
+int RandomMultiDecision::TestValue() {
+	return RandomBinomalInt(0, _daughterNodes.size() - 1);
+}

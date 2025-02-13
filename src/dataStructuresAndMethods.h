@@ -23,7 +23,6 @@ struct StaticCharacter {
 };
 
 bool IsInDistance(Vector2<float> positionA, Vector2<float> positionB, float distance);
-bool IsOutOfDistance(Vector2<float> positionA, Vector2<float> positionB, float distance);
 bool OutOfBorderX(float positionX, float offset);
 bool OutOfBorderY(float positionY, float offset);
 
@@ -32,8 +31,9 @@ Vector2<float> OrientationAsVector(float orientation);
 Vector2<float> RotateDirection(float degree, Vector2<float> direction);
 Vector2<float> RotateVector(float degree, Vector2<float> startPoint, Vector2<float> endPoint);
 
-
 Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration);
+
+Vector2<float> PointBetweenVectors(Vector2<float> fromVector, Vector2<float> toVector, float range);
 
 float RandomBinomalFloat(float a, float b);
 int RandomBinomalInt(int a, int b);

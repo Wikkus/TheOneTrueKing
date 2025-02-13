@@ -2,13 +2,14 @@
 #include <memory>
 #include <vector>
 
+#include "timerManager.h"
 #include "vector2.h"
 
 class EnemyBase;
 
 enum class NodeType {
 	DecisionNode,
-	AttackNode,
+	ActionNode,
 	Count
 };
 
@@ -23,10 +24,11 @@ public:
 	const NodeType GetNodeType() const;
 
 protected:
-	NodeType _nodeType;
+	NodeType _nodeType = NodeType::Count;
 
 };
 
+#pragma region Actions
 class Action : public DecisionTreeNode {
 public:
 	Action();
@@ -34,13 +36,15 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	virtual bool ExecuteAction(EnemyBase& owner);
+	virtual void ExecuteAction(EnemyBase& owner) {}
+
+	void SetActionFinished(bool actionFinished);
+	const bool GetActionFinished() const;
+
 
 protected:
-	bool _acitonFinished = false;
 
-private:
-
+	bool _actionFinished = false;
 
 };
 
@@ -51,9 +55,7 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	bool ExecuteAction(EnemyBase& owner) override;
-
-private:
+	void ExecuteAction(EnemyBase& owner) override;
 
 };
 
@@ -64,12 +66,15 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	bool ExecuteAction(EnemyBase& owner) override;
-
+	void ExecuteAction(EnemyBase& owner) override;
 private:
+	std::shared_ptr<Timer> _moveDuration = nullptr;
+	Vector2<float> _targetPos;
 
 };
+#pragma endregion
 
+#pragma region Decisions
 class Decision : public DecisionTreeNode {
 public:
 	Decision();
@@ -86,20 +91,7 @@ protected:
 	std::shared_ptr<DecisionTreeNode> _trueNode;
 	
 };
-class MultiDecision : public DecisionTreeNode {
-public:
-	MultiDecision();
-	~MultiDecision() {}
 
-	std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
-
-	int TestValue();
-
-private:
-	std::vector<std::shared_ptr<DecisionTreeNode>> _daughterNodes;
-
-};
 
 class WithinRangeDecision : public Decision {
 public:
@@ -132,3 +124,31 @@ private:
 	int _timeOutFrame = -1;
 
 };
+#pragma endregion
+
+#pragma region MultiDecisions
+class MultiDecision : public DecisionTreeNode {
+public:
+	MultiDecision();
+	~MultiDecision() {}
+
+	std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+
+	void AddNode(std::shared_ptr<DecisionTreeNode> node);
+
+	virtual int TestValue();
+
+protected:
+	std::vector<std::shared_ptr<DecisionTreeNode>> _daughterNodes;
+
+};
+
+class RandomMultiDecision : public MultiDecision {
+public:
+	RandomMultiDecision();
+	~RandomMultiDecision() {}
+
+	int TestValue() override;
+};
+#pragma endregion

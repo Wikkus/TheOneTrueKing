@@ -20,19 +20,22 @@ public:
 	void Render() override;
 	void RenderText() override;
 
-	bool HandleAttack() override;
-	bool UpdateMovement() override;
+	void HandleAttack() override;
+	void UpdateMovement() override;
 
 private:
-	bool MakeDecision();
 	void CreateDecisionTree();
+	void MakeDecision();
 
-	const char* _bossBoarSprite = "res/sprites/BoarBoss.png";
+	void FireProjectile();
 	
+	const char* _bossBoarSpritePath = "res/sprites/BoarBoss.png";
+
 	float _dashDistance = 0.f;
 	float _dashSpeed = 300.f;
 
-	float _attackRange = 0.f;
+	Vector2<float> _projectileDirection = { 0.f, 0.f };
+
 	int _attackDamage = 0;
 
 	bool _damagedPlayer = false;

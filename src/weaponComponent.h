@@ -17,25 +17,25 @@ class EnemyBase;
 
 class WeaponComponent {
 public:
-	WeaponComponent() {}
+	WeaponComponent();
 	~WeaponComponent() {}
 
-	virtual void Render(Vector2<float> position, float orientation) = 0;
+	void Init();
+	void Update();
+	void Render(Vector2<float> position, float orientation);
 
-	virtual void Attack(Vector2<float> position, float orientation) = 0;
+	virtual void Attack(Vector2<float> position) {}
 
-	virtual bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) = 0;
+	const virtual bool GetIsAttacking() const;
 
-	const virtual bool GetIsAttacking() const = 0;
-
-	const virtual float GetAttackRange() const = 0;
+	const virtual float GetAttackRange() const;
 	
-	const virtual int GetAttackDamage() const = 0;
-	const virtual int GetHealthModifier() const = 0;
+	const virtual int GetAttackDamage() const;
+	const virtual int GetHealthModifier() const;
 
-	const virtual WeaponType GetWeaponType() const = 0;
+	const virtual WeaponType GetWeaponType() const;
 
-	virtual void DeactivateTimers() = 0;
+	virtual void DeactivateTimers();
 
 protected:
 	std::shared_ptr<Sprite> _sprite = nullptr;
@@ -60,22 +60,7 @@ public:
 	ShieldComponent();
 	~ShieldComponent();
 
-	void Render(Vector2<float> position, float orientation) override;
-
-	void Attack(Vector2<float> position, float orientation) override;
-
-	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
-	
-	const bool GetIsAttacking() const override;
-
-	const float GetAttackRange() const override;
-
-	const int GetAttackDamage() const override;
-	const int GetHealthModifier() const override;
-
-	const WeaponType GetWeaponType() const override;
-
-	void DeactivateTimers() override;
+	void Attack(Vector2<float> position) override;
 };
 
 class StaffComponent : public WeaponComponent {
@@ -83,25 +68,12 @@ public:
 	StaffComponent();
 	~StaffComponent();
 
-	void Render(Vector2<float> position, float orientation) override;
-
-	void Attack(Vector2<float> position, float orientation) override;
-
-	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
-
-	const bool GetIsAttacking() const override;
-
-	const float GetAttackRange() const override;
-
-	const int GetAttackDamage() const override;
-	const int GetHealthModifier() const override;
-
-	const WeaponType GetWeaponType() const;
-
-	void DeactivateTimers() override;
+	void Attack(Vector2<float> position) override;
 
 private:
+	float _projectileOrientation = 0;
 	float _projectileSpeed = 200.f;
+	Vector2<float> _projectileDirection = { 0.f, 0.f };
 };
 
 class SwordComponent : public WeaponComponent {
@@ -109,21 +81,5 @@ public:
 	SwordComponent();
 	~SwordComponent();
 
-	void Render(Vector2<float> position, float orientation) override;
-
-	void Attack(Vector2<float> position, float orientation) override;
-	
-	bool AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) override;
-
-	const bool GetIsAttacking() const override;
-
-	const float GetAttackRange() const override;
-
-	const int GetAttackDamage() const override;
-	const int GetHealthModifier() const override;
-
-	const WeaponType GetWeaponType() const override;
-
-	void DeactivateTimers() override;
-
+	void Attack(Vector2<float> position) override;	
 };

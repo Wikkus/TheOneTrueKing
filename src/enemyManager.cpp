@@ -103,17 +103,17 @@ std::shared_ptr<WeaponComponent> EnemyManager::AccessWeapon(WeaponType weaponTyp
 void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position) {
 	switch (enemyType) {
 	case EnemyType::Boar:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>(objectID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>(lastObjectID, enemyType));
 		break;
 
 	case EnemyType::Human:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>(objectID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>(lastObjectID, enemyType));
 		break;
 	
 	default:
 		break;
 	}	
-	objectID++;
+	lastObjectID++;
 }
 
 void EnemyManager::CreateWeapon(WeaponType weaponType) {
@@ -136,7 +136,7 @@ void EnemyManager::CreateWeapon(WeaponType weaponType) {
 }
 
 void EnemyManager::SpawnBoss() {
-	_activeEnemies.emplace_back(std::make_shared<BoarBoss>(objectID, EnemyType::Boar));
+	_activeEnemies.emplace_back(std::make_shared<BoarBoss>(lastObjectID, EnemyType::Boar));
 	_activeEnemies.back()->Init();
 }
 

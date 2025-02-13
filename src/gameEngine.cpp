@@ -79,7 +79,7 @@ void ClearText(SDL_Surface* textSurface, SDL_Texture* textTexture) {
 float deltaTime = 0.f;
 int frameNumber = 0;
 
-unsigned int objectID = 0;
+unsigned int lastObjectID = 0;
 
 std::random_device randomDevice;
 std::mt19937 randomEngine(randomDevice());

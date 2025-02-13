@@ -8,7 +8,6 @@
 #include "obstacleManager.h"
 #include "obstacleWall.h"
 
-
 AlignBehavior::AlignBehavior() {
 	_behaviorType = SteeringBehaviorType::Align;
 }
@@ -420,14 +419,15 @@ void BlendSteering::AddSteeringBehaviour(BehaviorAndWeight behaviour) {
 	_behaviors.emplace_back(behaviour);
 }
 
-void BlendSteering::RemoveSteeringBehaviour(SteeringBehaviorType behaviorType) {
+bool BlendSteering::RemoveSteeringBehaviour(SteeringBehaviorType behaviorType) {
 	//Loops through and tries to find the target behavior type and removes it if found
 	for (unsigned int i = 0; i < _behaviors.size(); i++) {
 		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == behaviorType) {
 			_behaviors.erase(_behaviors.begin() + i);
-			break;
+			return true;
 		}
 	}
+	return false;
 }
 
 void BlendSteering::ClearBehaviours() {
@@ -474,10 +474,20 @@ void PrioritySteering::AddBehaviorInGroup(BehaviorAndWeight newBehavior, int gro
 	_groups[groupIndex].AddSteeringBehaviour(newBehavior);
 }
 
-void PrioritySteering::RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType, unsigned int groupIndex) {
-	_groups[groupIndex].RemoveSteeringBehaviour(oldBehaviorType);
+bool PrioritySteering::RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType) {
+	for (unsigned int i = 0; i < _groups.size(); i++) {
+		if (_groups[i].RemoveSteeringBehaviour(oldBehaviorType)) {
+			return true;
+		}
+	}
+	return false;
 }
 
-bool PrioritySteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior, unsigned int groupIndex) {
-	return _groups[groupIndex].ReplaceSteeringBheavior(oldBehaviorType, newBehavior);
+bool PrioritySteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+	for (unsigned int i = 0; i < _groups.size(); i++) {
+		if (_groups[i].ReplaceSteeringBheavior(oldBehaviorType, newBehavior)) {
+			return true;
+		}
+	}	
+	return false;
 }

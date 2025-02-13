@@ -5,13 +5,16 @@
 #include "enemyManager.h"
 #include "gameEngine.h"
 
-Projectile::Projectile(ProjectileType projectileType, const char* spritePath, unsigned int objectID) :
-	ObjectBase(objectID, ObjectType::Projectile) {
+Projectile::Projectile(unsigned int objectID, ProjectileType projectileType, const char* spritePath)
+	: ObjectBase(objectID, ObjectType::Projectile) {
+	_projectileType = projectileType;
+
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(spritePath);
-	_projectileType = projectileType;
+	
+	_position = { 10000.f, 10000.f };
 	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, 16.f);
+	_circleCollider->Init(_position, _sprite->w * 0.5f);	
 }
 
 Projectile::~Projectile() {}
@@ -19,8 +22,8 @@ Projectile::~Projectile() {}
 void Projectile::Init() {}
 
 void Projectile::Update() {
+	_velocity = _direction * _speed;
 	_position += _velocity * deltaTime;
-	_velocity = _direction * _projectileSpeed;
 	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
@@ -38,7 +41,7 @@ const ProjectileType Projectile::GetProjectileType() const {
 }
 
 const unsigned int Projectile::GetProjectileDamage() const {
-	return _projectileDamage;
+	return _damage;
 }
 
 void Projectile::SetDirection(Vector2<float> direction) {
@@ -50,16 +53,17 @@ void Projectile::SetPosition(Vector2<float> position) {
 	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
-void Projectile::ActivateProjectile(float orientation, unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position) {
+void Projectile::ActivateProjectile(float orientation, Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
 	_orientation = orientation;
-	_projectileDamage = projectileDamage;
-	_projectileSpeed = projectileSpeed;
 
 	_direction = direction.normalized();
-	_velocity = _direction * _projectileSpeed;
+	_velocity = _direction * _speed;
 
 	_position = position;
 	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
+
+	_damage = damage;
+	_speed = speed;
 }
 
 void Projectile::DeactivateProjectile() {

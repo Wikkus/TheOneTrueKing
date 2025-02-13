@@ -1,17 +1,16 @@
 #include "bossBoar.h"
 #include "decisionTree.h"
 #include "playerCharacter.h"
+#include "projectileManager.h"
 #include "timerManager.h"
+
 #include <string>
 
 BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
-	_sprite = std::make_shared<Sprite>();
-	_sprite->Load(_bossBoarSprite);
+	_sprite->Load(_bossBoarSpritePath);
 
 	_position = Vector2<float>(-10000.f, -10000.f);
-
-	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, 64.f);
+	_circleCollider->Init(_position, _sprite->h * 0.5f);
 
 	_behaviorData.characterRadius = _circleCollider->GetRadius();
 
@@ -20,8 +19,6 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 
 	_attackDamage = 300;
 	_attackRange = 300;
-	_attackRadius = std::make_shared<Circle>();
-	_attackRadius->Init(_position, 300.f);
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = PI * 0.005f;
@@ -59,7 +56,7 @@ BoarBoss::~BoarBoss() {}
 
 void BoarBoss::Init() {
 	_behaviorData.targetPosition = playerCharacter->GetPosition();
-	_position = Vector2<float>(windowWidth * 0.9f, windowHeight * 0.5f);
+	_position = Vector2<float>(windowWidth * 0.9f, windowHeight * 0.3f);
 	_direction = _behaviorData.targetPosition - _position;
 	_behaviorData.velocity = _velocity;
 
@@ -71,8 +68,8 @@ void BoarBoss::Init() {
 
 void BoarBoss::Update() {
 	if (_decisionTreeAction) {
-		if (_decisionTreeAction->ExecuteAction(*this)) {
-			//Action is finished
+		_decisionTreeAction->ExecuteAction(*this);
+		if (_decisionTreeAction->GetActionFinished()) {
 			MakeDecision();
 		}
 	}
@@ -86,13 +83,13 @@ void BoarBoss::RenderText() {
 	_healthTextSprite->Render();
 }
 
-bool BoarBoss::HandleAttack() {
+void BoarBoss::HandleAttack() {
 	if (!_isAttacking && !_attackCooldownTimer->GetTimerActive()) {
 		_isAttacking = true;
 		_behaviorData.targetPosition = playerCharacter->GetPosition();
-		_dashDistance = (_behaviorData.targetPosition - _position).absolute() * 1.5f;
+		_dashDistance = (_behaviorData.targetPosition - _position).absolute() + 200.f;
 		_velocity = { 0.f, 0.f };
-		_chargeAttackTimer->ActivateTimer();
+		_chargeAttackTimer->ResetTimer();
 	}
 	if (_chargeAttackTimer->GetTimerActive() || _attackCooldownTimer->GetTimerActive()) {
 		_behaviorData.targetPosition = playerCharacter->GetPosition();
@@ -124,13 +121,12 @@ bool BoarBoss::HandleAttack() {
 		}
 		if (_attackCooldownTimer->GetTimerFinished()) {
 			_attackCooldownTimer->DeactivateTimer();
-			return true;
+			_decisionTreeAction->SetActionFinished(true);
 		}
 	}
-	return false;
 }
 
-bool BoarBoss::UpdateMovement() {
+void BoarBoss::UpdateMovement() {
 	_behaviorData.targetPosition = playerCharacter->GetPosition();
 
 	_position += _velocity * deltaTime;
@@ -148,26 +144,27 @@ bool BoarBoss::UpdateMovement() {
 		_velocity = { 0.f, 0.f };
 	}
 	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
-	return true;
-}
-
-bool BoarBoss::MakeDecision() {
-	_decisionMade = _decisionTree->MakeDecision(*this);
-	if (_decisionMade->GetNodeType() == NodeType::AttackNode) {
-		_decisionTreeAction = std::static_pointer_cast<Action>(_decisionMade);
-		return true;
-	}
-	//Node is not an action, recursion failed
-	return false;
 }
 
 void BoarBoss::CreateDecisionTree() {
 	_decisionTree = std::make_shared<WithinRangeDecision>(_attackRange, 0);
-	std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>();
-	_decisionTree->SetFalseNode(moveAction);
-	std::shared_ptr<AttackAction> attackAction = std::make_shared<AttackAction>();
-	_decisionTree->SetTrueNode(attackAction);
+		std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>();
+		_decisionTree->SetFalseNode(moveAction);
+		std::shared_ptr<AttackAction> attackAction = std::make_shared<AttackAction>();
+		_decisionTree->SetTrueNode(attackAction);
+	
+}
+void BoarBoss::MakeDecision() {
+	_decisionMade = _decisionTree->MakeDecision(*this);
+	if (_decisionMade->GetNodeType() == NodeType::ActionNode) {
+		_decisionTreeAction = std::static_pointer_cast<Action>(_decisionMade);
+		_decisionTreeAction->SetActionFinished(false);
+	}
+	//Node is not an action, recursion failed
 
 }
 
-
+void BoarBoss::FireProjectile() {
+	_projectileDirection = (_behaviorData.targetPosition - _position).normalized();
+	projectileManager->SpawnProjectile(ProjectileType::Energyblast, VectorAsOrientation(_projectileDirection), _projectileDirection, _position, 500, 100);
+}

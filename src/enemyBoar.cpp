@@ -12,25 +12,17 @@
 #include <memory>
 
 EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
-	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_boarSprite);
 
-	_position = Vector2<float>(-10000.f, -10000.f);
-
-	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, 16.f);
+	_circleCollider->Init(_position, _sprite->h * 0.5f);
 
 	_behaviorData.characterRadius = _circleCollider->GetRadius();
 
 	_maxHealth = 150;
 	_currentHealth = _maxHealth;
 
-	_behaviorData.velocity = _velocity;
-
 	_attackDamage = 20;
-	_attackRange = 150;
-	_attackRadius = std::make_shared<Circle>();
-	_attackRadius->Init(_position, 150.f);
+	_attackRange = 150.f;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = PI * 0.005f;
@@ -47,9 +39,6 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(obj
 
 	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
-
-	_prioritySteering = std::make_shared<PrioritySteering>();
-	_blendSteering = std::make_shared<BlendSteering>();
 
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
@@ -78,7 +67,7 @@ void EnemyBoar::Init() {
 
 void EnemyBoar::Update() {
 	_behaviorData.queriedObjects = objectBaseQuadTree->Query(_circleCollider);
-	if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius->GetRadius())) {
+	if (IsInDistance(_position, playerCharacter->GetPosition(), _circleCollider->GetRadius())) {
 		_collidedWithPlayer = true;
 	}
 	if(!_isAttacking) {
@@ -87,7 +76,6 @@ void EnemyBoar::Update() {
 	}
 	HandleAttack();
 	_circleCollider->SetPosition(_position);
-	_attackRadius->SetPosition(_position);
 	_collidedWithPlayer = false;
 }
 
@@ -95,12 +83,12 @@ void EnemyBoar::Render() {
 	_sprite->RenderWithOrientation(_position, _orientation);
 }
 
-bool EnemyBoar::HandleAttack() {
+void EnemyBoar::HandleAttack() {
 	if (_attackCooldownTimer->GetTimerActive()) {
-		return true;
+		return;
 	}
 	if (!_playerInRange) {
-		if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRadius->GetRadius())) {
+		if (IsInDistance(_position, playerCharacter->GetPosition(), _attackRange)) {
 			_playerInRange = true;
 		}
 	}
@@ -127,10 +115,9 @@ bool EnemyBoar::HandleAttack() {
 		_chargeAttackTimer->ResetTimer();
 		_velocity = { 0.f, 0.f };
 	}
-	return true;
 }
 
-bool EnemyBoar::UpdateMovement() {
+void EnemyBoar::UpdateMovement() {
 	_behaviorData.targetPosition = playerCharacter->GetPosition();
 
 	_position += _velocity * deltaTime;
@@ -148,6 +135,5 @@ bool EnemyBoar::UpdateMovement() {
 		_velocity = { 0.f, 0.f };
 	}
 	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
-	return true;
 }
 

@@ -9,8 +9,23 @@ bool EnemyBase::TakeDamage(unsigned int damageAmount) {
     return false;
 }
 
+EnemyBase::EnemyBase(int objectID, EnemyType enemyType) :
+    ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {
+    _sprite = std::make_shared<Sprite>();
+    _position = Vector2<float>(-10000.f, -10000.f);
+
+    _circleCollider = std::make_shared<Circle>();
+
+    _prioritySteering = std::make_shared<PrioritySteering>();
+    _blendSteering = std::make_shared<BlendSteering>();
+}
+
 const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
     return _circleCollider;
+}
+
+const float EnemyBase::GetAttackRange() const {
+    return _attackRange;
 }
 
 const EnemyType EnemyBase::GetEnemyType() const {
@@ -20,6 +35,7 @@ const EnemyType EnemyBase::GetEnemyType() const {
 const float EnemyBase::GetRotation() const {
     return _rotation;
 }
+
 
 const int EnemyBase::GetCurrentHealth() const {
     return _currentHealth;
@@ -41,13 +57,9 @@ const std::shared_ptr<WeaponComponent> EnemyBase::GetWeaponComponent() const {
     return _weaponComponent;
 }
 
-bool EnemyBase::HandleAttack() {
-    return false;
-}
+void EnemyBase::HandleAttack() {}
 
-bool EnemyBase::UpdateMovement() {
-    return false;
-}
+void EnemyBase::UpdateMovement() {}
 
 void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
     _orientation = orienation;
@@ -84,4 +96,8 @@ void EnemyBase::SetTargetPosition(Vector2<float> targetPosition) {
 
 void EnemyBase::SetTargetOrientation(float targetOrientation) {
     _behaviorData.targetOrientation = targetOrientation;
+}
+
+bool EnemyBase::ReplaceSteeringBehavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+    return _prioritySteering->ReplaceSteeringBheavior(oldBehaviorType, newBehavior);
 }

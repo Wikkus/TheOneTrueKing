@@ -8,10 +8,6 @@ bool IsInDistance(Vector2<float> positionA, Vector2<float> positionB, float dist
 	return Vector2<float>::distanceBetweenVectors(positionA, positionB) <= distance;
 }
 
-bool IsOutOfDistance(Vector2<float> positionA, Vector2<float> positionB, float distance) {
-	return Vector2<float>::distanceBetweenVectors(positionA, positionB) >= distance;;
-}
-
 bool OutOfBorderX(float positionX, float offset) {
 	return positionX - offset < 0.f || positionX + offset > windowWidth;
 }
@@ -52,6 +48,10 @@ Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration) {
 		velocity = velocity.normalized() * maxAcceleration;
 	}
 	return velocity;
+}
+
+Vector2<float> PointBetweenVectors(Vector2<float> fromVector, Vector2<float> toVector, float range) {
+	return fromVector + ((toVector - fromVector).normalized() * range);
 }
 
 float RandomBinomalFloat(float a, float b) {

@@ -5,8 +5,8 @@
 #include "obstacleWall.h"
 
 void ObstacleManager::CreateWall(Vector2<float> position, float width, float height, SDL_Color color) {
-	std::shared_ptr<Wall> wall = std::make_shared<Wall>(objectID);
-	objectID++;
+	std::shared_ptr<Wall> wall = std::make_shared<Wall>(lastObjectID);
+	lastObjectID++;
 	wall->Activate(position, width, height, _walls.size(), color);
 	_walls.emplace_back(wall);
 }

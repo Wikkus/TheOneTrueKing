@@ -5,14 +5,15 @@
 #include "vector2.h"
 
 enum class ProjectileType {
-	EnemyProjectile,
-	PlayerProjectile,
+	Energyblast,
+	EnemyFireball,
+	PlayerFireball,
 	Count
 };
 
 class Projectile : public ObjectBase {
 public:
-	Projectile(ProjectileType damageType, const char* spritePath, unsigned int objectID);
+	Projectile(unsigned int objectID, ProjectileType projectileType, const char* spritePath);
 	~Projectile();
 
 	void Init() override;
@@ -26,16 +27,16 @@ public:
 	
 	void SetDirection(Vector2<float> direction);
 
-	void ActivateProjectile(float orientation, unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position);
+	void ActivateProjectile(float orientation, Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed);
 	void DeactivateProjectile();
 
 private:
 	std::shared_ptr<Circle> _circleCollider = nullptr;
 
-	float _projectileSpeed = 200.f;
+	float _speed = 200.f;
 
 	ProjectileType _projectileType = ProjectileType::Count;	
 
-	unsigned int _projectileDamage = 30;
+	unsigned int _damage = 30;
 };
 

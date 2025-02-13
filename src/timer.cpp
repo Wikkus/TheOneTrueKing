@@ -2,8 +2,9 @@
 
 #include "gameEngine.h"
 
-Timer::Timer(float timeInSeconds) : _timeInSeconds(timeInSeconds) {
+Timer::Timer(float timeInSeconds) {
 	_currentTime = timeInSeconds;
+	_timeInSeconds = timeInSeconds;
 }
 
 Timer::~Timer() {}
@@ -30,6 +31,7 @@ const float Timer::GetTimeInSeconds() const {
 
 void Timer::ActivateTimer() {
 	_timerActive = true;
+	_timerFinished = false;
 }
 
 void Timer::DeactivateTimer() {
@@ -52,5 +54,10 @@ void Timer::Update() {
 			_timerFinished = true;
 		}
 	}
+}
+
+void Timer::SetTimeInSeconds(float timeInSeconds) {
+	_timeInSeconds = timeInSeconds;
+	_currentTime = _timeInSeconds;
 }
 

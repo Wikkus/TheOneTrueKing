@@ -19,14 +19,12 @@ public:
 
 	bool CheckCollision(ProjectileType projectileType, unsigned int projectileIndex);
 
-	const char* GetEnemyProjectileSprite() const;
-	const char* GetPlayerProjectileSprite() const;
+	const std::shared_ptr<ObjectPool<std::shared_ptr<Projectile>>> GetProjectilePool(ProjectileType projectileType);
 
-	void CreateNewProjectile(ProjectileType projectileType, const char* spritePath, 
-		float orientation, Vector2<float> direction, Vector2<float> position);
+	void CreateNewProjectile(ProjectileType projectileType);
 	
-	void SpawnProjectile(ProjectileType projectileType, const char* spritePath, float orientation, 
-		unsigned int projectileDamage, unsigned int projectileSpeed, Vector2<float> direction, Vector2<float> position);
+	void SpawnProjectile(ProjectileType projectileType, float orientation, 
+		Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed);
 	
 	void QuickSort(int start, int end);
 	
@@ -45,11 +43,13 @@ private:
 	std::unordered_map<ProjectileType, std::shared_ptr<ObjectPool<std::shared_ptr<Projectile>>>> _projectilePools;
 	std::vector<std::shared_ptr<Projectile>> _activeProjectiles;
 
+
+	std::unordered_map<ProjectileType, const char*> _spritePaths;
+	const char* _energyBlastSprite = "res/sprites/Energyblast.png";
 	const char* _enemyProjectileSprite = "res/sprites/Fireball.png";
 	const char* _playerProjectileSprite = "res/sprites/Arcaneball.png";
 	
 	unsigned int _projectileAmountLimit = 2000;
-	unsigned int _numberOfProjectileTypes = 0;
 
 	int _latestProjectileIndex = -1;
 

@@ -23,8 +23,8 @@ public:
 	void Update() override;
 	void Render() override;
 
-	bool HandleAttack() override;
-	bool UpdateMovement() override;
+	void HandleAttack() override;
+	void UpdateMovement() override;
 	
 private:
 	void UpdateTarget();

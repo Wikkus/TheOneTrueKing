@@ -72,8 +72,8 @@ void PlayerCharacter::FireProjectile() {
 	_multiShotAngle = -PI * 0.0625f;
 	for (unsigned int i = 0; i < _multiShotAmount; i++) {
 		_multiShotDirection = RotateDirection(_multiShotAngle, _direction);
-		projectileManager->SpawnProjectile(ProjectileType::PlayerProjectile, projectileManager->GetPlayerProjectileSprite(), 
-			_orientation + _multiShotAngle, _attackDamage, _projectileSpeed, _multiShotDirection, _position);
+		projectileManager->SpawnProjectile(ProjectileType::PlayerFireball, _orientation + _multiShotAngle, 
+			_multiShotDirection, _position, _attackDamage, _projectileSpeed);
 		_multiShotAngle += PI * 0.0625f;
 	}
 }

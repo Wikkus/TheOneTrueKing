@@ -4,14 +4,46 @@
 #include "dataStructuresAndMethods.h"
 #include "enemyBase.h"
 #include "gameEngine.h"
+#include "objectPool.h"
 #include "stateStack.h"
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "sprite.h"
 #include "timerManager.h"
 
-ShieldComponent::ShieldComponent() {
+WeaponComponent::WeaponComponent() {
 	_sprite = std::make_shared<Sprite>();
+}
+
+void WeaponComponent::Init() {}
+
+void WeaponComponent::Update() {}
+
+void WeaponComponent::Render(Vector2<float> position, float orientation) {
+	_sprite->RenderWithOrientation(position, orientation);
+}
+const bool WeaponComponent::GetIsAttacking() const {
+	return _isAttacking;
+}
+const float WeaponComponent::GetAttackRange() const {
+	return _attackRange;
+}
+const int WeaponComponent::GetAttackDamage() const {
+	return _attackDamage;
+}
+const int WeaponComponent::GetHealthModifier() const {
+	return _healthModifier;
+}
+const WeaponType WeaponComponent::GetWeaponType() const {
+	return _weaponType;
+}
+void WeaponComponent::DeactivateTimers() {
+	_attackCooldownTimer->DeactivateTimer();
+	_chargeAttackTimer->DeactivateTimer();
+}
+
+
+ShieldComponent::ShieldComponent() {
 	_sprite->Load("res/sprites/Shield.png");
 
 	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
@@ -30,11 +62,7 @@ ShieldComponent::ShieldComponent() {
 
 ShieldComponent::~ShieldComponent() {}
 
-void ShieldComponent::Render(Vector2<float> position, float orientation) {
-	_sprite->RenderWithOrientation(position, orientation);
-}
-
-void ShieldComponent::Attack(Vector2<float> position, float orientation) {
+void ShieldComponent::Attack(Vector2<float> position) {
 	//if (_attackCooldownTimer->GetTimerActive()) {
 	//	return;
 	//}
@@ -47,38 +75,7 @@ void ShieldComponent::Attack(Vector2<float> position, float orientation) {
 	//	_isAttacking = true;
 	//}
 }
-
-bool ShieldComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
-	return false;
-}
-
-const bool ShieldComponent::GetIsAttacking() const {
-	return _isAttacking;
-}
-
-const float ShieldComponent::GetAttackRange() const {
-	return _attackRange;
-}
-
-const int ShieldComponent::GetAttackDamage() const {
-	return _attackDamage;
-}
-
-const int ShieldComponent::GetHealthModifier() const {
-	return _healthModifier;
-}
-
-const WeaponType ShieldComponent::GetWeaponType() const {
-	return _weaponType;
-}
-
-void ShieldComponent::DeactivateTimers() {
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
-}
-
 StaffComponent::StaffComponent() {
-	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Staff.png");
 
 	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
@@ -94,18 +91,17 @@ StaffComponent::StaffComponent() {
 
 StaffComponent::~StaffComponent() {}
 
-void StaffComponent::Render(Vector2<float> position, float orientation) {
-	_sprite->RenderWithOrientation(position, orientation);
-}
 //If the weapon is a staff it shoots a fireball towards the player
-void StaffComponent::Attack(Vector2<float> position, float orientation) {
+void StaffComponent::Attack(Vector2<float> position) {
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		Vector2<float> direction = Vector2<float>(playerCharacter->GetPosition() - position).normalized();	
-		projectileManager->SpawnProjectile(ProjectileType::EnemyProjectile, projectileManager->GetEnemyProjectileSprite(), 
-			VectorAsOrientation(direction), _attackDamage, _projectileSpeed, direction, position);
+		_projectileDirection = Vector2<float>(playerCharacter->GetPosition() - position).normalized();
+		_projectileOrientation = VectorAsOrientation(_projectileDirection);
+
+		projectileManager->SpawnProjectile(ProjectileType::EnemyFireball, _projectileOrientation, _projectileDirection, position, _attackDamage, _projectileSpeed);
+		
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
 
@@ -116,37 +112,7 @@ void StaffComponent::Attack(Vector2<float> position, float orientation) {
 	}
 }
 
-bool StaffComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
-	return false;
-}
-
-const bool StaffComponent::GetIsAttacking() const {
-	return _isAttacking;
-}
-
-const float StaffComponent::GetAttackRange() const {
-	return _attackRange;
-}
-
-const int StaffComponent::GetAttackDamage() const {
-	return _attackDamage;
-}
-
-const int StaffComponent::GetHealthModifier() const {
-	return _healthModifier;
-}
-
-const WeaponType StaffComponent::GetWeaponType() const {
-	return _weaponType;
-}
-
-void StaffComponent::DeactivateTimers() {
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
-}
-
 SwordComponent::SwordComponent() {
-	_sprite = std::make_shared<Sprite>();
 	_sprite->Load("res/sprites/Sword.png");
 	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
@@ -160,11 +126,8 @@ SwordComponent::SwordComponent() {
 
 SwordComponent::~SwordComponent() {}
 
-void SwordComponent::Render(Vector2<float> position, float orientation) {
-	_sprite->RenderWithOrientation(position, orientation);
-}
 //If the weapon is a sword it damages the player if its close enough
-void SwordComponent::Attack(Vector2<float> position, float orientation) {
+void SwordComponent::Attack(Vector2<float> position) {
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
@@ -180,37 +143,3 @@ void SwordComponent::Attack(Vector2<float> position, float orientation) {
 		_isAttacking = true;
 	}
 }
-
-bool SwordComponent::AtTargetDistance(Vector2<float> position, Vector2<float> targetPosition, float distance, bool isInDistance) {
-	if (isInDistance) {
-		return IsInDistance(targetPosition, position, distance);
-	} else {
-		return IsOutOfDistance(targetPosition, position, distance);
-	}
-}
-
-const bool SwordComponent::GetIsAttacking() const {
-	return _isAttacking;
-}
-
-const int SwordComponent::GetAttackDamage() const {
-	return _attackDamage;
-}
-
-const int SwordComponent::GetHealthModifier() const {
-	return _healthModifier;
-}
-
-const float SwordComponent::GetAttackRange() const {
-	return _attackRange;
-}
-
-const WeaponType SwordComponent::GetWeaponType() const {
-	return _weaponType;
-}
-
-void SwordComponent::DeactivateTimers() {
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
-}
-

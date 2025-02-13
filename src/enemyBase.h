@@ -12,10 +12,11 @@ class WeaponComponent;
 
 class EnemyBase : public ObjectBase {
 public:
-	EnemyBase(int objectID, EnemyType enemyType) : ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {}
+	EnemyBase(int objectID, EnemyType enemyType);
 	~EnemyBase() {}
 
 	const std::shared_ptr<Collider> GetCollider() const override;
+	const float GetAttackRange() const;
 
 	virtual bool TakeDamage(unsigned int damageAmount);
 
@@ -33,8 +34,8 @@ public:
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
 	
-	virtual bool HandleAttack();
-	virtual bool UpdateMovement();
+	virtual void HandleAttack();
+	virtual void UpdateMovement();
 
 	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
 	virtual void DeactivateEnemy();
@@ -42,6 +43,9 @@ public:
 	virtual void SetFormationIndex(int formationIndex);
 	virtual void SetTargetPosition(Vector2<float> targetPosition);
 	virtual void SetTargetOrientation(float targetOrientation);
+
+	bool ReplaceSteeringBehavior(SteeringBehaviorType oldBehavior, BehaviorAndWeight newBehavior);
+
 
 protected:
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment;
@@ -57,7 +61,6 @@ protected:
 	BehaviorData _behaviorData;
 
 	std::shared_ptr<Circle> _circleCollider = nullptr;
-	std::shared_ptr<Circle> _attackRadius = nullptr;
 
 	const EnemyType _enemyType = EnemyType::Count;
 
@@ -69,6 +72,7 @@ protected:
 
 	int _formationIndex = -1;
 
+	float _attackRange = 0.f;
 	float _rotation = 0.f;
 };
 

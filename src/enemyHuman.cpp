@@ -15,19 +15,14 @@
 
 EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	EnemyBase(objectID, enemyType) {
-	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_humanSprite);
-	_position = Vector2<float>(-10000.f, -10000.f);
 
-	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, 16.f);
+	_circleCollider->Init(_position, _sprite->h * 0.5f);
 	_behaviorData.characterRadius = _circleCollider->GetRadius();
 
 	_numberOfWeaponTypes = (int)(WeaponType::Count);
 	_maxHealth = 75;
 	_currentHealth = _maxHealth;
-
-	_behaviorData.velocity = _velocity;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = FLT_EPSILON;
@@ -42,19 +37,16 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
 
-	_prioritySteering = std::make_shared<PrioritySteering>();
-	_blendSteering = std::make_shared<BlendSteering>();
-	
+	_behaviorData.linearTargetRadius = 5.f;
+	_behaviorData.linearSlowDownRadius = 20.f;
+
 	_alignBehavior.steeringBehaviour = std::make_shared<AlignBehavior>();
 	_alignBehavior.weight = 1.f;
-
 	_faceBehavior.steeringBehaviour = std::make_shared<FaceBehavior>();
 	_faceBehavior.weight = 1.f;
 
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-	_behaviorData.linearTargetRadius = 5.f;
-	_behaviorData.linearSlowDownRadius = 20.f;
 
 
 }
@@ -66,9 +58,10 @@ void EnemyHuman::Init() {
 	_direction = Vector2<float>(_behaviorData.targetPosition - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
 	_behaviorData.velocity = _velocity;
-
-	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();
 	
+	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();	
+	_attackRange = _weaponComponent->GetAttackRange();
+
 	_prioritySteering->ClearGroups();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
@@ -103,30 +96,28 @@ void EnemyHuman::Render() {
 	_weaponComponent->Render(_position, _orientation);
 }
 
-bool EnemyHuman::HandleAttack() {
+void EnemyHuman::HandleAttack() {
 	//Depending on the weapon, the attack works differently
-	_weaponComponent->Attack(_position, _orientation);
-	return true;
+	_weaponComponent->Attack(_position);
 }
 
-bool EnemyHuman::UpdateMovement() {
+void EnemyHuman::UpdateMovement() {
 	_position += _velocity * deltaTime;
 	_orientation += _rotation * deltaTime;
 
 	_circleCollider->SetPosition(_position);
 	_behaviorData.rotation = _rotation;
-	_behaviorData.velocity = _velocity;
 
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	_rotation += _steeringOutput.angularVelocity * deltaTime;
 	_velocity += _steeringOutput.linearVelocity * deltaTime;
+	_behaviorData.velocity = _velocity;
 
 	//When steering linear velocity is 0, then the target is reached and the character should stop.
 	if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
 		_velocity = { 0.f, 0.f };
 	}
 	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
-	return true;
 }
 
 void EnemyHuman::UpdateTarget() {
@@ -139,8 +130,8 @@ void EnemyHuman::UpdateTarget() {
 				break;
 			case CurrentTarget::SlotFormation:
 				if (enemyManager->GetFormationManagers()[_formationIndex]->GetInPosition()) {
-					if (!_prioritySteering->ReplaceSteeringBheavior(SteeringBehaviorType::Align, BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0)) {
-						_prioritySteering->AddBehaviorInGroup(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f), 0);
+					if (!ReplaceSteeringBehavior(SteeringBehaviorType::Align, _faceBehavior)) {
+						_prioritySteering->AddBehaviorInGroup(_faceBehavior, 0);	
 					}
 					_currentTarget = CurrentTarget::Player;
 				}

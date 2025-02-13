@@ -47,8 +47,8 @@ int main(int argc, char* argv[]) {
 	imGuiHandler = std::make_shared<ImGuiHandler>();
 	obstacleManager = std::make_shared<ObstacleManager>();
 	projectileManager = std::make_shared<ProjectileManager>();
-	playerCharacter = std::make_shared<PlayerCharacter>(0.f, objectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
-	objectID++;
+	playerCharacter = std::make_shared<PlayerCharacter>(0.f, lastObjectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
+	lastObjectID++;
 	rayCast = std::make_shared<RayCast>();
 
 	timerManager = std::make_shared<TimerManager>();

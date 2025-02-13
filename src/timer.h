@@ -16,12 +16,13 @@ public:
 	void DeactivateTimer();
 	void ResetTimer();
 	void Update();
+	void SetTimeInSeconds(float timeInSecond);
 
 private:
-	bool _timerActive = true;
-	bool _timerFinished = false;
+	bool _timerActive = false;
+	bool _timerFinished = true;
 
-	const float _timeInSeconds;	
-	float _currentTime;
+	float _timeInSeconds = 0.f;	
+	float _currentTime = 0.f;
 
 };

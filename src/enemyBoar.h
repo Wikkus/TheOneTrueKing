@@ -15,8 +15,8 @@ public:
 	void Update() override;
 	void Render() override;
 
-	bool HandleAttack() override;
-	bool UpdateMovement() override;	
+	void HandleAttack() override;
+	void UpdateMovement() override;
 
 private:	
 	const char* _boarSprite = "res/sprites/MadBoar.png";
@@ -33,7 +33,6 @@ private:
 	float _dashDistance = 0.f;
 	float _dashSpeed = 300.f;
 
-	float _attackRange = 0.f;
 	int _attackDamage = 0;
 };
 

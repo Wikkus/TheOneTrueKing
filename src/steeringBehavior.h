@@ -213,9 +213,9 @@ public:
 	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase);
 
 	void AddSteeringBehaviour(BehaviorAndWeight behaviour);	
-	void RemoveSteeringBehaviour(SteeringBehaviorType behaviorType);
 	void ClearBehaviours();
 	
+	bool RemoveSteeringBehaviour(SteeringBehaviorType behaviorType);
 	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
 
 private:
@@ -236,9 +236,9 @@ public:
 	void ClearGroups();
 	
 	void AddBehaviorInGroup(BehaviorAndWeight newBehavior, int groupIndex);
-	void RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType, unsigned int groupIndex);
 	
-	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior, unsigned int groupIndex);
+	bool RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType);
+	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
 
 private:
 	std::vector<BlendSteering> _groups;

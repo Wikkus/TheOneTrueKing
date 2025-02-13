@@ -83,7 +83,7 @@ void DebugDrawer::DrawRectangles() {
 
 void DebugDrawer::DrawCircles() {
 	for (int i = 0; i < _debugCircles.size(); i++) {
-		SDL_SetRenderDrawColor(renderer, _debugRectangles[i].color.r, _debugRectangles[i].color.g, _debugRectangles[i].color.b, _debugRectangles[i].color.a);
+		SDL_SetRenderDrawColor(renderer, _debugCircles[i].color.r, _debugCircles[i].color.g, _debugCircles[i].color.b, _debugCircles[i].color.a);
 
 		int resolution = 24;
 		float step = (2 * PI) / resolution;
