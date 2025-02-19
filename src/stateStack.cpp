@@ -106,34 +106,40 @@ const GameMode GameStateHandler::GetGameMode() const {
 InGameState::InGameState() {
 	enemyManager->Reset();
 	projectileManager->Reset();
-
-	playerCharacter->Respawn();
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->Respawn();
+	}
 }
 
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
-	objectBaseQuadTree->Insert(playerCharacter, playerCharacter->GetCollider());
-	
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		objectBaseQuadTree->Insert(playerCharacters[i], playerCharacters[i]->GetCollider());
+		playerCharacters[i]->Update();
+	}	
 	enemyManager->UpdateQuadTree();
 	projectileManager->UpdateQuadTree();
 
 	enemyManager->Update();
 	obstacleManager->UpdateObstacles();
 	projectileManager->Update();
-	playerCharacter->Update();
 	timerManager->Update();
 }
 
 void InGameState::Render() {
 	enemyManager->Render();
 	obstacleManager->RenderObstacles();
-	playerCharacter->Render();
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->Render();
+	}
 	projectileManager->Render();
 }
 
 void InGameState::RenderText() {
-	playerCharacter->RenderText();
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->RenderText();
+	}
 }
 
 BossRushGameState::BossRushGameState() {
@@ -324,7 +330,9 @@ void PauseState::Update() {
 
 void PauseState::Render() {
 	enemyManager->Render();
-	playerCharacter->Render();
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->Render();
+	}
 	projectileManager->Render();
 
 	_buttons[ButtonType::MainMenu]->Render();
@@ -334,8 +342,9 @@ void PauseState::Render() {
 }
 
 void PauseState::RenderText() {
-	playerCharacter->RenderText();
-
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->RenderText();
+	}
 	_buttons[ButtonType::MainMenu]->RenderText();
 	_buttons[ButtonType::Restart]->RenderText();
 	_buttons[ButtonType::Resume]->RenderText();

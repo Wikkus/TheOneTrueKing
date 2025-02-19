@@ -39,7 +39,7 @@ extern std::shared_ptr<GameStateHandler> gameStateHandler;
 extern std::shared_ptr<ImGuiHandler> imGuiHandler;
 
 extern std::shared_ptr<ObstacleManager> obstacleManager;
-extern std::shared_ptr<PlayerCharacter> playerCharacter;
+extern std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 extern std::shared_ptr<ProjectileManager> projectileManager;
 
 extern std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;

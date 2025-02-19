@@ -180,6 +180,7 @@ public:
 
 private:
 	std::shared_ptr<AnchorPoint> _anchorPoint;
+	std::shared_ptr<ObjectBase> _targetObject;
 	StaticCharacter _driftOffset;
 
 	StaticCharacter _location;
@@ -200,7 +201,7 @@ private:
 	bool _posWithAnchorOri = false;
 
 	unsigned int _slotsOnScreen = 0;
-
+		
 	float _anchorDistance = 0.f;
 	float _costLimit = 2000.f;
 	float _orientation = 0.f;

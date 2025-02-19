@@ -10,6 +10,7 @@
 class EnemyBase;
 class SteeringBehavior;
 class Timer;
+
 template<typename T> class ObjectPool;
 template<typename T> class QuadTree;
 
@@ -22,15 +23,9 @@ enum class EnemyType {
 };
 
 struct BehaviorData {
-	std::vector<std::shared_ptr<ObjectBase>> queriedObjects;
-
-	float rotation = 0.f;
 	float targetOrientation = 0.f;
 
 	float timeToTarget = 0.1f;
-
-	Vector2<float> targetPosition = Vector2<float>{ 0.f, 0.f };
-	Vector2<float> velocity = Vector2<float>{ 0.f, 0.f };
 
 	//align data
 	float angularSlowDownRadius = 0.f;
@@ -64,8 +59,6 @@ struct BehaviorData {
 	float wanderOffset = 0.f;
 	float wanderRadius = 0.f;
 	float wanderRate = 0.f;
-
-
 };
 
 class EnemyManager {
@@ -144,7 +137,7 @@ private:
 	int _latestEnemyIndex = -1;
 
 	unsigned int _enemyAmountLimit = 1000;
-	unsigned int _weaponAmountLimit = 1000;
+	unsigned int _weaponAmountLimit = 2000;
 	unsigned int _numberOfEnemyTypes = 0;
 	unsigned int _numberOfWeaponTypes = 0;
 	unsigned int _spawnNumberOfEnemies = 5;

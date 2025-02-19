@@ -24,7 +24,6 @@ public:
 	void Render() override;
 
 	void HandleAttack() override;
-	void UpdateMovement() override;
 	
 private:
 	void UpdateTarget();
@@ -34,6 +33,6 @@ private:
 
 	float _linearTargetRadius = 0.f;
 
-	CurrentTarget _currentTarget = CurrentTarget::SlotFormation;
+	CurrentTarget _currentTargetState = CurrentTarget::SlotFormation;
 };
 

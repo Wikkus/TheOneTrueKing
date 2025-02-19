@@ -7,6 +7,7 @@
 
 class Timer;
 class Projectile;
+class WeaponComponent;
 
 class PlayerCharacter : public ObjectBase {
 public:
@@ -22,10 +23,9 @@ public:
 	const std::shared_ptr<Collider> GetCollider() const override;
 
 	void ExecuteDeath();
-	void FireProjectile();
 	void Respawn();
 
-	void TakeDamage(unsigned int damageAmount);
+	void TakeDamage(unsigned int damageAmount) override;
 
 	const int GetCurrentHealth() const;
 
@@ -36,18 +36,12 @@ private:
 	void UpdateTarget();
 
 	const char* _kingSprite = "res/sprites/HumanKing.png";
-
 	std::shared_ptr<Circle> _circleCollider = nullptr;
+	std::shared_ptr<ObjectBase> _dummyTarget = nullptr;
+	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
-	float _attackDamage = 50;
-	float _movementSpeed = 100.f;
-	float _projectileSpeed = 300;
-
-	float _attackCooldown = 0.25f;
-	float _regenerationTime = 0.5f;
-
-	int _maxHealth = 1000;
-	int _currentHealth = 0;
+	float _movementSpeed = 150.f;
+	float _regenerationCooldown = 0.5f;
 
 	unsigned int _multiShotAmount = 3;
 	float _multiShotAngle = 0.f;
@@ -57,7 +51,6 @@ private:
 
 	std::shared_ptr<TextSprite> _healthTextSprite = nullptr;
 
-	std::shared_ptr<Timer> _attackTimer = nullptr;
 	std::shared_ptr<Timer> _regenerationTimer = nullptr;
 
 	Vector2<float> _oldPosition = Vector2<float>(0.f, 0.f);

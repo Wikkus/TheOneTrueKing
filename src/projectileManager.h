@@ -23,7 +23,7 @@ public:
 
 	void CreateNewProjectile(ProjectileType projectileType);
 	
-	void SpawnProjectile(ProjectileType projectileType, float orientation, 
+	void SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
 		Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed);
 	
 	void QuickSort(int start, int end);
@@ -49,10 +49,9 @@ private:
 	const char* _enemyProjectileSprite = "res/sprites/Fireball.png";
 	const char* _playerProjectileSprite = "res/sprites/Arcaneball.png";
 	
-	unsigned int _projectileAmountLimit = 2000;
+	unsigned int _projectileAmountLimit = 3000;
 
 	int _latestProjectileIndex = -1;
 
 	std::vector<std::shared_ptr<ObjectBase>> _objectsHit;
-	std::shared_ptr<EnemyBase> _enemyHit = nullptr;
 };

@@ -1,15 +1,20 @@
 #pragma once
+#include "objectBase.h"
+#include "projectile.h"
 #include "vector2.h"
 
 #include <memory>
 
+class Circle;
 class Sprite;
 class Timer;
 
 enum class WeaponType {
 	Shield,
 	Staff,
+	SuperStaff,
 	Sword,
+	Tusks,
 	Count
 };
 
@@ -20,11 +25,11 @@ public:
 	WeaponComponent();
 	~WeaponComponent() {}
 
-	void Init();
+	virtual void Init(std::shared_ptr<ObjectBase> owner);
 	void Update();
-	void Render(Vector2<float> position, float orientation);
+	void Render();
 
-	virtual void Attack(Vector2<float> position) {}
+	virtual void Attack() {}
 
 	const virtual bool GetIsAttacking() const;
 
@@ -38,11 +43,13 @@ public:
 	virtual void DeactivateTimers();
 
 protected:
+	std::shared_ptr<ObjectBase> _owner = nullptr;
+
 	std::shared_ptr<Sprite> _sprite = nullptr;
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
 	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
-	
+
 	bool _isAttacking = false;
 
 	float _attackRange = 0.f;
@@ -60,7 +67,7 @@ public:
 	ShieldComponent();
 	~ShieldComponent();
 
-	void Attack(Vector2<float> position) override;
+	void Attack() override;
 };
 
 class StaffComponent : public WeaponComponent {
@@ -68,12 +75,32 @@ public:
 	StaffComponent();
 	~StaffComponent();
 
-	void Attack(Vector2<float> position) override;
+	void Init(std::shared_ptr<ObjectBase> owner) override;
+	void Attack() override;
 
-private:
+protected:
+	ProjectileType _projectileType;
+
+	bool _unlimitedRange = false;
+
 	float _projectileOrientation = 0;
 	float _projectileSpeed = 200.f;
 	Vector2<float> _projectileDirection = { 0.f, 0.f };
+};
+class SuperStaffComponent : public StaffComponent {
+public:
+	SuperStaffComponent();
+	~SuperStaffComponent();
+
+	void Attack() override;
+
+private:
+	unsigned int _multiShotAmount = 5;
+	
+	float _multiShotAngle = 0.f;
+	float _angleOffset = 0.25;
+
+	Vector2<float> _multiShotDirection = 0.f;
 };
 
 class SwordComponent : public WeaponComponent {
@@ -81,5 +108,22 @@ public:
 	SwordComponent();
 	~SwordComponent();
 
-	void Attack(Vector2<float> position) override;	
+	void Attack() override;	
+};
+
+class TusksComponent : public WeaponComponent {
+public:
+	TusksComponent();
+	~TusksComponent();
+
+	void Attack() override;
+
+private:
+	std::shared_ptr<Timer> _damageCooldown = nullptr;
+
+	float _dashDistance = 0.f;
+	float _dashSpeed = 300.f;
+
+	Vector2<float> _dashDirection;
+	Vector2<float> _dashStartPosition;
 };

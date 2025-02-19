@@ -1,9 +1,22 @@
 #include "collision.h"
 #include "debugDrawer.h"
 #include "gameEngine.h"
+#include "objectBase.h"
 
 #include <minmax.h>
 #include <SDL2/SDL.h>
+
+const ColliderType Collider::GetColliderType() const {
+	return _colliderType;
+}
+
+const Vector2<float> Collider::GetPosition() const {
+	return _position;
+}
+
+void Collider::SetPosition(Vector2<float> position) {
+	_position = position;
+}
 
 AABB::AABB() {
 	_colliderType = ColliderType::AABB;
@@ -17,10 +30,6 @@ void AABB::Init(Vector2<float> position, float h, float w) {
 	_max.y = position.y + (h * 0.5f);
 	_height = h;
 	_width = w;
-}
-
-const ColliderType AABB::GetColliderType() const {
-	return _colliderType;
 }
 
 const float AABB::GetHeight() const {
@@ -45,10 +54,6 @@ void AABB::SetHeight(float height) {
 
 void AABB::SetWidth(float width) {
 	_width = width;
-}
-
-const Vector2<float> AABB::GetPosition() const {
-	return _position;
 }
 
 bool ColliderIntersect(std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB) {
@@ -146,18 +151,7 @@ void Circle::Init(Vector2<float> position, float radius) {
 	_radius = radius;
 }
 
-const ColliderType Circle::GetColliderType() const {
-	return _colliderType;
-}
-
 const float Circle::GetRadius() const {
 	return _radius;
 }
 
-const Vector2<float> Circle::GetPosition() const {
-	return _position;
-}
-
-void Circle::SetPosition(Vector2<float> position) {
-	_position = position;
-}

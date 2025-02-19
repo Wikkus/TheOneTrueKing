@@ -125,9 +125,17 @@ void EnemyManager::CreateWeapon(WeaponType weaponType) {
 	case WeaponType::Staff:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<StaffComponent>());
 		break;
+			
+	case WeaponType::SuperStaff:
+		_weaponPools[weaponType]->PoolObject(std::make_shared<SuperStaffComponent>());
+		break;
 		
 	case WeaponType::Sword:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<SwordComponent>());
+		break;
+
+	case WeaponType::Tusks:
+		_weaponPools[weaponType]->PoolObject(std::make_shared<TusksComponent>());
 		break;
 
 	default:
@@ -196,6 +204,8 @@ void EnemyManager::SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow,
 void EnemyManager::SurvivalEnemySpawner() {
 	std::uniform_int_distribution dist{ 0, 1 };
 	_currentSpawnAmount = _spawnNumberOfEnemies + (_waveNumber * 4);
+	_currentWeaponType = WeaponType::Count;
+
 	for (unsigned int i = 0; i < _currentSpawnAmount; i++) {
 		if (i < _currentSpawnAmount * 0.5f) {
 			std::uniform_real_distribution<float> distY{ 0.f, windowHeight };
@@ -215,13 +225,24 @@ void EnemyManager::SurvivalEnemySpawner() {
 			}
 			_currentSpawnPosition.x = distX(randomEngine);
 		}
-		_currentSpawnDirection = (playerCharacter->GetPosition() - _currentSpawnPosition).normalized();
+		_currentSpawnDirection = (playerCharacters.back()->GetPosition() - _currentSpawnPosition).normalized();
 		if (i % 3 == 0) {
-			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, WeaponType::Count);
+			enemyManager->SpawnEnemy(EnemyType::Boar, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, WeaponType::Tusks);
 		} else {	
 			std::uniform_int_distribution decideWeapon{ 1, 2 };
 			unsigned int weaponPicked = decideWeapon(randomEngine);
-			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, (WeaponType)weaponPicked);
+			switch (weaponPicked) {
+			case 1:
+				_currentWeaponType = WeaponType::Staff;
+				break;
+			case 2:
+				_currentWeaponType = WeaponType::Sword;
+				break;
+			default:
+				_currentWeaponType = WeaponType::Sword;
+				break;
+			}
+			enemyManager->SpawnEnemy(EnemyType::Human, VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, _currentWeaponType);
 		}
 	}
 	_waveNumber++;
@@ -279,31 +300,17 @@ void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
 }
 
 void EnemyManager::Reset() {
-	switch (gameStateHandler->GetGameMode())
-	{
-	case GameMode::Formation:
-		_formationsSpawned = 1;
-		_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
-		_formationManagers.clear();
-		_latestAnchorPoint = nullptr;
-
-		break;
-	case GameMode::Survival:
-
-		break;
-
-	default:
-		break;
-	}
+	_formationsSpawned = 1;
+	_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
+	_formationManagers.clear();
+	_latestAnchorPoint = nullptr;
 	_waveNumber = 1;
 	RemoveAllEnemies();
 	_spawnTimer->ResetTimer();
 }
 
 void EnemyManager::TakeDamage(unsigned int enemyIndex, unsigned int damageAmount) {
-	if(_activeEnemies[enemyIndex]->TakeDamage(damageAmount)) {
-		RemoveEnemy(_activeEnemies[enemyIndex]->GetEnemyType(), enemyIndex);
-	}
+	_activeEnemies[enemyIndex]->TakeDamage(damageAmount);
 }
 
 void EnemyManager::UpdateQuadTree() {

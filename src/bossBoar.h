@@ -20,15 +20,12 @@ public:
 	void Render() override;
 	void RenderText() override;
 
+	void TakeDamage(unsigned int damageAmount) override;
 	void HandleAttack() override;
-	void UpdateMovement() override;
 
 private:
 	void CreateDecisionTree();
 	void MakeDecision();
-
-	void FireProjectile();
-	
 	const char* _bossBoarSpritePath = "res/sprites/BoarBoss.png";
 
 	float _dashDistance = 0.f;

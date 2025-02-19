@@ -43,6 +43,8 @@ float VectorAsOrientation(Vector2<float> direction);
 float WrapMax(float rotation, float maxValue);
 float WrapMinMax(float rotation, float minValue, float maxValue);
 
+int ClosestPosition(std::vector<Vector2<float>> positions, Vector2<float> targetPosition);
+
 //int BinarySearch(std::vector<std::shared_ptr<ObjectBase>> objectVector, int low, int high, int targetID);
 
 int Partition(std::vector<float>& objectVector,  int start, int end);

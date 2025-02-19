@@ -36,27 +36,36 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	virtual void ExecuteAction(EnemyBase& owner) {}
+	virtual bool ExecuteAction(EnemyBase& owner) { return false; }
 
-	void SetActionFinished(bool actionFinished);
-	const bool GetActionFinished() const;
-
-
-protected:
-
-	bool _actionFinished = false;
 
 };
 
-class AttackAction : public Action {
+class MeleeAttackAction : public Action {
 public:
-	AttackAction();
-	~AttackAction() {}
+	MeleeAttackAction(float attackRange, float attackCooldown, float attackChargeTime, int attackDamage);
+	~MeleeAttackAction() {}
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	void ExecuteAction(EnemyBase& owner) override;
+	bool ExecuteAction(EnemyBase& owner) override; 
+private:
+	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
+	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
 
+	bool _isAttacking = false;
+	float _attackRange = 0.f;
+	int _attackDamage = 0;
+};
+
+class DashAction : public Action {
+public:
+	DashAction();
+	~DashAction() {}
+
+	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+
+	bool ExecuteAction(EnemyBase& owner) override;
 };
 
 class MoveAction : public Action {
@@ -66,12 +75,9 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
 
-	void ExecuteAction(EnemyBase& owner) override;
-private:
-	std::shared_ptr<Timer> _moveDuration = nullptr;
-	Vector2<float> _targetPos;
-
+	bool ExecuteAction(EnemyBase& owner) override;
 };
+
 #pragma endregion
 
 #pragma region Decisions
@@ -110,18 +116,15 @@ private:
 
 class RandomDecision : public Decision {
 public:
-	RandomDecision();
+	RandomDecision(float timeOut);
 	~RandomDecision() {}
 
 	bool TestValue();
 
-
 private:
-	bool _currentDecision = false;
-	int _lastFame = -1;
+	std::shared_ptr<Timer> _timer;
 
-	int _timeOut = 1000;
-	int _timeOutFrame = -1;
+	bool _currentDecision = false;
 
 };
 #pragma endregion

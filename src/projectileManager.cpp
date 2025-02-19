@@ -56,36 +56,27 @@ void ProjectileManager::CreateNewProjectile(ProjectileType projectileType) {
 	lastObjectID++;
 }
 
-void ProjectileManager::SpawnProjectile(ProjectileType projectileType, float orientation,
+void ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
 	Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
 	if (_projectilePools[projectileType]->IsEmpty()) {
 		CreateNewProjectile(projectileType);
 	}
 	_activeProjectiles.emplace_back(_projectilePools[projectileType]->SpawnObject());
-	_activeProjectiles.back()->ActivateProjectile(orientation, direction, position, damage, speed);
+	_activeProjectiles.back()->ActivateProjectile(owner, orientation, direction, position, damage, speed);
 }
 
 bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {
 	_objectsHit = objectBaseQuadTree->Query(_activeProjectiles[projectileIndex]->GetCollider());
-	if (projectileType == ProjectileType::PlayerFireball) {
-		for (unsigned int i = 0; i < _objectsHit.size(); i++) {
-			if (_objectsHit[i]->GetObjectType() == ObjectType::Enemy) {
-				_enemyHit = std::static_pointer_cast<EnemyBase>(_objectsHit[i]);
-				//Returns true if the enemy dies
-				if (_enemyHit->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage())) {
-					enemyManager->RemoveEnemy(_enemyHit->GetEnemyType(), _enemyHit->GetObjectID());
-				}
-				RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
-				return true;
-			}
+
+	for (unsigned int i = 0; i < _objectsHit.size(); i++) {
+		if (_objectsHit[i]->GetObjectType() == ObjectType::Projectile) {
+			continue;
 		}
-	} else {
-		if (_objectsHit.size() > 0) {
-			if (_objectsHit[0]->GetObjectID() == playerCharacter->GetObjectID()) {
-				playerCharacter->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
-				RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
-				return true;
-			}
+		if (_objectsHit[i]->GetObjectType() != _activeProjectiles[projectileIndex]->GetOwner()->GetObjectType()) {
+			_objectsHit[i]->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
+
+			RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
+			return true;
 		}
 	}
 	return false;

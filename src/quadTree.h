@@ -100,7 +100,7 @@ inline std::vector<T> QuadTree<T>::Query(std::shared_ptr<Collider> range) {
 	if (_quadTreeNode.Intersect(range)) {
 		/*Loops through all the items in the node, checks if they are interacting with the collider.
 		If it does, add it to the vector*/
-		for (unsigned int i = 0; i < _objectsInserted.size(); i++) {	
+		for (unsigned int i = 0; i < _objectsInserted.size(); i++) {
 			if (ColliderIntersect(range, _colliders[i])) {
 				_objectsFound.emplace_back(_objectsInserted[i]);
 			}

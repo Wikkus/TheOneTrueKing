@@ -6,7 +6,8 @@
 #include "playerCharacter.h"
 #include "collision.h"
 
-DecisionTreeNode::DecisionTreeNode() {}
+DecisionTreeNode::DecisionTreeNode() {
+}
 
 std::shared_ptr<DecisionTreeNode> DecisionTreeNode::MakeDecision(EnemyBase& owner) {
 	return std::shared_ptr<DecisionTreeNode>();
@@ -27,41 +28,61 @@ std::shared_ptr<DecisionTreeNode> Action::MakeDecision(EnemyBase& owner) {
 	return shared_from_this();
 }
 
-
-void Action::SetActionFinished(bool actionFinished) {
-	_actionFinished = actionFinished;
+MeleeAttackAction::MeleeAttackAction(float attackRange, float attackCooldown, float attackChargeTime, int attackDamage) {
+	_attackCooldownTimer = timerManager->CreateTimer(attackCooldown);
+	_chargeAttackTimer = timerManager->CreateTimer(attackChargeTime);
+	_attackDamage = attackDamage;
+	_attackRange = attackRange;
 }
 
-const bool Action::GetActionFinished() const {
-	return _actionFinished;
-}
-
-AttackAction::AttackAction() {}
-
-std::shared_ptr<DecisionTreeNode> AttackAction::MakeDecision(EnemyBase& owner) {
+std::shared_ptr<DecisionTreeNode> MeleeAttackAction::MakeDecision(EnemyBase& owner) {
 	return shared_from_this();
 }
 
-void AttackAction::ExecuteAction(EnemyBase& owner) {
-	owner.HandleAttack();
+bool MeleeAttackAction::ExecuteAction(EnemyBase& owner) {
+	if (_attackCooldownTimer->GetTimerActive()) {
+		return false;
+	}
+	if (_chargeAttackTimer->GetTimerActive()) {
+		owner.UpdateAngularMovement();
+	}
+	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
+		if (IsInDistance(owner.GetCurrentTarget()->GetPosition(), owner.GetPosition(), _attackRange)) {
+			owner.GetCurrentTarget()->TakeDamage(_attackDamage);
+		}
+		owner.SetVelocity({ 0.f, 0.f });
+		owner.SetRotation(0.f);
+		_isAttacking = false;
+		_attackCooldownTimer->ResetTimer();
+		_chargeAttackTimer->DeactivateTimer();
+		return true;
+
+	} else if (!_isAttacking) {
+		_chargeAttackTimer->ResetTimer();
+		_isAttacking = true;
+	}
+	return false;
 }
 
-MoveAction::MoveAction() {
-	_moveDuration = timerManager->CreateTimer(1.f);
+DashAction::DashAction() {}
+
+std::shared_ptr<DecisionTreeNode> DashAction::MakeDecision(EnemyBase& owner) {
+	return std::shared_ptr<DecisionTreeNode>();
 }
+
+bool DashAction::ExecuteAction(EnemyBase& owner) {
+	return true;
+}
+
+MoveAction::MoveAction() {}
 
 std::shared_ptr<DecisionTreeNode> MoveAction::MakeDecision(EnemyBase& owner) {
-	_moveDuration->ResetTimer();
 	return shared_from_this();
 }
 
-void MoveAction::ExecuteAction(EnemyBase& owner) {
-	if (IsInDistance(owner.GetBehaviorData().targetPosition, owner.GetPosition(), owner.GetAttackRange() - 5.f) 
-		|| _moveDuration->GetTimerFinished()) {
-		_actionFinished = true;
-		_moveDuration->DeactivateTimer();
-	}
+bool MoveAction::ExecuteAction(EnemyBase& owner) {
 	owner.UpdateMovement();
+	return true;
 }
 
 
@@ -91,7 +112,7 @@ WithinRangeDecision::WithinRangeDecision(float maxRange, float minRange) {
 }
 
 std::shared_ptr<DecisionTreeNode> WithinRangeDecision::GetBranch(EnemyBase& owner) {
-	_distance = TestValue(owner.GetPosition(), owner.GetBehaviorData().targetPosition);
+	_distance = TestValue(owner.GetPosition(), owner.GetTargetPosition());
 	if (_minValue <= _distance && _distance <= _maxValue) {
 		return _trueNode;
 	}
@@ -102,15 +123,17 @@ float WithinRangeDecision::TestValue(Vector2<float> position, Vector2<float> tar
 	return Vector2<float>::distanceBetweenVectors(targetPosition, position);
 }
 
-RandomDecision::RandomDecision() {}
+RandomDecision::RandomDecision(float timeOut) {
+	_timer = timerManager->CreateTimer(timeOut);
+}
 
 bool RandomDecision::TestValue() {
-	if (frameNumber > _lastFame + 1 || frameNumber >= _timeOutFrame) {	
+	if (_timer->GetTimerActive()) {
+		return _currentDecision;
+	} else {
 		_currentDecision = RandomBinomalInt(0, 1);
-		
-		_timeOutFrame = frameNumber + _timeOut;
+		_timer->ResetTimer();
 	}
-	_lastFame = frameNumber;
 	return _currentDecision;
 }
 
@@ -137,3 +160,5 @@ RandomMultiDecision::RandomMultiDecision() {}
 int RandomMultiDecision::TestValue() {
 	return RandomBinomalInt(0, _daughterNodes.size() - 1);
 }
+
+

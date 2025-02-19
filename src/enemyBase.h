@@ -16,34 +16,34 @@ public:
 	~EnemyBase() {}
 
 	const std::shared_ptr<Collider> GetCollider() const override;
-	const float GetAttackRange() const;
-
-	virtual bool TakeDamage(unsigned int damageAmount);
-
 	virtual const EnemyType GetEnemyType() const;
 	 
+	void TakeDamage(unsigned int damageAmount) override;
+
 	virtual const float GetRotation() const;
 
 	virtual const int GetCurrentHealth() const;
 
 	virtual const int GetFormationIndex() const;
 
-	virtual const BehaviorData GetBehaviorData() const;	
-
-	virtual const std::vector<std::shared_ptr<ObjectBase>> GetQueriedObjects() const;
+	virtual const BehaviorData GetBehaviorData() const;
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
-	
+
 	virtual void HandleAttack();
-	virtual void UpdateMovement();
+
+	void UpdateMovement();
+	void UpdateAngularMovement();
+	void UpdateLinearMovement();
 
 	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
 	virtual void DeactivateEnemy();
-	
+
 	virtual void SetFormationIndex(int formationIndex);
-	virtual void SetTargetPosition(Vector2<float> targetPosition);
 	virtual void SetTargetOrientation(float targetOrientation);
 
+	void SetPosition(Vector2<float> position) override;
+	
 	bool ReplaceSteeringBehavior(SteeringBehaviorType oldBehavior, BehaviorAndWeight newBehavior);
 
 
@@ -64,15 +64,6 @@ protected:
 
 	const EnemyType _enemyType = EnemyType::Count;
 
-	bool _playerInRange = false;
-	bool _collidedWithPlayer = false;
-	
-	int _currentHealth = 0;
-	int _maxHealth = 0;
-
 	int _formationIndex = -1;
-
-	float _attackRange = 0.f;
-	float _rotation = 0.f;
 };
 

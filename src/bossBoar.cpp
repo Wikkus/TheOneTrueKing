@@ -1,4 +1,5 @@
 #include "bossBoar.h"
+#include "debugDrawer.h"
 #include "decisionTree.h"
 #include "playerCharacter.h"
 #include "projectileManager.h"
@@ -18,7 +19,6 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 	_currentHealth = _maxHealth;
 
 	_attackDamage = 300;
-	_attackRange = 300;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = PI * 0.005f;
@@ -29,9 +29,6 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 
 	_behaviorData.maxLinearAcceleration = 50.f;
 	_behaviorData.maxSpeed = 100.f;
-
-	_behaviorData.linearTargetRadius = 5.f;
-	_behaviorData.linearSlowDownRadius = _attackRange + 25.f;
 
 	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
@@ -49,16 +46,22 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 	_chargeAttackTimer->DeactivateTimer();
 	_healthTextSprite = std::make_shared<TextSprite>();
 
+	_weaponComponent = enemyManager->AccessWeapon(WeaponType::Tusks);
+	_behaviorData.linearTargetRadius = 50.f;
+	_behaviorData.linearSlowDownRadius = 200.f;
+
 	CreateDecisionTree();
 }
 
 BoarBoss::~BoarBoss() {}
 
+std::shared_ptr<Vector2<float>> temp = nullptr;
+
 void BoarBoss::Init() {
-	_behaviorData.targetPosition = playerCharacter->GetPosition();
+	_targetPosition = _currentTarget->GetPosition();
+
 	_position = Vector2<float>(windowWidth * 0.9f, windowHeight * 0.3f);
-	_direction = _behaviorData.targetPosition - _position;
-	_behaviorData.velocity = _velocity;
+	_direction = _targetPosition - _position;
 
 	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.9f));
@@ -67,9 +70,11 @@ void BoarBoss::Init() {
 }
 
 void BoarBoss::Update() {
+	_targetPosition = playerCharacters.back()->GetPosition();
+	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
+
 	if (_decisionTreeAction) {
-		_decisionTreeAction->ExecuteAction(*this);
-		if (_decisionTreeAction->GetActionFinished()) {
+		if (_decisionTreeAction->ExecuteAction(*this)) {
 			MakeDecision();
 		}
 	}
@@ -83,31 +88,39 @@ void BoarBoss::RenderText() {
 	_healthTextSprite->Render();
 }
 
+void BoarBoss::TakeDamage(unsigned int damageAmount) {
+	_currentHealth -= damageAmount;
+	if (_currentHealth <= 0) {
+		enemyManager->RemoveEnemy(_enemyType, _objectID);
+	}
+	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
+}
+
 void BoarBoss::HandleAttack() {
 	if (!_isAttacking && !_attackCooldownTimer->GetTimerActive()) {
 		_isAttacking = true;
-		_behaviorData.targetPosition = playerCharacter->GetPosition();
-		_dashDistance = (_behaviorData.targetPosition - _position).absolute() + 200.f;
+		_targetPosition = _currentTarget->GetPosition();
+		_dashDistance = (_targetPosition - _position).absolute() + 200.f;
 		_velocity = { 0.f, 0.f };
 		_chargeAttackTimer->ResetTimer();
 	}
 	if (_chargeAttackTimer->GetTimerActive() || _attackCooldownTimer->GetTimerActive()) {
-		_behaviorData.targetPosition = playerCharacter->GetPosition();
+		_targetPosition = _currentTarget->GetPosition();
 
 		_orientation += _rotation * deltaTime;
-		_behaviorData.rotation = _rotation;
+		_rotation = _rotation;
 
 		_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 		_rotation += _steeringOutput.angularVelocity * deltaTime;
 
 	} else if (_chargeAttackTimer->GetTimerFinished()) {
 		_chargeAttackTimer->DeactivateTimer();
-		_dashDirection = (_behaviorData.targetPosition - _position).normalized();
+		_dashDirection = (_targetPosition - _position).normalized();
 		_dashStartPosition = _position;
 
 	} else {
-		if (!_damagedPlayer && IsInDistance(_position, playerCharacter->GetPosition(), _circleCollider->GetRadius())) {
-			playerCharacter->TakeDamage(_attackDamage);
+		if (!_damagedPlayer && IsInDistance(_position, _currentTarget->GetPosition(), _circleCollider->GetRadius())) {
+			_currentTarget->TakeDamage(_attackDamage);
 			_damagedPlayer = true;
 		}
 		if (_isAttacking) {
@@ -121,36 +134,15 @@ void BoarBoss::HandleAttack() {
 		}
 		if (_attackCooldownTimer->GetTimerFinished()) {
 			_attackCooldownTimer->DeactivateTimer();
-			_decisionTreeAction->SetActionFinished(true);
 		}
 	}
 }
 
-void BoarBoss::UpdateMovement() {
-	_behaviorData.targetPosition = playerCharacter->GetPosition();
-
-	_position += _velocity * deltaTime;
-	_orientation += _rotation * deltaTime;
-
-	_circleCollider->SetPosition(_position);
-	_behaviorData.rotation = _rotation;
-	_behaviorData.velocity = _velocity;
-
-	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
-	_rotation += _steeringOutput.angularVelocity * deltaTime;
-	_velocity += _steeringOutput.linearVelocity * deltaTime;
-
-	if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
-		_velocity = { 0.f, 0.f };
-	}
-	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
-}
-
 void BoarBoss::CreateDecisionTree() {
-	_decisionTree = std::make_shared<WithinRangeDecision>(_attackRange, 0);
+	_decisionTree = std::make_shared<WithinRangeDecision>(75, 0);
 		std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>();
 		_decisionTree->SetFalseNode(moveAction);
-		std::shared_ptr<AttackAction> attackAction = std::make_shared<AttackAction>();
+		std::shared_ptr<MeleeAttackAction> attackAction = std::make_shared<MeleeAttackAction>(100.f, 1.f, 0.75f, _attackDamage);
 		_decisionTree->SetTrueNode(attackAction);
 	
 }
@@ -158,13 +150,7 @@ void BoarBoss::MakeDecision() {
 	_decisionMade = _decisionTree->MakeDecision(*this);
 	if (_decisionMade->GetNodeType() == NodeType::ActionNode) {
 		_decisionTreeAction = std::static_pointer_cast<Action>(_decisionMade);
-		_decisionTreeAction->SetActionFinished(false);
 	}
 	//Node is not an action, recursion failed
 
-}
-
-void BoarBoss::FireProjectile() {
-	_projectileDirection = (_behaviorData.targetPosition - _position).normalized();
-	projectileManager->SpawnProjectile(ProjectileType::Energyblast, VectorAsOrientation(_projectileDirection), _projectileDirection, _position, 500, 100);
 }

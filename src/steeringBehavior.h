@@ -35,7 +35,7 @@ class SteeringBehavior {
 public:
 	SteeringBehavior() {}
 	~SteeringBehavior() {}
-	virtual SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) = 0;
+	virtual SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) = 0;
 	virtual const SteeringBehaviorType GetBehaviorType() const = 0;
 
 
@@ -48,7 +48,7 @@ class AlignBehavior : public SteeringBehavior {
 public:
 	AlignBehavior();
 	~AlignBehavior() {}
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -62,7 +62,7 @@ public:
 	FaceBehavior();
 	~FaceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -74,7 +74,7 @@ public:
 	LookAtDirectionBehavior();
 	~LookAtDirectionBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 };
 
@@ -83,7 +83,7 @@ public:
 	ArriveBehavior();
 	~ArriveBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -99,7 +99,7 @@ public:
 	CollisionAvoidanceBehavior();
 	~CollisionAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -130,7 +130,7 @@ public:
 	SeekBehavior(SteeringBehaviorType behaviorType);
 	~SeekBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 };
@@ -139,7 +139,7 @@ public:
 	ObstacleAvoidanceBehavior();
 	~ObstacleAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -154,7 +154,7 @@ public:
 	PursueBehavior(SteeringBehaviorType behaviorType);
 	~PursueBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -168,7 +168,7 @@ public:
 	SeparationBehavior();
 	~SeparationBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
@@ -183,7 +183,7 @@ public:
 	VelocityMatchBehaviour();
 	~VelocityMatchBehaviour() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 };
 
@@ -192,10 +192,11 @@ public:
 	WanderBehavior();
 	~WanderBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase) override;
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
 	const SteeringBehaviorType GetBehaviorType() const override;
 
 private:
+	Vector2<float> _targetPosition = { 0.f, 0.f };
 	float _wanderOrientation = 0;
 
 };
@@ -210,7 +211,7 @@ public:
 	BlendSteering() {}
 	~BlendSteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase);
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase);
 
 	void AddSteeringBehaviour(BehaviorAndWeight behaviour);	
 	void ClearBehaviours();
@@ -230,7 +231,7 @@ public:
 	PrioritySteering() {}
 	~PrioritySteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, const ObjectBase& objectBase);
+	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase);
 
 	void AddGroup(BlendSteering& behaviour);
 	void ClearGroups();

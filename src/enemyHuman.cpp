@@ -21,8 +21,6 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_behaviorData.characterRadius = _circleCollider->GetRadius();
 
 	_numberOfWeaponTypes = (int)(WeaponType::Count);
-	_maxHealth = 75;
-	_currentHealth = _maxHealth;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = FLT_EPSILON;
@@ -44,96 +42,82 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_alignBehavior.weight = 1.f;
 	_faceBehavior.steeringBehaviour = std::make_shared<FaceBehavior>();
 	_faceBehavior.weight = 1.f;
-
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-
-
 }
 
 EnemyHuman::~EnemyHuman() {}
 
 void EnemyHuman::Init() {
-	_behaviorData.targetPosition = playerCharacter->GetPosition();
-	_direction = Vector2<float>(_behaviorData.targetPosition - _position).normalized();
+	_currentTarget = playerCharacters.back();
+	_targetPosition = _currentTarget->GetPosition();
+	_direction = Vector2<float>(_targetPosition - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
-	_behaviorData.velocity = _velocity;
+	_velocity = { 0.f, 0.f };
 	
-	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();	
-	_attackRange = _weaponComponent->GetAttackRange();
+	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();
+
+	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
+		_behaviorData.linearTargetRadius = 5.f;
+		_behaviorData.linearSlowDownRadius = 25.f;
+
+	} else {
+		std::uniform_real_distribution dist{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
+		_linearTargetRadius = dist(randomEngine);
+		_behaviorData.linearTargetRadius = _linearTargetRadius;
+		_behaviorData.linearSlowDownRadius = _linearTargetRadius * 2.f;
+	}
 
 	_prioritySteering->ClearGroups();
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-	_behaviorData.linearTargetRadius = 5.f;
-	_behaviorData.linearSlowDownRadius = 20.f;
 
-	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
+	switch (gameStateHandler->GetGameMode()) {
+	case GameMode::Formation:
 		_blendSteering->AddSteeringBehaviour(_alignBehavior);
-
-	} else {
-		if (_weaponComponent->GetWeaponType() == WeaponType::Staff) {
-			std::uniform_real_distribution dist{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
-			_linearTargetRadius = dist(randomEngine);
-			_behaviorData.linearTargetRadius = _linearTargetRadius;
-			_behaviorData.linearSlowDownRadius = _linearTargetRadius * 1.5f;
-		}
+		break;
+	case GameMode::Survival:
 		_blendSteering->AddSteeringBehaviour(_faceBehavior);
+		break;
+	default:
+		break;
 	}
+
 	_prioritySteering->AddGroup(*_blendSteering);
 }
 
 void EnemyHuman::Update() {
-	_behaviorData.queriedObjects = objectBaseQuadTree->Query(_circleCollider);
+	_queriedObjects = objectBaseQuadTree->Query(_circleCollider);
 	UpdateTarget();
 	HandleAttack();
 
+	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	UpdateMovement();
+	_weaponComponent->Update();
 }
 
 void EnemyHuman::Render() {
 	_sprite->RenderWithOrientation(_position, _orientation);
-	_weaponComponent->Render(_position, _orientation);
+	_weaponComponent->Render();
 }
 
 void EnemyHuman::HandleAttack() {
 	//Depending on the weapon, the attack works differently
-	_weaponComponent->Attack(_position);
-}
-
-void EnemyHuman::UpdateMovement() {
-	_position += _velocity * deltaTime;
-	_orientation += _rotation * deltaTime;
-
-	_circleCollider->SetPosition(_position);
-	_behaviorData.rotation = _rotation;
-
-	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
-	_rotation += _steeringOutput.angularVelocity * deltaTime;
-	_velocity += _steeringOutput.linearVelocity * deltaTime;
-	_behaviorData.velocity = _velocity;
-
-	//When steering linear velocity is 0, then the target is reached and the character should stop.
-	if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
-		_velocity = { 0.f, 0.f };
-	}
-	_velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
+	_weaponComponent->Attack();
 }
 
 void EnemyHuman::UpdateTarget() {
 	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
 		if (_weaponComponent->GetWeaponType() == WeaponType::Sword) {
 			//When the formation is at the target position, the swordfighters will change target and run to the player
-			switch (_currentTarget) {
+			switch (_currentTargetState) {
 			case CurrentTarget::Player:
-				_behaviorData.targetPosition = playerCharacter->GetPosition();
+				_targetPosition = _currentTarget->GetPosition();
 				break;
 			case CurrentTarget::SlotFormation:
 				if (enemyManager->GetFormationManagers()[_formationIndex]->GetInPosition()) {
 					if (!ReplaceSteeringBehavior(SteeringBehaviorType::Align, _faceBehavior)) {
 						_prioritySteering->AddBehaviorInGroup(_faceBehavior, 0);	
 					}
-					_currentTarget = CurrentTarget::Player;
+					_currentTargetState = CurrentTarget::Player;
 				}
 				break;
 			case CurrentTarget::Count:
@@ -143,6 +127,6 @@ void EnemyHuman::UpdateTarget() {
 			}
 		}
 	} else {
-		_behaviorData.targetPosition = playerCharacter->GetPosition();
+		_targetPosition = _currentTarget->GetPosition();
 	}
 }

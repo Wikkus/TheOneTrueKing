@@ -25,7 +25,7 @@ std::shared_ptr<DebugDrawer> debugDrawer;
 std::shared_ptr<GameStateHandler> gameStateHandler;
 std::shared_ptr<ImGuiHandler> imGuiHandler;
 std::shared_ptr<ObstacleManager> obstacleManager;
-std::shared_ptr<PlayerCharacter> playerCharacter;
+std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 std::shared_ptr<ProjectileManager> projectileManager;
 
 std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;

@@ -16,9 +16,8 @@ public:
 	void Render() override;
 
 	void HandleAttack() override;
-	void UpdateMovement() override;
 
-private:	
+private:
 	const char* _boarSprite = "res/sprites/MadBoar.png";
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
@@ -34,5 +33,8 @@ private:
 	float _dashSpeed = 300.f;
 
 	int _attackDamage = 0;
+
+	bool _playerInRange = false;
+	bool _collidedWithPlayer = false;
 };
 

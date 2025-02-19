@@ -2,6 +2,7 @@
 
 #include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
+#include "enemyManager.h"
 #include "gameEngine.h"
 #include "objectBase.h"
 #include "projectile.h"
@@ -21,25 +22,29 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int object
 	_circleCollider->Init(_position, 16.f);
 	_oldPosition = _position;
 
+	_maxHealth = 1000.f;
 	_currentHealth = _maxHealth;
-	
 	_healthTextSprite = std::make_shared<TextSprite>();
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
+
+	_dummyTarget = std::make_shared<ObjectBase>(INT_MAX, ObjectType::Count);
 }
 
 PlayerCharacter::~PlayerCharacter() {}
 
 void PlayerCharacter::Init() {
 	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
-	_attackTimer = timerManager->CreateTimer(_attackCooldown);
-	_regenerationTimer = timerManager->CreateTimer(_regenerationTime);
+	_regenerationTimer = timerManager->CreateTimer(_regenerationCooldown);
+
+	_weaponComponent = enemyManager->AccessWeapon(WeaponType::SuperStaff);
+	_weaponComponent->Init(shared_from_this());
 }
 
 void PlayerCharacter::Update() {
+	UpdateTarget();
 	UpdateHealthRegen();
 	UpdateInput();
 	UpdateMovement();
-	UpdateTarget();
 }
 
 void PlayerCharacter::Render() {
@@ -55,8 +60,7 @@ const std::shared_ptr<Collider> PlayerCharacter::GetCollider() const {
 }
 
 void PlayerCharacter::TakeDamage(unsigned int damageAmount) {
-	_currentHealth -= damageAmount;
-	
+	_currentHealth -= damageAmount;	
 	if (_currentHealth <= 0) {
 		_currentHealth = 0;
 		ExecuteDeath();
@@ -68,20 +72,9 @@ void PlayerCharacter::ExecuteDeath() {
 	gameStateHandler->ReplaceCurrentState(std::make_shared<GameOverState>());
 }
 
-void PlayerCharacter::FireProjectile() {
-	_multiShotAngle = -PI * 0.0625f;
-	for (unsigned int i = 0; i < _multiShotAmount; i++) {
-		_multiShotDirection = RotateDirection(_multiShotAngle, _direction);
-		projectileManager->SpawnProjectile(ProjectileType::PlayerFireball, _orientation + _multiShotAngle, 
-			_multiShotDirection, _position, _attackDamage, _projectileSpeed);
-		_multiShotAngle += PI * 0.0625f;
-	}
-}
-
 void PlayerCharacter::Respawn() {
 	_position = Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f);
 	_orientation = 0.f;
-	_attackTimer->ResetTimer();
 
 	_currentHealth = _maxHealth;
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
@@ -102,10 +95,7 @@ void PlayerCharacter::UpdateHealthRegen() {
 
 void PlayerCharacter::UpdateInput() {
 	if (GetMouseButton(SDL_BUTTON_LEFT)) {
-		if (_attackTimer->GetTimerFinished()) {
-			FireProjectile();
-			_attackTimer->ResetTimer();
-		}
+		_weaponComponent->Attack();
 	}
 	if (GetKeyPressed(SDL_SCANCODE_ESCAPE)) {
 		gameStateHandler->AddState(std::make_shared<PauseState>());
@@ -141,7 +131,11 @@ void PlayerCharacter::UpdateMovement() {
 }
 
 void PlayerCharacter::UpdateTarget() {
-	_direction = (GetCursorPosition() - _position).normalized();
+	_targetPosition = GetCursorPosition();
+	_dummyTarget->SetPosition(_targetPosition);
+	_currentTarget = _dummyTarget;
+
+	_direction = (_targetPosition - _position).normalized();
 	_orientation = VectorAsOrientation(_direction);
 }
 

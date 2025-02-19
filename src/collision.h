@@ -1,6 +1,8 @@
 #pragma once
 #include "vector2.h"
 
+class ObjectBase;
+
 enum class ColliderType {
 	AABB,
 	Circle,
@@ -12,12 +14,14 @@ public:
 	Collider() {}
 	~Collider() {}
 
-	virtual const ColliderType GetColliderType() const = 0;
-	virtual const Vector2<float> GetPosition() const = 0;
 
-	virtual void SetPosition(Vector2<float> position) = 0;
+	const ColliderType GetColliderType() const;
+	const Vector2<float> GetPosition() const;
+
+	virtual void SetPosition(Vector2<float> position);
 
 protected:
+	std::shared_ptr<ObjectBase> _owner = nullptr;
 	ColliderType _colliderType = ColliderType::Count;
 
 	Vector2<float> _position = { 0.f, 0.f };
@@ -30,9 +34,6 @@ public:
 
 	void Init(Vector2<float> position, float h, float w);
 
-	const ColliderType GetColliderType() const override;
-	const Vector2<float> GetPosition() const override;
-	
 	void SetPosition(Vector2<float> position) override;
 
 	const float GetHeight() const;
@@ -58,12 +59,7 @@ public:
 
 	void Init(Vector2<float> position, float radius);
 
-	const ColliderType GetColliderType() const override;
-
 	const float GetRadius() const;
-	const Vector2<float> GetPosition() const override;
-
-	void SetPosition(Vector2<float> position) override;
 
 private:
 	float _radius = 0.f;

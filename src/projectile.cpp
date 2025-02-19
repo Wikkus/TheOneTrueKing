@@ -14,7 +14,7 @@ Projectile::Projectile(unsigned int objectID, ProjectileType projectileType, con
 	
 	_position = { 10000.f, 10000.f };
 	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, _sprite->w * 0.5f);	
+	_circleCollider->Init(_position, _sprite->w * 0.5f);
 }
 
 Projectile::~Projectile() {}
@@ -36,6 +36,10 @@ const std::shared_ptr<Collider> Projectile::GetCollider() const {
 	return _circleCollider;
 }
 
+const std::shared_ptr<ObjectBase> Projectile::GetOwner() const {
+	return _owner;
+}
+
 const ProjectileType Projectile::GetProjectileType() const {
 	return _projectileType;
 }
@@ -53,7 +57,10 @@ void Projectile::SetPosition(Vector2<float> position) {
 	_circleCollider->SetPosition(_position + _direction * (_sprite->h * 0.25f));
 }
 
-void Projectile::ActivateProjectile(float orientation, Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
+void Projectile::ActivateProjectile(std::shared_ptr<ObjectBase> owner, float orientation, 
+	Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
+	_owner = owner;
+	
 	_orientation = orientation;
 
 	_direction = direction.normalized();
@@ -67,6 +74,7 @@ void Projectile::ActivateProjectile(float orientation, Vector2<float> direction,
 }
 
 void Projectile::DeactivateProjectile() {
+	_owner = nullptr;
 	_orientation = 0.f;
 	_direction = { 0.f, 0.f };
 	_velocity = { 0.f, 0.f };

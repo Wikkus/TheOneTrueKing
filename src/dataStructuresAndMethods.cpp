@@ -58,7 +58,6 @@ float RandomBinomalFloat(float a, float b) {
 	std::uniform_real_distribution<float> dist(a, b);
 	return dist(randomEngine);
 }
-
 int RandomBinomalInt(int a, int b) {
 	std::uniform_int_distribution<int> dist(a, b);	
 	return dist(randomEngine);
@@ -75,6 +74,19 @@ float WrapMax(float rotation, float maxValue) {
 
 float WrapMinMax(float rotation, float minValue, float maxValue) {
 	return minValue + WrapMax(rotation - minValue, maxValue - minValue);
+}
+
+int ClosestPosition(std::vector<Vector2<float>> positions, Vector2<float> targetPosition) {
+	float shortestDistance = FLT_MAX;
+	int currentIndex = -1;
+	for (unsigned int i = 0; i < positions.size(); i++) {
+		float positionClosestTo = (positions[i] - targetPosition).absolute();
+		if (positionClosestTo < shortestDistance) {
+			shortestDistance = positionClosestTo;
+			currentIndex = i;
+		}
+	}
+	return currentIndex;
 }
 
 int Partition(std::vector<float>& objectVector, int start, int end) {

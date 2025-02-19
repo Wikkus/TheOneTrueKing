@@ -1,4 +1,5 @@
 #include "formationManager.h"
+#include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
 #include "enemyBase.h"
 #include "enemyHuman.h"
@@ -40,9 +41,11 @@ bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 }
 
 void FormationManager::UpdateAnchorPoint() {
+	_targetObject = playerCharacters.back();
+
 	_anchorPoint->direction = Vector2<float>(_anchorPoint->targetPosition - _anchorPoint->position);
 	_anchorPoint->distance = _anchorPoint->direction.absolute();
-	_anchorPoint->orientation = VectorAsOrientation(playerCharacter->GetPosition() - _anchorPoint->position);
+	_anchorPoint->orientation = VectorAsOrientation(_targetObject->GetPosition() - _anchorPoint->position);
 	if(_inPosition || _slotAssignments.size() <= 0){
 		return;
 

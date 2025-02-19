@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	imGuiHandler = std::make_shared<ImGuiHandler>();
 	obstacleManager = std::make_shared<ObstacleManager>();
 	projectileManager = std::make_shared<ProjectileManager>();
-	playerCharacter = std::make_shared<PlayerCharacter>(0.f, lastObjectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f));
+	playerCharacters.emplace_back(std::make_shared<PlayerCharacter>(0.f, lastObjectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f)));
 	lastObjectID++;
 	rayCast = std::make_shared<RayCast>();
 
@@ -60,8 +60,10 @@ int main(int argc, char* argv[]) {
 
 	//Init here
 	enemyManager->Init();
+	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
+		playerCharacters[i]->Init();
+	}
 	imGuiHandler->Init();
-	playerCharacter->Init();
 	projectileManager->Init();
 
 	gameStateHandler->AddState(std::make_shared<MenuState>());
