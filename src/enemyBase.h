@@ -60,8 +60,6 @@ protected:
 	BehaviorAndWeight _faceBehavior;
 	BehaviorData _behaviorData;
 
-	std::shared_ptr<Circle> _circleCollider = nullptr;
-
 	const EnemyType _enemyType = EnemyType::Count;
 
 	int _formationIndex = -1;

@@ -10,12 +10,12 @@
 BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
 	_sprite->Load(_bossBoarSpritePath);
 
-	_position = Vector2<float>(-10000.f, -10000.f);
-	_circleCollider->Init(_position, _sprite->h * 0.5f);
+	_collider = std::make_shared<Circle>();
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 
-	_behaviorData.characterRadius = _circleCollider->GetRadius();
+	_behaviorData.characterRadius = _sprite->h * 0.5f;
 
-	_maxHealth = 1500;
+	_maxHealth = 15000;
 	_currentHealth = _maxHealth;
 
 	_attackDamage = 300;
@@ -30,7 +30,7 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 	_behaviorData.maxLinearAcceleration = 50.f;
 	_behaviorData.maxSpeed = 100.f;
 
-	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
+	_behaviorData.separationThreshold = _behaviorData.characterRadius * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
 
 	_prioritySteering = std::make_shared<PrioritySteering>();
@@ -119,13 +119,21 @@ void BoarBoss::HandleAttack() {
 		_dashStartPosition = _position;
 
 	} else {
-		if (!_damagedPlayer && IsInDistance(_position, _currentTarget->GetPosition(), _circleCollider->GetRadius())) {
+		if (!_damagedPlayer) {
+			for (unsigned int i = 0; i < _queriedObjects.size(); i++) {
+				if (_queriedObjects[i]->GetObjectType() == _currentTarget->GetObjectType()) {
+					_queriedObjects[i]->TakeDamage(_attackDamage);
+					_damagedPlayer = true;	
+				}
+			}
+		}
+		if (!_damagedPlayer && IsInDistance(_position, _currentTarget->GetPosition(), _behaviorData.characterRadius)) {
 			_currentTarget->TakeDamage(_attackDamage);
 			_damagedPlayer = true;
 		}
 		if (_isAttacking) {
 			_position += _dashDirection * _dashSpeed * deltaTime;
-			_circleCollider->SetPosition(_position);
+			_collider->SetPosition(_position);
 			if ((_dashStartPosition - _position).absolute() > _dashDistance) {
 				_attackCooldownTimer->ResetTimer();
 				_isAttacking = false;

@@ -51,38 +51,45 @@ void EnemyManager::Init() {
 	}
 }
 
-void EnemyManager::Update() {}
-
+void EnemyManager::Update() {
+	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
+		_spawnEnemy = true;
+	}
+	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
+		_activeEnemies[i]->Update();
+		_activeEnemies[i]->QueryObjects();
+	}
+}
 void EnemyManager::UpdateBossRush() {
-	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->Update();
+	if (_spawnEnemy && _activeEnemies.size() <= 0) {
+		BossSpawner();
+		_spawnEnemy = false;
 	}
 }
-
-void EnemyManager::UpdateSurvival() {
-	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
-		SurvivalEnemySpawner();
-	}	
-	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->Update();
-	}
-}
-
 void EnemyManager::UpdateFormation() {
-	if (_spawnTimer->GetTimerFinished() && _activeEnemies.size() < _enemyAmountLimit) {
+	if (_spawnEnemy) {
 		FormationEnemySpawner();
-	}	
+		_spawnEnemy = false;
+	}
 	for (unsigned int i = 0; i < _formationManagers.size(); i++) {
 		_formationManagers[i]->UpdateSlots();
 	}
-	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
-		_activeEnemies[i]->Update();
+}
+void EnemyManager::UpdateSurvival() {
+	if (_spawnEnemy) {
+		SurvivalEnemySpawner();
+		_spawnEnemy = false;
 	}
 }
 
 void EnemyManager::Render() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
 		_activeEnemies[i]->Render();
+	}
+}
+
+void EnemyManager::RenderText() {
+	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
 		_activeEnemies[i]->RenderText();
 	}
 }
@@ -121,30 +128,25 @@ void EnemyManager::CreateWeapon(WeaponType weaponType) {
 	case WeaponType::Shield:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<ShieldComponent>());
 		break;
-
 	case WeaponType::Staff:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<StaffComponent>());
-		break;
-			
+		break;			
 	case WeaponType::SuperStaff:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<SuperStaffComponent>());
 		break;
-		
 	case WeaponType::Sword:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<SwordComponent>());
 		break;
-
 	case WeaponType::Tusks:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<TusksComponent>());
 		break;
-
 	default:
 		break;
 	}
 }
 
-void EnemyManager::SpawnBoss() {
-	_activeEnemies.emplace_back(std::make_shared<BoarBoss>(lastObjectID, EnemyType::Boar));
+void EnemyManager::BossSpawner() {
+	_activeEnemies.emplace_back(std::make_shared<BoarBoss>(lastObjectID, EnemyType::Boss));
 	_activeEnemies.back()->Init();
 }
 
@@ -313,10 +315,9 @@ void EnemyManager::TakeDamage(unsigned int enemyIndex, unsigned int damageAmount
 	_activeEnemies[enemyIndex]->TakeDamage(damageAmount);
 }
 
-void EnemyManager::UpdateQuadTree() {
+void EnemyManager::InsertEnemiesQuadtree() {
 	for (unsigned i = 0; i < _activeEnemies.size(); i++) {
 		objectBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
-		enemyBaseQuadTree->Insert(_activeEnemies[i], _activeEnemies[i]->GetCollider());
 	}
 }
 const unsigned int EnemyManager::GetWaveNumber() const {

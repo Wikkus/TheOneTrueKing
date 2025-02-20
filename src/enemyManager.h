@@ -17,6 +17,7 @@ template<typename T> class QuadTree;
 enum class EnemyType;
 
 enum class EnemyType {
+	Boss,
 	Boar,
 	Human,
 	Count
@@ -68,10 +69,13 @@ public:
 
 	void Init();
 	void Update();
+
 	void UpdateBossRush();
 	void UpdateSurvival();
 	void UpdateFormation();
+
 	void Render();
+	void RenderText();
 
 	std::vector<std::shared_ptr<EnemyBase>> GetActiveEnemies();
 	const std::vector<std::shared_ptr<FormationManager>>  GetFormationManagers() const;
@@ -83,7 +87,7 @@ public:
 
 	void CreateWeapon(WeaponType weaponType);
 
-	void SpawnBoss();
+	void BossSpawner();
 
 	void FormationEnemySpawner();
 	void SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType);
@@ -100,7 +104,7 @@ public:
 
 	void TakeDamage(unsigned int enemyIndex, unsigned int damageAmount);
 
-	void UpdateQuadTree();
+	void InsertEnemiesQuadtree();
 
 	const unsigned int GetWaveNumber() const;
 
@@ -122,6 +126,8 @@ private:
 	std::unordered_map<EnemyType, std::shared_ptr<ObjectPool<std::shared_ptr<EnemyBase>>>> _enemyPools;
 
 	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
+
+	bool _spawnEnemy = false;
 
 	unsigned int _currentSpawnAmount = 0;
 	SlotAttackType _currentAttackType = SlotAttackType::Count;

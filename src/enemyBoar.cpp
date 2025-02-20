@@ -14,9 +14,10 @@
 EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
 	_sprite->Load(_boarSprite);
 
-	_circleCollider->Init(_position, _sprite->h * 0.5f);
+	_collider = std::make_shared<Circle>();
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 
-	_behaviorData.characterRadius = _circleCollider->GetRadius();
+	_behaviorData.characterRadius = _sprite->h * 0.5f;
 
 	_attackDamage = 20;
 
@@ -30,7 +31,7 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(obj
 	_behaviorData.maxLinearAcceleration = 75.f;
 	_behaviorData.maxSpeed = 100.f;
 	
-	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
+	_behaviorData.separationThreshold = _behaviorData.characterRadius * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
 
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
@@ -41,8 +42,6 @@ EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(obj
 	_attackCooldownTimer = timerManager->CreateTimer(1.f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
 	_chargeAttackTimer->DeactivateTimer();
-
-	
 }
 
 EnemyBoar::~EnemyBoar() {}
@@ -66,8 +65,6 @@ void EnemyBoar::Init() {
 }
 
 void EnemyBoar::Update() {
-	_queriedObjects = objectBaseQuadTree->Query(_circleCollider);
-	
 	if(!_weaponComponent->GetIsAttacking()) {
 		_targetPosition = _currentTarget->GetPosition();
 		_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
@@ -75,7 +72,7 @@ void EnemyBoar::Update() {
 	}
 	_weaponComponent->Update();
 	HandleAttack();
-	_circleCollider->SetPosition(_position);
+	_collider->SetPosition(_position);
 }
 
 void EnemyBoar::Render() {

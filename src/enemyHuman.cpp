@@ -16,9 +16,10 @@
 EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	EnemyBase(objectID, enemyType) {
 	_sprite->Load(_humanSprite);
+	_collider = std::make_shared<Circle>();
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 
-	_circleCollider->Init(_position, _sprite->h * 0.5f);
-	_behaviorData.characterRadius = _circleCollider->GetRadius();
+	_behaviorData.characterRadius = _sprite->h * 0.5f;
 
 	_numberOfWeaponTypes = (int)(WeaponType::Count);
 
@@ -32,7 +33,7 @@ EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
 	_behaviorData.maxLinearAcceleration = 75.f;
 	_behaviorData.maxSpeed = 75.f;
 
-	_behaviorData.separationThreshold = _circleCollider->GetRadius() * 1.5f;
+	_behaviorData.separationThreshold = _behaviorData.characterRadius * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
 
 	_behaviorData.linearTargetRadius = 5.f;
@@ -85,7 +86,6 @@ void EnemyHuman::Init() {
 }
 
 void EnemyHuman::Update() {
-	_queriedObjects = objectBaseQuadTree->Query(_circleCollider);
 	UpdateTarget();
 	HandleAttack();
 

@@ -12,6 +12,7 @@
 #define eulersNumber 2.71828
 
 class Button;
+class CollisionCheck;
 class DebugDrawer;
 class EnemyBase;
 class EnemyManager;
@@ -33,6 +34,7 @@ class QuadTree;
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 
+extern std::shared_ptr<CollisionCheck> collisionCheck;
 extern std::shared_ptr<EnemyManager> enemyManager;
 extern std::shared_ptr<DebugDrawer> debugDrawer;
 extern std::shared_ptr<GameStateHandler> gameStateHandler;
@@ -42,7 +44,6 @@ extern std::shared_ptr<ObstacleManager> obstacleManager;
 extern std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 extern std::shared_ptr<ProjectileManager> projectileManager;
 
-extern std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
 
 extern std::shared_ptr<RayCast> rayCast;

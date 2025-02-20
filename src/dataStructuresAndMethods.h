@@ -35,6 +35,7 @@ Vector2<float> LimitVelocity(Vector2<float> velocity, float maxAcceleration);
 
 Vector2<float> PointBetweenVectors(Vector2<float> fromVector, Vector2<float> toVector, float range);
 
+float Clamp(const float& a, const float& min, const float& max);
 float RandomBinomalFloat(float a, float b);
 int RandomBinomalInt(int a, int b);
 

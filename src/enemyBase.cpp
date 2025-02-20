@@ -5,7 +5,7 @@ EnemyBase::EnemyBase(int objectID, EnemyType enemyType) :
     ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {
     _sprite = std::make_shared<Sprite>();
     _position = Vector2<float>(-10000.f, -10000.f);
-    _circleCollider = std::make_shared<Circle>();
+
     _maxHealth = 100.f;
     _currentHealth = _maxHealth;
 
@@ -16,7 +16,7 @@ EnemyBase::EnemyBase(int objectID, EnemyType enemyType) :
 }
 
 const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
-    return _circleCollider;
+    return _collider;
 }
 
 const EnemyType EnemyBase::GetEnemyType() const {
@@ -64,7 +64,7 @@ void EnemyBase::UpdateAngularMovement() {
 
 void EnemyBase::UpdateLinearMovement() {
     _position += _velocity * deltaTime;
-    _circleCollider->SetPosition(_position);
+    _collider->SetPosition(_position);
     _velocity += _steeringOutput.linearVelocity * deltaTime;
 
     if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
@@ -77,7 +77,7 @@ void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector
     _orientation = orienation;
     _direction = direction;
     _position = position;
-    _circleCollider->SetPosition(position);
+    _collider->SetPosition(position);
     if (weaponType != WeaponType::Count) {
         _weaponComponent = enemyManager->AccessWeapon(weaponType);
         _weaponComponent->Init(shared_from_this());
@@ -90,7 +90,7 @@ void EnemyBase::DeactivateEnemy() {
     _direction = { 0.f, 0.f };
     _position = { -10000.f, 10000.f };
     _rotation = 0.f;
-    _circleCollider->SetPosition(_position);
+    _collider->SetPosition(_position);
     _velocity = { 0.f, 0.f };
     _formationIndex = -1;
     if (_weaponComponent) {
@@ -104,7 +104,7 @@ void EnemyBase::SetFormationIndex(int formationIndex) {
 
 void EnemyBase::SetPosition(Vector2<float> position) {
     _position = position;
-    _circleCollider->SetPosition(position);
+    _collider->SetPosition(position);
 }
 
 void EnemyBase::SetTargetOrientation(float targetOrientation) {

@@ -35,12 +35,15 @@ void ProjectileManager::Init() {
 void ProjectileManager::Update() {
 	for (unsigned int i = 0; i < _activeProjectiles.size(); i++) {
 		_activeProjectiles[i]->Update();
-		if (CheckCollision(_activeProjectiles[i]->GetProjectileType(), i)) {
-			continue;
-		}
+		_activeProjectiles[i]->QueryObjects();
+
 		if (OutOfBorderX(_activeProjectiles[i]->GetPosition().x, 0.f) ||
 			OutOfBorderY(_activeProjectiles[i]->GetPosition().y, 0.f)) {
 			RemoveProjectile(_activeProjectiles[i]->GetProjectileType(), _activeProjectiles[i]->GetObjectID());
+			continue;
+		}
+		if (CheckCollision(_activeProjectiles[i]->GetProjectileType(), i)) {
+			continue;
 		}
 	}
 }
@@ -66,18 +69,15 @@ void ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, Proje
 }
 
 bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {
-	_objectsHit = objectBaseQuadTree->Query(_activeProjectiles[projectileIndex]->GetCollider());
-
+	_objectsHit = _activeProjectiles[projectileIndex]->GetQueriedObjects();
 	for (unsigned int i = 0; i < _objectsHit.size(); i++) {
-		if (_objectsHit[i]->GetObjectType() == ObjectType::Projectile) {
+		if (_objectsHit[i]->GetObjectType() == ObjectType::Projectile ||
+			_objectsHit[i]->GetObjectType() == _activeProjectiles[projectileIndex]->GetOwner()->GetObjectType()) {
 			continue;
 		}
-		if (_objectsHit[i]->GetObjectType() != _activeProjectiles[projectileIndex]->GetOwner()->GetObjectType()) {
-			_objectsHit[i]->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
-
-			RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
-			return true;
-		}
+		_objectsHit[i]->TakeDamage(_activeProjectiles[projectileIndex]->GetProjectileDamage());
+		RemoveProjectile(projectileType, _activeProjectiles[projectileIndex]->GetObjectID());
+		return true;
 	}
 	return false;
 }
@@ -114,7 +114,7 @@ void ProjectileManager::Reset() {
 	RemoveAllProjectiles();
 }
 
-void ProjectileManager::UpdateQuadTree() {
+void ProjectileManager::InsertProjectilesQuadtree() {
 	for (unsigned int i = 0; i < _activeProjectiles.size(); i++) {
 		objectBaseQuadTree->Insert(_activeProjectiles[i], _activeProjectiles[i]->GetCollider());
 	}

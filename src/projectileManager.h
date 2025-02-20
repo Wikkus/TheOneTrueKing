@@ -33,7 +33,7 @@ public:
 
 	void Reset();
 
-	void UpdateQuadTree();
+	void InsertProjectilesQuadtree();
 
 	int BinarySearch(int low, int high, int targetID);
 

@@ -36,7 +36,6 @@ private:
 	void UpdateTarget();
 
 	const char* _kingSprite = "res/sprites/HumanKing.png";
-	std::shared_ptr<Circle> _circleCollider = nullptr;
 	std::shared_ptr<ObjectBase> _dummyTarget = nullptr;
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
@@ -46,8 +45,6 @@ private:
 	unsigned int _multiShotAmount = 3;
 	float _multiShotAngle = 0.f;
 	Vector2<float> _multiShotDirection = 0.f;
-
-	std::shared_ptr<Projectile> _collidedProjectile = nullptr;
 
 	std::shared_ptr<TextSprite> _healthTextSprite = nullptr;
 

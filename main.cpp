@@ -10,6 +10,8 @@
 #include "ImGui/imgui_sdl.h"
 #include "ImGui/imgui_impl_sdl.h"
 
+#include "src/bossBoar.h"
+#include "src/collision.h"
 #include "src/dataStructuresAndMethods.h"
 #include "src/debugDrawer.h"
 #include "src/enemyBase.h"
@@ -28,7 +30,6 @@
 #include "src/timerManager.h"
 #include "src/textSprite.h"
 #include "src/vector2.h"
-#include "src/bossBoar.h"
 
 int main(int argc, char* argv[]) {
 	HWND windowHandle = GetConsoleWindow();
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
 	window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);	
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	collisionCheck = std::make_shared<CollisionCheck>();
 	enemyManager = std::make_shared<EnemyManager>();
 	gameStateHandler = std::make_shared<GameStateHandler>();
 	debugDrawer = std::make_shared<DebugDrawer>();
@@ -55,8 +57,7 @@ int main(int argc, char* argv[]) {
 
 	QuadTreeNode quadTreeNode;
 	quadTreeNode.rectangle.Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
-	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 35);
-	enemyBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<EnemyBase>>>(quadTreeNode, 25);
+	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 50);
 
 	//Init here
 	enemyManager->Init();
@@ -132,11 +133,12 @@ int main(int argc, char* argv[]) {
 		debugDrawer->DrawCircles();
 		debugDrawer->DrawLines();
 
-		objectBaseQuadTree->Clear();
-
 		//Render text here
 		gameStateHandler->RenderStateText();
 
+		//objectBaseQuadTree->Render();
+		objectBaseQuadTree->Clear();
+		
 		imGuiHandler->Render();
 
 		SDL_RenderPresent(renderer);

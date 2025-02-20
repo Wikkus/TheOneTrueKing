@@ -28,7 +28,7 @@ Button::Button(const char* buttonText, int height, int width, Vector2<float> pos
 bool Button::ClickedOn() {
 	_cursorCollider.SetPosition(GetCursorPosition());
 	if (GetMouseButtonPressed(SDL_BUTTON_LEFT)) {
-		if (AABBCircleIntersect(_boxCollider, _cursorCollider)) {
+		if (collisionCheck->AABBCircleIntersect(_boxCollider, _cursorCollider)) {
 			return true;
 		}
 	}
@@ -114,13 +114,12 @@ InGameState::InGameState() {
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
+	enemyManager->InsertEnemiesQuadtree();
+	projectileManager->InsertProjectilesQuadtree();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		objectBaseQuadTree->Insert(playerCharacters[i], playerCharacters[i]->GetCollider());
 		playerCharacters[i]->Update();
-	}	
-	enemyManager->UpdateQuadTree();
-	projectileManager->UpdateQuadTree();
-
+	}
 	enemyManager->Update();
 	obstacleManager->UpdateObstacles();
 	projectileManager->Update();
@@ -128,8 +127,8 @@ void InGameState::Update() {
 }
 
 void InGameState::Render() {
-	enemyManager->Render();
 	obstacleManager->RenderObstacles();
+	enemyManager->Render();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		playerCharacters[i]->Render();
 	}
@@ -143,7 +142,7 @@ void InGameState::RenderText() {
 }
 
 BossRushGameState::BossRushGameState() {
-	enemyManager->SpawnBoss();
+	enemyManager->BossSpawner();
 }
 
 void BossRushGameState::SetButtonPositions() {
@@ -155,6 +154,7 @@ void BossRushGameState::Update() {
 }
 void BossRushGameState::Render() {
 	InGameState::Render();
+	enemyManager->RenderText();
 }
 void BossRushGameState::RenderText() {
 	InGameState::RenderText();
@@ -194,7 +194,7 @@ void SurvivalGameState::RenderText() {
 
 GameOverState::GameOverState() {
 	_waveNumberText = std::make_shared<TextSprite>();
-	_waveNumberText->Init("res/roboto.ttf", 24, ("Waves survived: " + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
+	_waveNumberText->Init("res/roboto.ttf", 24, ("You died on wave: " + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
 	_waveNumberText->SetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
 	SetButtonPositions();
 }

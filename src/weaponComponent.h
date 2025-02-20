@@ -79,7 +79,7 @@ public:
 	void Attack() override;
 
 protected:
-	ProjectileType _projectileType;
+	ProjectileType _projectileType = ProjectileType::Count;
 
 	bool _unlimitedRange = false;
 

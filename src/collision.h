@@ -80,10 +80,17 @@ struct Collision {
 	bool collisionDetected = false;
 };
 
-bool ColliderIntersect(std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB);
+class CollisionCheck {
+public:
+	bool AABBIntersect(AABB& boxA, AABB& boxB);
 
-bool CircleIntersect(Circle circleA, Circle circleB);
+	bool AABBCircleIntersect(AABB& box, Circle& circle);
 
-bool AABBIntersect(AABB& boxA, AABB& boxB);
+	bool CircleIntersect(Circle circleA, Circle circleB);
 
-bool AABBCircleIntersect(AABB& box, Circle& circle);
+private:
+	Vector2<float> _clamped = { 0.f, 0.f };
+	Vector2<float> _delta = { 0.f, 0.f };
+	float distance = 0.f;
+
+};

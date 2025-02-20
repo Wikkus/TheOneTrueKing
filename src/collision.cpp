@@ -1,4 +1,5 @@
 #include "collision.h"
+#include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
 #include "gameEngine.h"
 #include "objectBase.h"
@@ -56,84 +57,6 @@ void AABB::SetWidth(float width) {
 	_width = width;
 }
 
-bool ColliderIntersect(std::shared_ptr<Collider> colliderA, std::shared_ptr<Collider> colliderB) {
-	switch (colliderA->GetColliderType()) {
-	case ColliderType::AABB:
-		switch (colliderB->GetColliderType()) {
-		case ColliderType::AABB:
-			return AABBIntersect(*std::static_pointer_cast<AABB>(colliderA), 
-				*std::static_pointer_cast<AABB>(colliderB));
-			break;
-		case ColliderType::Circle:
-			return AABBCircleIntersect(*std::static_pointer_cast<AABB>(colliderA), 
-				*std::static_pointer_cast<Circle>(colliderB));
-			break;
-		default:
-			break;
-		}
-		break;
-	case ColliderType::Circle:
-		switch (colliderB->GetColliderType()) {
-		case ColliderType::AABB:
-			return AABBCircleIntersect(*std::static_pointer_cast<AABB>(colliderB),
-				*std::static_pointer_cast<Circle>(colliderA));
-			break;
-		case ColliderType::Circle:
-			return CircleIntersect(*std::static_pointer_cast<Circle>(colliderA),
-				*std::static_pointer_cast<Circle>(colliderB));
-			break;
-		default:
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-	return false;
-}
-
-bool CircleIntersect(Circle circleA, Circle circleB) {
-	float dx = circleB.GetPosition().x - circleA.GetPosition().x;
-	float dy = circleB.GetPosition().y - circleA.GetPosition().y;
-
-	float distanceSquared = dx * dx + dy * dy;
-	float distance = sqrt(distanceSquared);
-
-	float radiusSum = circleA.GetRadius() + circleB.GetRadius();
-	return distance < radiusSum;
-}
-
-bool AABBIntersect(AABB& boxA, AABB& boxB) {
-	return (
-		boxA.GetMax().x > boxB.GetMin().x &&
-		boxB.GetMax().x > boxA.GetMin().x &&
-		boxA.GetMax().y > boxB.GetMin().y &&
-		boxB.GetMax().y > boxA.GetMin().y);
-}
-
-
-float Clamp(float a, float min, float max) {
-	if (a < min) {
-		return min;
-	}
-	else if (a > max) {
-		return max;
-	}
-	return a;
-}
-
-bool AABBCircleIntersect(AABB& box, Circle& circle) {
-	float clampedX = Clamp(circle.GetPosition().x, box.GetMin().x, box.GetMax().x);
-	float clampedY = Clamp(circle.GetPosition().y, box.GetMin().y, box.GetMax().y);
-
-	float deltaX = circle.GetPosition().x - clampedX;
-	float deltaY = circle.GetPosition().y - clampedY;
-
-	float distanceSquared = deltaX * deltaX + deltaY * deltaY;
-	float distance = sqrt(distanceSquared);
-	return (distance < circle.GetRadius());
-}
-
 void AABB::SetPosition(Vector2<float> newPosition) {
 	_position = newPosition;
 	_min.x = _position.x - (_width * 0.5f);
@@ -155,3 +78,23 @@ const float Circle::GetRadius() const {
 	return _radius;
 }
 
+bool CollisionCheck::AABBIntersect(AABB& boxA, AABB& boxB) {
+	return (
+		boxA.GetMax().x > boxB.GetMin().x &&
+		boxB.GetMax().x > boxA.GetMin().x &&
+		boxA.GetMax().y > boxB.GetMin().y &&
+		boxB.GetMax().y > boxA.GetMin().y);
+}
+
+bool CollisionCheck::AABBCircleIntersect(AABB& box, Circle& circle) {
+	_clamped = { Clamp(circle.GetPosition().x, box.GetMin().x, box.GetMax().x),
+		Clamp(circle.GetPosition().y, box.GetMin().y, box.GetMax().y) };
+
+	_delta = circle.GetPosition() - _clamped;
+	return (_delta.absolute() < circle.GetRadius());
+}
+
+bool CollisionCheck::CircleIntersect(Circle circleA, Circle circleB) {
+	_delta = circleB.GetPosition() - circleA.GetPosition();
+	return _delta.absolute() < (circleA.GetRadius() + circleB.GetRadius());
+}

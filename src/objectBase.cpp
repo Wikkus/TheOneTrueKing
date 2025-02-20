@@ -2,6 +2,7 @@
 
 #include "collision.h"
 #include "gameEngine.h"
+#include "quadTree.h"
 
 const unsigned int ObjectBase::GetObjectID() const {
     return _objectID;
@@ -70,6 +71,10 @@ void ObjectBase::SetTargetPosition(Vector2<float> targetPosition) {
 
 void ObjectBase::SetVelocity(Vector2<float> velocity) {
     _velocity = velocity;
+}
+
+void ObjectBase::QueryObjects() {
+    _queriedObjects = objectBaseQuadTree->Query(_collider);
 }
 
 void ObjectBase::TakeDamage(unsigned int damageAmount) {}

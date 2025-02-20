@@ -33,7 +33,6 @@ public:
 	void DeactivateProjectile();
 
 private:
-	std::shared_ptr<Circle> _circleCollider = nullptr;
 	std::shared_ptr<ObjectBase> _owner = nullptr;
 
 	ProjectileType _projectileType = ProjectileType::Count;

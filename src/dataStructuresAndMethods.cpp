@@ -54,6 +54,15 @@ Vector2<float> PointBetweenVectors(Vector2<float> fromVector, Vector2<float> toV
 	return fromVector + ((toVector - fromVector).normalized() * range);
 }
 
+float Clamp(const float& a, const float& min, const float& max) {
+	if (a < min) {
+		return min;
+	} else if (a > max) {
+		return max;
+	}
+	return a;
+}
+
 float RandomBinomalFloat(float a, float b) {
 	std::uniform_real_distribution<float> dist(a, b);
 	return dist(randomEngine);

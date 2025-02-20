@@ -18,8 +18,9 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int object
 	_sprite->Load(_kingSprite);
 	_orientation = characterOrientation;
 	_position = characterPosition;
-	_circleCollider = std::make_shared<Circle>();
-	_circleCollider->Init(_position, 16.f);
+	_collider = std::make_shared<Circle>();
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.45f);
+
 	_oldPosition = _position;
 
 	_maxHealth = 1000.f;
@@ -56,7 +57,7 @@ void PlayerCharacter::RenderText() {
 }
 
 const std::shared_ptr<Collider> PlayerCharacter::GetCollider() const {
-	return _circleCollider;
+	return _collider;
 }
 
 void PlayerCharacter::TakeDamage(unsigned int damageAmount) {
@@ -127,7 +128,7 @@ void PlayerCharacter::UpdateMovement() {
 	if (OutOfBorderY(_position.y, 0.f)) {
 		_position.y = _oldPosition.y;
 	}
-	_circleCollider->SetPosition(_position);
+	_collider->SetPosition(_position);
 }
 
 void PlayerCharacter::UpdateTarget() {

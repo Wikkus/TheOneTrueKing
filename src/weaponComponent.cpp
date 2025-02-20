@@ -144,7 +144,7 @@ SuperStaffComponent::SuperStaffComponent() {
 
 	_attackCooldownTimer = timerManager->CreateTimer(0.25f);
 
-	_attackDamage = 50;
+	_attackDamage = 150;
 	_healthModifier = 0;
 
 	_weaponType = WeaponType::Staff;

@@ -20,6 +20,7 @@
 SDL_Window* window;
 SDL_Renderer* renderer;
 
+std::shared_ptr<CollisionCheck> collisionCheck;
 std::shared_ptr<EnemyManager> enemyManager;
 std::shared_ptr<DebugDrawer> debugDrawer;
 std::shared_ptr<GameStateHandler> gameStateHandler;
@@ -28,7 +29,6 @@ std::shared_ptr<ObstacleManager> obstacleManager;
 std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 std::shared_ptr<ProjectileManager> projectileManager;
 
-std::shared_ptr<QuadTree<std::shared_ptr<EnemyBase>>> enemyBaseQuadTree;
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
 
 std::shared_ptr<RayCast> rayCast;
