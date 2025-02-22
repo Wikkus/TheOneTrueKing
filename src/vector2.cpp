@@ -68,13 +68,13 @@ void Vector2<T>::normalize(){
 	}
 }
 template<typename T>
-void Vector2<T>::rotate(T rotation){
+void Vector2<T>::rotate(const T& rotation){
 	T x_1 = x;
 	x = (x * cos(rotation)) - (y * sin(rotation));
 	y = (x_1 * sin(rotation)) + (y * cos(rotation));
 }
 template<typename T>
-Vector2<T> Vector2<T>::rotated(T rotation) const{
+Vector2<T> Vector2<T>::rotated(const T& rotation) const{
 	return Vector2(
 		(x * cos(rotation)) - (y * sin(rotation)),
 		(x * sin(rotation)) + (y * cos(rotation))
@@ -97,7 +97,7 @@ T Vector2<T>::absolute() const{
 	return sqrt((x * x) + (y * y));
 }
 template<typename T>
-T Vector2<T>::distanceBetweenVectors(Vector2 vectorA, Vector2 vectorB) {
+T Vector2<T>::distanceBetweenVectors(const Vector2& vectorA, const Vector2& vectorB) {
 	return sqrt(((vectorA.x - vectorB.x) * (vectorA.x - vectorB.x)) +
 		((vectorA.y - vectorB.y) * (vectorA.y - vectorB.y)));
 }
@@ -117,6 +117,11 @@ std::ostream& operator<<(std::ostream& os, const Vector2<T>& vector2){
 //Compile for double
 template class Vector2<double>;
 template std::ostream& operator<<(std::ostream& os, const Vector2<double>& vector2);
+
 //Compile for float
 template class Vector2<float>;
 template std::ostream& operator<<(std::ostream& os, const Vector2<float>& vector2);
+
+//Compile for int
+template class Vector2<int>;
+template std::ostream& operator<<(std::ostream& os, const Vector2<int>& vector2);

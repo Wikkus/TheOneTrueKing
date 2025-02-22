@@ -25,12 +25,12 @@ public:
 
 	const ProjectileType GetProjectileType() const;
 
-	const unsigned int GetProjectileDamage() const;
+	const int GetDamage() const override;
 	
 	void SetDirection(Vector2<float> direction);
 
-	void ActivateProjectile(std::shared_ptr<ObjectBase> owner, float orientation, Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed);
-	void DeactivateProjectile();
+	void ActivateProjectile(std::shared_ptr<ObjectBase> owner, float orientation, Vector2<float> direction, Vector2<float> position, int damage, float speed);
+	void DeactivateObject() override;
 
 private:
 	std::shared_ptr<ObjectBase> _owner = nullptr;
@@ -38,6 +38,6 @@ private:
 	ProjectileType _projectileType = ProjectileType::Count;
 	
 	float _speed = 200.f;
-	unsigned int _damage = 30;
+	int _damage = 30;
 };
 

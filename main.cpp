@@ -12,7 +12,6 @@
 
 #include "src/bossBoar.h"
 #include "src/collision.h"
-#include "src/dataStructuresAndMethods.h"
 #include "src/debugDrawer.h"
 #include "src/enemyBase.h"
 #include "src/enemyManager.h"
@@ -22,6 +21,7 @@
 #include "src/playerCharacter.h"
 #include "src/projectileManager.h"
 #include "src/quadTree.h"
+#include "src/searchSortAlgorithms.h"
 #include "src/rayCast.h"
 #include "src/sprite.h"
 #include "src/spriteSheet.h"
@@ -29,6 +29,7 @@
 #include "src/steeringBehavior.h"
 #include "src/timerManager.h"
 #include "src/textSprite.h"
+#include "src/universalFunctions.h"
 #include "src/vector2.h"
 
 int main(int argc, char* argv[]) {
@@ -50,10 +51,11 @@ int main(int argc, char* argv[]) {
 	obstacleManager = std::make_shared<ObstacleManager>();
 	projectileManager = std::make_shared<ProjectileManager>();
 	playerCharacters.emplace_back(std::make_shared<PlayerCharacter>(0.f, lastObjectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f)));
-	lastObjectID++;
+	quickSort = std::make_shared<SearchSortAlgorithms>();
 	rayCast = std::make_shared<RayCast>();
 
 	timerManager = std::make_shared<TimerManager>();
+	universalFunctions = std::make_shared<UniversalFunctions>();
 
 	QuadTreeNode quadTreeNode;
 	quadTreeNode.rectangle.Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);

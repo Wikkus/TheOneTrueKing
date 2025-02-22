@@ -95,7 +95,7 @@ public:
 	void Attack() override;
 
 private:
-	unsigned int _multiShotAmount = 5;
+	unsigned int _multiShotAmount = 3;
 	
 	float _multiShotAngle = 0.f;
 	float _angleOffset = 0.25;

@@ -45,7 +45,7 @@ const ProjectileType Projectile::GetProjectileType() const {
 	return _projectileType;
 }
 
-const unsigned int Projectile::GetProjectileDamage() const {
+const int Projectile::GetDamage() const {
 	return _damage;
 }
 
@@ -59,7 +59,7 @@ void Projectile::SetPosition(Vector2<float> position) {
 }
 
 void Projectile::ActivateProjectile(std::shared_ptr<ObjectBase> owner, float orientation, 
-	Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
+	Vector2<float> direction, Vector2<float> position, int damage, float speed) {
 	_owner = owner;
 	
 	_orientation = orientation;
@@ -74,11 +74,11 @@ void Projectile::ActivateProjectile(std::shared_ptr<ObjectBase> owner, float ori
 	_speed = speed;
 }
 
-void Projectile::DeactivateProjectile() {
+void Projectile::DeactivateObject() {
 	_owner = nullptr;
 	_orientation = 0.f;
 	_direction = { 0.f, 0.f };
-	_velocity = { 0.f, 0.f };
 	_position = { -10000.f, 10000.f };
 	_collider->SetPosition(_position);
+	_velocity = { 0.f, 0.f };
 }

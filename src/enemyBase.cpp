@@ -19,6 +19,10 @@ const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
     return _collider;
 }
 
+const int EnemyBase::GetDamage() const {
+    return _weaponComponent->GetAttackDamage();
+}
+
 const EnemyType EnemyBase::GetEnemyType() const {
     return _enemyType;
 }
@@ -70,7 +74,7 @@ void EnemyBase::UpdateLinearMovement() {
     if (_steeringOutput.linearVelocity.absolute() < FLT_EPSILON) {
         _velocity = { 0.f, 0.f };
     }
-    _velocity = LimitVelocity(_velocity, _behaviorData.maxSpeed);
+    universalFunctions->LimitVelocity(_velocity, _behaviorData.maxSpeed);
 }
 
 void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
@@ -85,7 +89,7 @@ void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector
     Init();
 }
 
-void EnemyBase::DeactivateEnemy() {
+void EnemyBase::DeactivateObject() {
     _orientation = 0.f;
     _direction = { 0.f, 0.f };
     _position = { -10000.f, 10000.f };

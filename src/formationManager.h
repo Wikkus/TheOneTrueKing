@@ -1,5 +1,4 @@
 #pragma once
-#include "dataStructuresAndMethods.h"
 #include "vector2.h"
 #include "weaponComponent.h"
 
@@ -22,6 +21,17 @@ enum class SlotAttackType {
 	Mage,
 	Swordsman,
 	Count
+};
+
+struct AnchorPoint {
+	Vector2<float> position = { 0.f , 0.f };
+	Vector2<float> targetPosition = { 0.f , 0.f };
+
+	Vector2<float> direction = { 0.f , 0.f };
+
+	float distance = 0.f;
+	float movementSpeed = 60.f;
+	float orientation = 0.f;
 };
 
 struct CostAndSlot {
@@ -48,6 +58,11 @@ struct SlotAssignment {
 	bool isOnScreen = false;
 	std::shared_ptr<EnemyBase> enemyCharacter;
 	unsigned int slotNumber = INT_MAX;
+};
+
+struct StaticCharacter {
+	Vector2<float> position = { 0.f , 0.f };
+	float orientation = 0.f;
 };
 
 std::vector<CostAndSlot> SortByCost(std::vector<CostAndSlot> slotsAndCosts);
@@ -77,9 +92,15 @@ public:
 
 protected:
 	unsigned int _numberOfSlots = 0;
+
 	StaticCharacter _location;
 	StaticCharacter _result;
 
+	StaticCharacter _tempLocation;
+	Vector2<float> _tempPosition;
+
+	unsigned int _amountSlots = 0;
+	
 	std::unordered_map<SlotAttackType, unsigned int> _amountSlotsPerType;
 };
 
@@ -144,7 +165,7 @@ public:
 private:
 	void CreateSlotsOfType(std::shared_ptr<AnchorPoint> anchorPoint, unsigned int amountSlots,
 		Vector2<float> frontSlotPosition, SlotAttackType attackType);
-	
+
 	std::vector<SlotPositionAndType> _slotPositionAndType;
 	float _offset = 15.f;
 	float _rowDistance = 32.f;

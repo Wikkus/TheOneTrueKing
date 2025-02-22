@@ -1,5 +1,5 @@
 #include "collision.h"
-#include "dataStructuresAndMethods.h"
+#include "universalFunctions.h"
 #include "debugDrawer.h"
 #include "gameEngine.h"
 #include "objectBase.h"
@@ -87,8 +87,8 @@ bool CollisionCheck::AABBIntersect(AABB& boxA, AABB& boxB) {
 }
 
 bool CollisionCheck::AABBCircleIntersect(AABB& box, Circle& circle) {
-	_clamped = { Clamp(circle.GetPosition().x, box.GetMin().x, box.GetMax().x),
-		Clamp(circle.GetPosition().y, box.GetMin().y, box.GetMax().y) };
+	_clamped = { universalFunctions->Clamp(circle.GetPosition().x, box.GetMin().x, box.GetMax().x),
+		universalFunctions->Clamp(circle.GetPosition().y, box.GetMin().y, box.GetMax().y) };
 
 	_delta = circle.GetPosition() - _clamped;
 	return (_delta.absolute() < circle.GetRadius());

@@ -1,6 +1,5 @@
 #include "enemyBoar.h"
 
-#include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
 #include "gameEngine.h"
 #include "imGuiManager.h"

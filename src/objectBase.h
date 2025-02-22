@@ -19,7 +19,7 @@ class Timer;
 
 class ObjectBase : public std::enable_shared_from_this<ObjectBase> {
 public:
-	ObjectBase(unsigned int objectID, ObjectType objectType) : _objectID(objectID), _objectType(objectType) {}
+	ObjectBase(unsigned int objectID, ObjectType objectType);
 	~ObjectBase() {}
 
 	virtual void Init() {}
@@ -31,7 +31,10 @@ public:
 
 	virtual void SetPosition(Vector2<float> position);
 	virtual void TakeDamage(unsigned int damageAmount);
+
+	virtual void DeactivateObject() {}
 	
+
 	const unsigned int GetObjectID() const;	
 	const float GetOrientation() const;
 	const float GetRotation() const;
@@ -46,6 +49,8 @@ public:
 	const Vector2<float> GetPosition() const;
 	const Vector2<float> GetTargetPosition() const;
 	const Vector2<float> GetVelocity() const;	
+
+	virtual const int GetDamage() const;
 
 	void SetOrientation(float orientation);
 	void SetRotation(float rotation);

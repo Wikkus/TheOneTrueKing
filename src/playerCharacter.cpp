@@ -1,6 +1,5 @@
 #include "playerCharacter.h"
 
-#include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
 #include "enemyManager.h"
 #include "gameEngine.h"
@@ -28,7 +27,7 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int object
 	_healthTextSprite = std::make_shared<TextSprite>();
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
 
-	_dummyTarget = std::make_shared<ObjectBase>(INT_MAX, ObjectType::Count);
+	_dummyTarget = std::make_shared<ObjectBase>(INT_MAX, ObjectType::Count); 
 }
 
 PlayerCharacter::~PlayerCharacter() {}
@@ -122,22 +121,22 @@ void PlayerCharacter::UpdateMovement() {
 	}
 	_position += _velocity * deltaTime;
 
-	if (OutOfBorderX(_position.x, 0.f)) {
+	if (universalFunctions->OutsideBorderX(_position.x, 0.f)) {
 		_position.x = _oldPosition.x;
 	}
-	if (OutOfBorderY(_position.y, 0.f)) {
+	if (universalFunctions->OutsideBorderY(_position.y, 0.f)) {
 		_position.y = _oldPosition.y;
 	}
 	_collider->SetPosition(_position);
 }
 
 void PlayerCharacter::UpdateTarget() {
-	_targetPosition = GetCursorPosition();
+	_targetPosition = universalFunctions->GetCursorPosition();
 	_dummyTarget->SetPosition(_targetPosition);
 	_currentTarget = _dummyTarget;
 
 	_direction = (_targetPosition - _position).normalized();
-	_orientation = VectorAsOrientation(_direction);
+	_orientation = universalFunctions->VectorAsOrientation(_direction);
 }
 
 const int PlayerCharacter::GetCurrentHealth() const {

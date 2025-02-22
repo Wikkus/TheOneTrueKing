@@ -8,6 +8,10 @@ const unsigned int ObjectBase::GetObjectID() const {
     return _objectID;
 }
 
+ObjectBase::ObjectBase(unsigned int objectID, ObjectType objectType) : _objectID(objectID), _objectType(objectType) {
+    lastObjectID++;
+}
+
 const std::shared_ptr<Collider> ObjectBase::GetCollider() const {
     return std::shared_ptr<Collider>();
 }
@@ -51,6 +55,10 @@ const Vector2<float> ObjectBase::GetTargetPosition() const {
 
 const Vector2<float> ObjectBase::GetVelocity() const {
     return _velocity;
+}
+
+const int ObjectBase::GetDamage() const {
+    return 0;
 }
 
 void ObjectBase::SetOrientation(float orientation) {

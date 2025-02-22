@@ -1,6 +1,8 @@
 #pragma once
 #include "formationManager.h"
+#include "managerBase.h"
 #include "quadTree.h"
+#include "universalFunctions.h"
 #include "vector2.h"
 
 #include <vector>
@@ -62,7 +64,7 @@ struct BehaviorData {
 	float wanderRate = 0.f;
 };
 
-class EnemyManager {
+class EnemyManager : public ManagerBase {
 public:
 	EnemyManager();
 	~EnemyManager();
@@ -77,11 +79,11 @@ public:
 	void Render();
 	void RenderText();
 
-	std::vector<std::shared_ptr<EnemyBase>> GetActiveEnemies();
 	const std::vector<std::shared_ptr<FormationManager>>  GetFormationManagers() const;
+	const unsigned int GetWaveNumber() const;
 
 	std::shared_ptr<WeaponComponent> AccessWeapon(WeaponType weaponType);
-
+	
 	void CreateNewEnemy(EnemyType enemyType, float orientation,
 		Vector2<float> direction, Vector2<float> position);
 
@@ -102,18 +104,11 @@ public:
 
 	void Reset();
 
-	void TakeDamage(unsigned int enemyIndex, unsigned int damageAmount);
-
-	void InsertEnemiesQuadtree();
-
-	const unsigned int GetWaveNumber() const;
-
-	int BinarySearch(int low, int high, int objectID);
-
-	int Partition(int start, int end);
-	void QuickSort( int start, int end);
 
 private:
+	std::shared_ptr<EnemyBase> CastAsEnemy(std::shared_ptr<ObjectBase> currentObject);
+	std::shared_ptr<EnemyBase> _currentEnemy = nullptr;
+
 	std::array<Vector2<float>, 4> _spawnPositions;
 
 	std::shared_ptr<AnchorPoint> _latestAnchorPoint = nullptr;
@@ -121,10 +116,7 @@ private:
 
 	std::shared_ptr<Timer> _spawnTimer = nullptr;
 
-	std::vector<std::shared_ptr<EnemyBase>> _activeEnemies;
-
 	std::unordered_map<EnemyType, std::shared_ptr<ObjectPool<std::shared_ptr<EnemyBase>>>> _enemyPools;
-
 	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
 
 	bool _spawnEnemy = false;
@@ -140,13 +132,21 @@ private:
 	unsigned int _minRowSpawn = 1;
 	std::array<unsigned int, 2> _spawnCountPerRow = { 6, 1 };
 
-	int _latestEnemyIndex = -1;
-
 	unsigned int _enemyAmountLimit = 1000;
 	unsigned int _weaponAmountLimit = 2000;
 	unsigned int _numberOfEnemyTypes = 0;
 	unsigned int _numberOfWeaponTypes = 0;
 	unsigned int _spawnNumberOfEnemies = 5;
 	unsigned int _waveNumber = 1;
+
+	int _targetEnemyIndex = -1;
+
+	//Quicksort variables
+	int _pivot = 0;
+	int _pivotIndex = 0;
+	int _count = 0;
+	int _i = 0;
+	int _k = 0;
+	int _partition = 0;
 };
 

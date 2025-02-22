@@ -1,7 +1,6 @@
 #include "weaponComponent.h"
 
 #include "collision.h"
-#include "dataStructuresAndMethods.h"
 #include "enemyBase.h"
 #include "gameEngine.h"
 #include "objectPool.h"
@@ -119,7 +118,7 @@ void StaffComponent::Attack() {
 	}
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
 		_projectileDirection = Vector2<float>(_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition()).normalized();
-		_projectileOrientation = VectorAsOrientation(_projectileDirection);
+		_projectileOrientation = universalFunctions->VectorAsOrientation(_projectileDirection);
 
 		projectileManager->SpawnProjectile(_owner, _projectileType,
 			_projectileOrientation, _projectileDirection, _owner->GetPosition(), _attackDamage, _projectileSpeed);
@@ -132,7 +131,7 @@ void StaffComponent::Attack() {
 			_chargeAttackTimer->ResetTimer();
 			_isAttacking = true;
 
-		} else if (IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		} else if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 			_chargeAttackTimer->ResetTimer();
 			_isAttacking = true;
 		}
@@ -160,12 +159,12 @@ void SuperStaffComponent::Attack() {
 	}
 	_projectileDirection = _owner->GetTargetPosition() - _owner->GetPosition();
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
-	_multiShotAngle *= 0.5f;
+	_multiShotAngle /= _multiShotAmount;
 
 	for (unsigned int i = 0; i < _multiShotAmount; i++) {
-		_multiShotDirection = RotateDirection(_multiShotAngle, _projectileDirection);
+		_multiShotDirection = _projectileDirection.rotated(_multiShotAngle);
 
-		projectileManager->SpawnProjectile(_owner, _projectileType, VectorAsOrientation(_projectileDirection) + _multiShotAngle,
+		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_projectileDirection) + _multiShotAngle,
 			_multiShotDirection, _owner->GetPosition(), _attackDamage, _projectileSpeed);
 		_multiShotAngle += _angleOffset;
 	}
@@ -193,7 +192,7 @@ void SwordComponent::Attack() {
 		return;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		if (IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 			_owner->GetCurrentTarget()->TakeDamage(_attackDamage);
 		}
 		_isAttacking = false;
@@ -239,7 +238,7 @@ void TusksComponent::Attack() {
 			_isAttacking = false;
 		}
 	} else {	
-		if (IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 			_chargeAttackTimer->DeactivateTimer();
 			_dashDirection = (_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition());
 			_dashDistance = _dashDirection.absolute() + 100.f;

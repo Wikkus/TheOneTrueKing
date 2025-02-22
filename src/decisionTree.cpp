@@ -1,6 +1,6 @@
 #include "decisionTree.h"
 
-#include "dataStructuresAndMethods.h"
+#include "universalFunctions.h"
 #include "gameEngine.h"
 #include "enemyBase.h"
 #include "playerCharacter.h"
@@ -47,7 +47,7 @@ bool MeleeAttackAction::ExecuteAction(EnemyBase& owner) {
 		owner.UpdateAngularMovement();
 	}
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		if (IsInDistance(owner.GetCurrentTarget()->GetPosition(), owner.GetPosition(), _attackRange)) {
+		if (universalFunctions->IsInDistance(owner.GetCurrentTarget()->GetPosition(), owner.GetPosition(), _attackRange)) {
 			owner.GetCurrentTarget()->TakeDamage(_attackDamage);
 		}
 		owner.SetVelocity({ 0.f, 0.f });
@@ -131,7 +131,7 @@ bool RandomDecision::TestValue() {
 	if (_timer->GetTimerActive()) {
 		return _currentDecision;
 	} else {
-		_currentDecision = RandomBinomalInt(0, 1);
+		_currentDecision = universalFunctions->RandomBinomialInt(0, 1);
 		_timer->ResetTimer();
 	}
 	return _currentDecision;
@@ -158,7 +158,7 @@ int MultiDecision::TestValue() {
 RandomMultiDecision::RandomMultiDecision() {}
 
 int RandomMultiDecision::TestValue() {
-	return RandomBinomalInt(0, _daughterNodes.size() - 1);
+	return universalFunctions->RandomBinomialInt(0, _daughterNodes.size() - 1);
 }
 
 

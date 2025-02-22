@@ -35,13 +35,13 @@ public:
 	 * 
 	 * @param rotation Rotation angle in radians.
 	 */
-	void rotate(T rotation);
+	void rotate(const T& rotation);
 	/**
 	 * @brief Rotate the vector clockwize in the z direction
 	 * 
 	 * @param rotation Rotation angle in radians.
 	 */
-	Vector2 rotated(T rotation) const;
+	Vector2 rotated(const T& rotation) const;
 	/**
 	 * @brief Return a vector that is the normelized vector of this vector
 	 * @details [long description]
@@ -55,7 +55,7 @@ public:
 	 */
 	T absolute() const;
 	
-	static T distanceBetweenVectors(Vector2 vectorA, Vector2 vectorB);
+	static T distanceBetweenVectors(const Vector2& vectorA, const Vector2& vectorB);
 		
 	/**
 	 * @brief Calculate the dot product of two vetors.
@@ -68,6 +68,7 @@ public:
 	 * @return Vector result of the dot operation.
 	 */
 	static T dotProduct(const Vector2 &left, const Vector2 &right);
+
 };
 
 template<typename T>

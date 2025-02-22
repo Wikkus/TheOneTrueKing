@@ -16,6 +16,8 @@ public:
 	~EnemyBase() {}
 
 	const std::shared_ptr<Collider> GetCollider() const override;
+	const int GetDamage() const override;
+
 	virtual const EnemyType GetEnemyType() const;
 	 
 	void TakeDamage(unsigned int damageAmount) override;
@@ -37,7 +39,7 @@ public:
 	void UpdateLinearMovement();
 
 	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
-	virtual void DeactivateEnemy();
+	void DeactivateObject() override;
 
 	virtual void SetFormationIndex(int formationIndex);
 	virtual void SetTargetOrientation(float targetOrientation);
@@ -45,7 +47,6 @@ public:
 	void SetPosition(Vector2<float> position) override;
 	
 	bool ReplaceSteeringBehavior(SteeringBehaviorType oldBehavior, BehaviorAndWeight newBehavior);
-
 
 protected:
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment;

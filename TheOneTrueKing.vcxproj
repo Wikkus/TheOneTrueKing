@@ -32,7 +32,9 @@
     <ClCompile Include="src\behaviorTree.cpp" />
     <ClCompile Include="src\bossBoar.cpp" />
     <ClCompile Include="src\collision.cpp" />
-    <ClCompile Include="src\dataStructuresAndMethods.cpp" />
+    <ClCompile Include="src\managerBase.cpp" />
+    <ClCompile Include="src\searchSortAlgorithms.cpp" />
+    <ClCompile Include="src\universalFunctions.cpp" />
     <ClCompile Include="src\debugDrawer.cpp" />
     <ClCompile Include="src\decisionTree.cpp" />
     <ClCompile Include="src\enemyBase.cpp" />
@@ -168,7 +170,9 @@
     <ClInclude Include="src\behaviorTree.h" />
     <ClInclude Include="src\bossBoar.h" />
     <ClInclude Include="src\collision.h" />
-    <ClInclude Include="src\dataStructuresAndMethods.h" />
+    <ClInclude Include="src\managerBase.h" />
+    <ClInclude Include="src\searchSortAlgorithms.h" />
+    <ClInclude Include="src\universalFunctions.h" />
     <ClInclude Include="src\debugDrawer.h" />
     <ClInclude Include="src\decisionTree.h" />
     <ClInclude Include="src\enemyBase.h" />

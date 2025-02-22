@@ -1,5 +1,6 @@
 #include "gameEngine.h"
 
+#include "universalFunctions.h"
 #include "debugDrawer.h"
 #include "enemyBase.h"
 #include "enemyManager.h"
@@ -8,14 +9,11 @@
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "quadTree.h"
+#include "searchSortAlgorithms.h"
 #include "rayCast.h"
 #include "stateStack.h"
 #include "steeringBehavior.h"
 #include "timerManager.h"
-
-#include "enemyHuman.h"
-
-#include <vector>
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -31,8 +29,10 @@ std::shared_ptr<ProjectileManager> projectileManager;
 
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
 
+std::shared_ptr<SearchSortAlgorithms> quickSort;
 std::shared_ptr<RayCast> rayCast;
 std::shared_ptr<TimerManager> timerManager;
+std::shared_ptr<UniversalFunctions> universalFunctions;
 std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 
 bool runningGame = false;

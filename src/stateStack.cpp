@@ -1,6 +1,5 @@
 #include "stateStack.h"
 
-#include "dataStructuresAndMethods.h"
 #include "enemyManager.h"
 #include "gameEngine.h"
 #include "objectBase.h"
@@ -26,7 +25,7 @@ Button::Button(const char* buttonText, int height, int width, Vector2<float> pos
 }
 
 bool Button::ClickedOn() {
-	_cursorCollider.SetPosition(GetCursorPosition());
+	_cursorCollider.SetPosition(universalFunctions->GetCursorPosition());
 	if (GetMouseButtonPressed(SDL_BUTTON_LEFT)) {
 		if (collisionCheck->AABBCircleIntersect(_boxCollider, _cursorCollider)) {
 			return true;
@@ -114,8 +113,8 @@ InGameState::InGameState() {
 void InGameState::SetButtonPositions() {}
 
 void InGameState::Update() {
-	enemyManager->InsertEnemiesQuadtree();
-	projectileManager->InsertProjectilesQuadtree();
+	enemyManager->InsertObjectsQuadtree();
+	projectileManager->InsertObjectsQuadtree();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		objectBaseQuadTree->Insert(playerCharacters[i], playerCharacters[i]->GetCollider());
 		playerCharacters[i]->Update();

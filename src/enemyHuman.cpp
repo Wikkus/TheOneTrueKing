@@ -1,6 +1,5 @@
 #include "enemyHuman.h"
 
-#include "dataStructuresAndMethods.h"
 #include "debugDrawer.h"
 #include "gameEngine.h"
 #include "playerCharacter.h"
@@ -51,7 +50,7 @@ void EnemyHuman::Init() {
 	_currentTarget = playerCharacters.back();
 	_targetPosition = _currentTarget->GetPosition();
 	_direction = Vector2<float>(_targetPosition - _position).normalized();
-	_orientation = VectorAsOrientation(_direction);
+	_orientation = universalFunctions->VectorAsOrientation(_direction);
 	_velocity = { 0.f, 0.f };
 	
 	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();

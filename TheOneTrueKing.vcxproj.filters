@@ -11,16 +11,13 @@
     <ClCompile Include="src\enemyHuman.cpp">
       <Filter>Enemies</Filter>
     </ClCompile>
-    <ClCompile Include="src\enemyManager.cpp">
-      <Filter>Enemies</Filter>
-    </ClCompile>
     <ClCompile Include="include\ImGui\example.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\collision.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
-    <ClCompile Include="src\dataStructuresAndMethods.cpp">
+    <ClCompile Include="src\universalFunctions.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\debugDrawer.cpp">
@@ -57,9 +54,6 @@
       <Filter>GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\projectile.cpp">
-      <Filter>Projectiles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\projectileManager.cpp">
       <Filter>Projectiles</Filter>
     </ClCompile>
     <ClCompile Include="src\playerCharacter.cpp">
@@ -124,6 +118,18 @@
     </ClCompile>
     <ClCompile Include="src\bossBoar.cpp">
       <Filter>Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\searchSortAlgorithms.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enemyManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managerBase.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\projectileManager.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -400,9 +406,6 @@
     <ClInclude Include="include\SDL2\SDL_video.h">
       <Filter>SDLIncludes</Filter>
     </ClInclude>
-    <ClInclude Include="src\enemyManager.h">
-      <Filter>Enemies</Filter>
-    </ClInclude>
     <ClInclude Include="src\enemyBase.h">
       <Filter>Enemies</Filter>
     </ClInclude>
@@ -415,7 +418,7 @@
     <ClInclude Include="src\collision.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
-    <ClInclude Include="src\dataStructuresAndMethods.h">
+    <ClInclude Include="src\universalFunctions.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\debugDrawer.h">
@@ -453,9 +456,6 @@
     </ClInclude>
     <ClInclude Include="src\imGuiManager.h">
       <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\projectileManager.h">
-      <Filter>Projectiles</Filter>
     </ClInclude>
     <ClInclude Include="src\projectile.h">
       <Filter>Projectiles</Filter>
@@ -529,6 +529,18 @@
     <ClInclude Include="include\SDL2\close_code.h">
       <Filter>SDLIncludes</Filter>
     </ClInclude>
+    <ClInclude Include="src\searchSortAlgorithms.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemyManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\managerBase.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\projectileManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\SDL2\SDL_config.h.cmake">
@@ -580,6 +592,9 @@
     </Filter>
     <Filter Include="DecisionMaking">
       <UniqueIdentifier>{ef891053-09ce-4151-ae9e-be9d83df221a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{2330f724-11fb-44ec-af85-d2416ac6e785}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 #include "steeringBehavior.h"
 
-#include "dataStructuresAndMethods.h"
 #include "enemyBase.h"
 #include "gameEngine.h"
 #include "imGuiManager.h"
@@ -15,7 +14,7 @@ AlignBehavior::AlignBehavior() {
 SteeringOutput AlignBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
 	//Calculates the speed that the enemy will rotate and clamps it between -PI, PI radians(-180, 180 degree)
 	_rotation = behaviorData.targetOrientation - objectBase.GetOrientation();
-	_rotation = WrapMinMax(_rotation, -PI, PI);
+	_rotation = universalFunctions->WrapMinMax(_rotation, -PI, PI);
 
 	//Uses a variable that will always be the positive value and use it for the if statements
 	_rotationSize = abs(_rotation);
@@ -64,7 +63,7 @@ SteeringOutput FaceBehavior::Steering(BehaviorData behaviorData, ObjectBase& obj
 		return SteeringOutput();
 	}
 	//Sets the targetOrientation based on the direction using atan2f
-	behaviorData.targetOrientation = VectorAsOrientation(_direction);
+	behaviorData.targetOrientation = universalFunctions->VectorAsOrientation(_direction);
 
 	//returns the steering function from alignBehavior which aligns the character with the targetOrientation
 	return AlignBehavior::Steering(behaviorData, objectBase);
@@ -80,7 +79,7 @@ SteeringOutput LookAtDirectionBehavior::Steering(BehaviorData behaviorData, Obje
 		return SteeringOutput();
 	}
 	//Sets the targetOrientation to the velocity as orientation using atan2f
-	behaviorData.targetOrientation = VectorAsOrientation(objectBase.GetVelocity().absolute());
+	behaviorData.targetOrientation = universalFunctions->VectorAsOrientation(objectBase.GetVelocity().absolute());
 	return AlignBehavior::Steering(behaviorData, objectBase);
 }
 
@@ -117,7 +116,7 @@ SteeringOutput ArriveBehavior::Steering(BehaviorData behaviorData, ObjectBase& o
 	_result.linearVelocity /= behaviorData.timeToTarget;
 
 	//Make sure the velocity doesn't go beyond maxAcceleration
-	_result.linearVelocity = LimitVelocity(_result.linearVelocity, behaviorData.maxLinearAcceleration);
+	universalFunctions->LimitVelocity(_result.linearVelocity, behaviorData.maxLinearAcceleration);
 
 	//Make sure to return the angularVelocity as 0, since this behavior will only change the linearVelocity
 	_result.angularVelocity = 0.f;
@@ -218,7 +217,7 @@ SteeringOutput SeekBehavior::Steering(BehaviorData behaviorData, ObjectBase& obj
 	_result.linearVelocity *= behaviorData.maxLinearAcceleration;
 
 	//Make sure the velocity doesn't go above the maxSpeed
-	_result.linearVelocity = LimitVelocity(_result.linearVelocity, behaviorData.maxSpeed);
+	universalFunctions->LimitVelocity(_result.linearVelocity, behaviorData.maxSpeed);
 
 	//Make sure to return the angularVelocity as 0, since this behavior will only change the linearVelocity
 	_result.angularVelocity = 0.f;
@@ -240,11 +239,11 @@ SteeringOutput ObstacleAvoidanceBehavior::Steering(BehaviorData behaviorData, Ob
 
 	_whiskerA = _ray;
 	_whiskerA.length = _ray.length * 0.75f;
-	_whiskerA.direction = RotateVector(-PI * 0.25, objectBase.GetPosition(), objectBase.GetPosition() + _ray.direction);
-	
+	_whiskerA.direction = _ray.direction.rotated(-PI * 0.25);
+
 	_whiskerB = _ray;
 	_whiskerB.length = _ray.length * 0.75f;
-	_whiskerB.direction = RotateVector(PI * 0.25, objectBase.GetPosition(), objectBase.GetPosition() + _ray.direction);
+	_whiskerB.direction = _ray.direction.rotated(PI * 0.25);
 
 	//debugDrawer->AddDebugLine(enemy->GetPosition(), enemy->GetPosition() + _ray.direction * _ray.length, {0, 255, 0, 255 });
 	//debugDrawer->AddDebugLine(enemy->GetPosition(), enemy->GetPosition() + _whiskerA.direction * _whiskerA.length, { 0, 255, 0, 255 });
@@ -361,7 +360,7 @@ SteeringOutput VelocityMatchBehaviour::Steering(BehaviorData behaviorData, Objec
 	_result.linearVelocity /= behaviorData.timeToTarget;
 
 	//Make sure the velocity doesn't get higher than the max acceleration
-	_result.linearVelocity = LimitVelocity(_result.linearVelocity, behaviorData.maxLinearAcceleration);
+	universalFunctions->LimitVelocity(_result.linearVelocity, behaviorData.maxLinearAcceleration);
 	_result.angularVelocity = 0.f;
 	return _result;
 }
@@ -376,18 +375,18 @@ WanderBehavior::WanderBehavior() {
 
 SteeringOutput WanderBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
 	//Set the current wander orientation based on a random value combined with the wander rate
-	_wanderOrientation += RandomBinomalFloat(-1, 1) * behaviorData.wanderRate;
+	_wanderOrientation += universalFunctions->RandomBinomialFloat(-1, 1) * behaviorData.wanderRate;
 
 	//Calculates the combined orientation between the enemy and the current wanderOrientation
 	behaviorData.targetOrientation = _wanderOrientation + objectBase.GetOrientation();
 	
 	//Calculates the center position of the target
 	_targetPosition = objectBase.GetPosition() + 
-		(OrientationAsVector(objectBase.GetOrientation()) * behaviorData.wanderOffset);
+		(universalFunctions->OrientationAsVector(objectBase.GetOrientation()) * behaviorData.wanderOffset);
 
 	//Adds the orientation and wanderRadius as an offset to the targetPosition
 	objectBase.SetTargetPosition(_targetPosition +
-		OrientationAsVector(behaviorData.targetOrientation) * behaviorData.wanderRadius);
+		universalFunctions->OrientationAsVector(behaviorData.targetOrientation) * behaviorData.wanderRadius);
 
 	debugDrawer->AddDebugCross(objectBase.GetTargetPosition(), 25.f, { 0, 255, 0, 255 });
 
@@ -395,7 +394,7 @@ SteeringOutput WanderBehavior::Steering(BehaviorData behaviorData, ObjectBase& o
 	_result = FaceBehavior::Steering(behaviorData, objectBase);
 
 	//Set the linearVelocity based on the enemies current orientation
-	_result.linearVelocity = OrientationAsVector(objectBase.GetOrientation()) * behaviorData.maxLinearAcceleration;
+	_result.linearVelocity = universalFunctions->OrientationAsVector(objectBase.GetOrientation()) * behaviorData.maxLinearAcceleration;
 	return _result;
 }
 

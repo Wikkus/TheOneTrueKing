@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_scancode.h>
 
+#include <memory>
 #include <random>
 #include <unordered_map>
 #include <vector>
@@ -22,9 +23,11 @@ class ObjectBase;
 class ObstacleManager;
 class PlayerCharacter;
 class ProjectileManager;
+class SearchSortAlgorithms;
 class RayCast;
 class SteeringBehavior;
 class TimerManager;
+class UniversalFunctions;
 
 enum class ButtonType;
 
@@ -46,9 +49,11 @@ extern std::shared_ptr<ProjectileManager> projectileManager;
 
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
 
+extern std::shared_ptr<SearchSortAlgorithms> quickSort;
 extern std::shared_ptr<RayCast> rayCast;
 extern std::shared_ptr<SteeringBehavior> separationBehavior;
 extern std::shared_ptr<TimerManager> timerManager;
+extern std::shared_ptr<UniversalFunctions> universalFunctions;
 
 
 extern std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;

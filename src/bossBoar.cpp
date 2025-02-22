@@ -127,7 +127,7 @@ void BoarBoss::HandleAttack() {
 				}
 			}
 		}
-		if (!_damagedPlayer && IsInDistance(_position, _currentTarget->GetPosition(), _behaviorData.characterRadius)) {
+		if (!_damagedPlayer && universalFunctions->IsInDistance(_position, _currentTarget->GetPosition(), _behaviorData.characterRadius)) {
 			_currentTarget->TakeDamage(_attackDamage);
 			_damagedPlayer = true;
 		}
