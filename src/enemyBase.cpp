@@ -1,8 +1,8 @@
 #include "enemyBase.h"
 #include "playerCharacter.h"
+#include "weaponManager.h"
 
-EnemyBase::EnemyBase(int objectID, EnemyType enemyType) :
-    ObjectBase(objectID, ObjectType::Enemy), _enemyType(enemyType) {
+EnemyBase::EnemyBase(EnemyType enemyType) : ObjectBase(ObjectType::Enemy), _enemyType(enemyType) {
     _sprite = std::make_shared<Sprite>();
     _position = Vector2<float>(-10000.f, -10000.f);
 
@@ -13,6 +13,7 @@ EnemyBase::EnemyBase(int objectID, EnemyType enemyType) :
     _blendSteering = std::make_shared<BlendSteering>();
 
     _currentTarget = playerCharacters.back();
+    _collider = std::make_shared<Circle>(true);
 }
 
 const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
@@ -30,7 +31,7 @@ const EnemyType EnemyBase::GetEnemyType() const {
 void EnemyBase::TakeDamage(unsigned int damageAmount) {
     _currentHealth -= damageAmount;
     if (_currentHealth <= 0) {
-        enemyManager->RemoveEnemy(_enemyType, _objectID);
+        enemyManager->RemoveObject(_objectID);
     }
 }
 
@@ -82,9 +83,12 @@ void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector
     _direction = direction;
     _position = position;
     _collider->SetPosition(position);
+
     if (weaponType != WeaponType::Count) {
-        _weaponComponent = enemyManager->AccessWeapon(weaponType);
-        _weaponComponent->Init(shared_from_this());
+        _weaponComponent = weaponManager->SpawnWeapon(weaponType);
+        _weaponComponent->SetOwner(shared_from_this());
+        _weaponComponent->ActivateObject(position, direction, orienation);
+        _weaponComponent->Init();
     }
     Init();
 }
@@ -97,9 +101,8 @@ void EnemyBase::DeactivateObject() {
     _collider->SetPosition(_position);
     _velocity = { 0.f, 0.f };
     _formationIndex = -1;
-    if (_weaponComponent) {
-        _weaponComponent->DeactivateTimers();
-    }
+    weaponManager->RemoveObject(_weaponComponent->GetObjectID());
+    _weaponComponent = nullptr;
 }
 
 void EnemyBase::SetFormationIndex(int formationIndex) {

@@ -9,6 +9,7 @@
 #include "quadTree.h"
 #include "textSprite.h"
 #include "timerManager.h"
+#include "weaponManager.h"
 
 #include <vector>
 #include <string>
@@ -16,8 +17,12 @@
 Button::Button(const char* buttonText, int height, int width, Vector2<float> position) {
 	_position = position;
 	
-	_boxCollider.Init(position, height, width);
-	_cursorCollider.Init({ 0.f, 0.f }, 10.f);
+	_boxCollider = std::make_shared<AABB>(true);
+	_boxCollider->Init(position, height, width);
+
+	_cursorCollider = std::make_shared<Circle>(true);
+	_cursorCollider->Init({ 0.f, 0.f }, 10.f);
+
 	_text = std::make_shared<TextSprite>();
 	
 	_text->Init("res/roboto.ttf", 24, buttonText, _textColor);
@@ -25,9 +30,9 @@ Button::Button(const char* buttonText, int height, int width, Vector2<float> pos
 }
 
 bool Button::ClickedOn() {
-	_cursorCollider.SetPosition(universalFunctions->GetCursorPosition());
+	_cursorCollider->SetPosition(universalFunctions->GetCursorPosition());
 	if (GetMouseButtonPressed(SDL_BUTTON_LEFT)) {
-		if (collisionCheck->AABBCircleIntersect(_boxCollider, _cursorCollider)) {
+		if (collisionCheck->AABBCircleIntersect(*_boxCollider, *_cursorCollider)) {
 			return true;
 		}
 	}
@@ -35,7 +40,7 @@ bool Button::ClickedOn() {
 }
 
 void Button::Render() {
-	debugDrawer->AddDebugBox(_position, _boxCollider.GetMin(), _boxCollider.GetMax(), _buttonColor);
+	debugDrawer->AddDebugBox(_position, _boxCollider->GetMin(), _boxCollider->GetMax(), _buttonColor);
 }
 
 void Button::RenderText() {
@@ -44,7 +49,7 @@ void Button::RenderText() {
 
 void Button::SetPosition(Vector2<float> position) {
 	_position = position;
-	_boxCollider.SetPosition(position);
+	_boxCollider->SetPosition(position);
 	_text->SetPosition(_position);
 }
 GameStateHandler::GameStateHandler() {
@@ -115,23 +120,27 @@ void InGameState::SetButtonPositions() {}
 void InGameState::Update() {
 	enemyManager->InsertObjectsQuadtree();
 	projectileManager->InsertObjectsQuadtree();
+	weaponManager->InsertObjectsQuadtree();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		objectBaseQuadTree->Insert(playerCharacters[i], playerCharacters[i]->GetCollider());
 		playerCharacters[i]->Update();
 	}
+
 	enemyManager->Update();
-	obstacleManager->UpdateObstacles();
+	obstacleManager->Update();
 	projectileManager->Update();
 	timerManager->Update();
+	weaponManager->Update();
 }
 
 void InGameState::Render() {
-	obstacleManager->RenderObstacles();
 	enemyManager->Render();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		playerCharacters[i]->Render();
 	}
 	projectileManager->Render();
+	weaponManager->Render();
+	obstacleManager->Render();
 }
 
 void InGameState::RenderText() {

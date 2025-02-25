@@ -43,8 +43,8 @@ private:
 	SDL_Color _buttonColor = { 120,81,169, 255 };
 	SDL_Color _textColor = { 212, 175, 55, 255 };
 
-	AABB _boxCollider;
-	Circle _cursorCollider;
+	std::shared_ptr<AABB> _boxCollider = nullptr;
+	std::shared_ptr<Circle> _cursorCollider = nullptr;
 	std::shared_ptr<TextSprite> _text;
 	Vector2<float> _position;
 };

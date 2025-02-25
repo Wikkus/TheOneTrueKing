@@ -4,16 +4,16 @@
 #include "gameEngine.h"
 #include "quadTree.h"
 
+ObjectBase::ObjectBase(ObjectType objectType) : _objectID(lastObjectID), _objectType(objectType) {
+    lastObjectID++;
+}
+
 const unsigned int ObjectBase::GetObjectID() const {
     return _objectID;
 }
 
-ObjectBase::ObjectBase(unsigned int objectID, ObjectType objectType) : _objectID(objectID), _objectType(objectType) {
-    lastObjectID++;
-}
-
 const std::shared_ptr<Collider> ObjectBase::GetCollider() const {
-    return std::shared_ptr<Collider>();
+    return _collider;
 }
 
 const float ObjectBase::GetOrientation() const {
@@ -86,3 +86,18 @@ void ObjectBase::QueryObjects() {
 }
 
 void ObjectBase::TakeDamage(unsigned int damageAmount) {}
+
+void ObjectBase::ActivateObject(Vector2<float> position, Vector2<float> direction, float orienation) {
+    _position = position;
+    _direction = direction;
+    _orientation = orienation;
+}
+
+void ObjectBase::DeactivateObject() {
+    _orientation = 0.f;
+    _direction = { 0.f, 0.f };
+    _position = { -10000.f, 10000.f };
+    _rotation = 0.f;
+    _collider->SetPosition(_position);
+    _velocity = { 0.f, 0.f };
+}

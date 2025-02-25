@@ -9,13 +9,13 @@
 #include "steeringBehavior.h"
 #include "timerManager.h"
 #include "weaponComponent.h"
+#include "weaponManager.h"
 
 #include <memory>
 
-EnemyHuman::EnemyHuman(unsigned int objectID, EnemyType enemyType) :
-	EnemyBase(objectID, enemyType) {
+EnemyHuman::EnemyHuman() : EnemyBase(EnemyType::Human) {
 	_sprite->Load(_humanSprite);
-	_collider = std::make_shared<Circle>();
+
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 
 	_behaviorData.characterRadius = _sprite->h * 0.5f;

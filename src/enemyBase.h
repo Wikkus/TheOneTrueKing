@@ -1,7 +1,7 @@
 #pragma once
 #include "collision.h"
 #include "enemyManager.h"
-#include "formationManager.h"
+#include "formationHandler.h"
 #include "objectBase.h"
 #include "sprite.h"
 #include "steeringBehavior.h"
@@ -10,9 +10,16 @@
 class Timer;
 class WeaponComponent;
 
+enum class EnemyType {
+	Boss,
+	Boar,
+	Human,
+	Count
+};
+
 class EnemyBase : public ObjectBase {
 public:
-	EnemyBase(int objectID, EnemyType enemyType);
+	EnemyBase(EnemyType enemyType);
 	~EnemyBase() {}
 
 	const std::shared_ptr<Collider> GetCollider() const override;
@@ -49,7 +56,7 @@ public:
 	bool ReplaceSteeringBehavior(SteeringBehaviorType oldBehavior, BehaviorAndWeight newBehavior);
 
 protected:
-	std::shared_ptr<SlotAssignment> _currentSlotAssignment;
+	std::shared_ptr<SlotAssignment> _currentSlotAssignment = nullptr;
 
 	SteeringOutput _steeringOutput;
 

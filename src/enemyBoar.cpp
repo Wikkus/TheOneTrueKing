@@ -10,10 +10,9 @@
 
 #include <memory>
 
-EnemyBoar::EnemyBoar(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
+EnemyBoar::EnemyBoar() : EnemyBase(EnemyType::Boar) {
 	_sprite->Load(_boarSprite);
 
-	_collider = std::make_shared<Circle>();
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 
 	_behaviorData.characterRadius = _sprite->h * 0.5f;

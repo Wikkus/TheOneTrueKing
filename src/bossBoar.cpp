@@ -4,14 +4,15 @@
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "timerManager.h"
+#include "weaponManager.h"
 
 #include <string>
 
-BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objectID, enemyType) {
+BoarBoss::BoarBoss() : EnemyBase(EnemyType::Boss) {
 	_sprite->Load(_bossBoarSpritePath);
 
-	_collider = std::make_shared<Circle>();
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
+
 
 	_behaviorData.characterRadius = _sprite->h * 0.5f;
 
@@ -46,7 +47,7 @@ BoarBoss::BoarBoss(unsigned int objectID, EnemyType enemyType) : EnemyBase(objec
 	_chargeAttackTimer->DeactivateTimer();
 	_healthTextSprite = std::make_shared<TextSprite>();
 
-	_weaponComponent = enemyManager->AccessWeapon(WeaponType::Tusks);
+
 	_behaviorData.linearTargetRadius = 50.f;
 	_behaviorData.linearSlowDownRadius = 200.f;
 
@@ -65,6 +66,9 @@ void BoarBoss::Init() {
 
 	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.9f));
+	
+	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Tusks);
+	_weaponComponent->SetOwner(shared_from_this());
 
 	MakeDecision();
 }
@@ -91,7 +95,7 @@ void BoarBoss::RenderText() {
 void BoarBoss::TakeDamage(unsigned int damageAmount) {
 	_currentHealth -= damageAmount;
 	if (_currentHealth <= 0) {
-		enemyManager->RemoveEnemy(_enemyType, _objectID);
+		enemyManager->RemoveObject(_objectID);
 	}
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 }

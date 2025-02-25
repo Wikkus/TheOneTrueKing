@@ -1,12 +1,13 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 class ObjectBase;
 
 class ManagerBase {
 public:
-	ManagerBase() {}
+	ManagerBase();
 	~ManagerBase() {}
 
 	virtual void Init() {}
@@ -17,24 +18,12 @@ public:
 	virtual void RenderText() {}
 
 	virtual void InsertObjectsQuadtree();
-	virtual void Reset() {}
-
-	void TakeDamage(unsigned int objectIndex, int damageAmount);
+	virtual void RemoveAllObjects() {}
+	virtual void RemoveObject(unsigned int objectID) {}
+	virtual void Reset();
 
 protected:
-	int Partition(std::vector<int>& objectVector, int start, int end);
-	void QuickSort(std::vector<int>& objectVector, int start, int end);
-
-	std::vector<std::shared_ptr<ObjectBase>> _activeObjects;
-	std::vector<int> _objectIDs;
-
-	//Quicksort variables
-	int _pivot = 0;
-	int _pivotIndex = 0;
-	int _count = 0;
-	int _i = 0;
-	int _k = 0;
-	int _partition = 0;
-
+	std::unordered_map<unsigned int, std::shared_ptr<ObjectBase>> _activeObjects;
+	std::vector<std::shared_ptr<ObjectBase>> _removeObjects;
 };
 

@@ -16,7 +16,7 @@ class WeaponComponent;
 
 class EnemyHuman : public EnemyBase {
 public:
-	EnemyHuman(unsigned int objectID, EnemyType enemyType);
+	EnemyHuman();
 	~EnemyHuman();
 
 	void Init() override;

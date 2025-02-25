@@ -1,5 +1,6 @@
 #pragma once
 #include "collision.h"
+#include "managerBase.h"
 #include "vector2.h"
 
 #include <SDL2/SDL.h>
@@ -7,18 +8,19 @@
 
 class Wall;
 
-class ObstacleManager {
+class ObstacleManager : public ManagerBase {
 public:
 	ObstacleManager(){}
 	~ObstacleManager(){}
 
 	void CreateWall(Vector2<float> position, float width, float height, SDL_Color color);
 
-	void UpdateObstacles();
-	void RenderObstacles();
+	void Update() override;
+	void Render() override;
 
-	const std::vector<std::shared_ptr<Wall>> const GetWalls();
+	std::shared_ptr<Wall> CastAsWall(std::shared_ptr<ObjectBase> objectBase);
 
 private:
-	std::vector<std::shared_ptr<Wall>> _walls;
+	std::shared_ptr<Wall> _currentWall = nullptr;
+
 };

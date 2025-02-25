@@ -1,4 +1,4 @@
-#include "formationManager.h"
+#include "formationHandler.h"
 #include "universalFunctions.h"
 #include "debugDrawer.h"
 #include "enemyBase.h"
@@ -6,7 +6,7 @@
 #include "playerCharacter.h"
 #include "searchSortAlgorithms.h"
 
-FormationManager::FormationManager(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow,
+FormationHandler::FormationHandler(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow,
 	std::shared_ptr<AnchorPoint> anchorPoint, bool posWithAnchorOri) {
 	switch (formationType) {
 	case FormationType::DefensiveCircle:
@@ -25,7 +25,7 @@ FormationManager::FormationManager(FormationType formationType, std::array<unsig
 	_formationPattern->CreateSlots(spawnCountPerRow, anchorPoint);
 }
 
-bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
+bool FormationHandler::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 	//Adds a new character to the first available slot in the formation
 	_occupiedSlots = _slotAssignments.size();
 	if (_formationPattern->SupportsSlots(_occupiedSlots)) {
@@ -40,7 +40,7 @@ bool FormationManager::AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 	return false;
 }
 
-void FormationManager::UpdateAnchorPoint() {
+void FormationHandler::UpdateAnchorPoint() {
 	_targetObject = playerCharacters.back();
 
 	_anchorPoint->direction = Vector2<float>(_anchorPoint->targetPosition - _anchorPoint->position);
@@ -57,7 +57,7 @@ void FormationManager::UpdateAnchorPoint() {
 	_anchorPoint->position += _anchorPoint->direction * deltaTime * _anchorPoint->movementSpeed;
 }
 
-void FormationManager::UpdateSlots() {
+void FormationHandler::UpdateSlots() {
 	_slotsOnScreen = 0;
 	UpdateAnchorPoint();
 	//Offsets each character based on the anchor point and current slot location
@@ -95,7 +95,7 @@ void FormationManager::UpdateSlots() {
 	}
 }
 
-void FormationManager::ReconstructSlotAssignments() {
+void FormationHandler::ReconstructSlotAssignments() {
 	_characterAndSlots.clear();
 	for (unsigned int i = 0; i < _slotAssignments.size(); ++i) {
 		_datum.assignmentEase = 0.f;
@@ -145,7 +145,7 @@ void FormationManager::ReconstructSlotAssignments() {
 	_driftOffset = _formationPattern->GetDriftOffset(*_anchorPoint, _slotAssignments);
 }
 
-void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
+void FormationHandler::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter) {
 	for (unsigned int i = 0; i < _slotAssignments.size(); ++i) {
 		if (_slotAssignments[i].enemyCharacter->GetObjectID() == enemyCharacter->GetObjectID()) {
 			_slotAssignments[i] = _slotAssignments.back();	
@@ -158,19 +158,19 @@ void FormationManager::RemoveCharacter(std::shared_ptr<EnemyBase> enemyCharacter
 	//ReconstructSlotAssignments();
 }
 
-std::vector<SlotAssignment> FormationManager::GetSlotAssignments() {
+std::vector<SlotAssignment> FormationHandler::GetSlotAssignments() {
 	return _slotAssignments;
 }
 
-std::shared_ptr<FormationPattern> FormationManager::GetFormationPattern() {
+std::shared_ptr<FormationPattern> FormationHandler::GetFormationPattern() {
 	return _formationPattern;
 }
 
-const bool FormationManager::GetInPosition() const {
+const bool FormationHandler::GetInPosition() const {
 	return _inPosition;
 }
 
-const unsigned int FormationManager::GetNumberOfSlots() const {
+const unsigned int FormationHandler::GetNumberOfSlots() const {
 	return _numberOfSlots;
 }
 
@@ -354,12 +354,12 @@ void DefensiveCirclePattern::SetNumberOfSlots(unsigned int numberOfSlots) {
 }
 
 std::vector<CostAndSlot> SortByCost(std::vector<CostAndSlot> slotsAndCosts) {
-	quickSort->QuickSort(slotsAndCosts, 0, slotsAndCosts.size() - 1);
+	searchSort->QuickSort(slotsAndCosts, 0, slotsAndCosts.size() - 1);
 	return slotsAndCosts;
 }
 
 std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlots> characterAndSlots) {
-	quickSort->QuickSort(characterAndSlots, 0, characterAndSlots.size() - 1);
+	searchSort->QuickSort(characterAndSlots, 0, characterAndSlots.size() - 1);
 	return characterAndSlots;
 }
 

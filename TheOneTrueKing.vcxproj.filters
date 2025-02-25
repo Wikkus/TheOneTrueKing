@@ -62,9 +62,6 @@
     <ClCompile Include="src\objectBase.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\obstacleManager.cpp">
-      <Filter>Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\obstacleWall.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
@@ -104,8 +101,8 @@
     <ClCompile Include="src\steeringBehavior.cpp">
       <Filter>SteeringBehavior</Filter>
     </ClCompile>
-    <ClCompile Include="src\formationManager.cpp">
-      <Filter>FormationManager</Filter>
+    <ClCompile Include="src\formationHandler.cpp">
+      <Filter>Formations</Filter>
     </ClCompile>
     <ClCompile Include="src\decisionTree.cpp">
       <Filter>DecisionMaking</Filter>
@@ -129,6 +126,12 @@
       <Filter>Managers</Filter>
     </ClCompile>
     <ClCompile Include="src\projectileManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\weaponManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obstacleManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -469,9 +472,6 @@
     <ClInclude Include="src\obstacleWall.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\obstacleManager.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\objectPool.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
@@ -508,8 +508,8 @@
     <ClInclude Include="src\steeringBehavior.h">
       <Filter>SteeringBehavior</Filter>
     </ClInclude>
-    <ClInclude Include="src\formationManager.h">
-      <Filter>FormationManager</Filter>
+    <ClInclude Include="src\formationHandler.h">
+      <Filter>Formations</Filter>
     </ClInclude>
     <ClInclude Include="src\bossBoar.h">
       <Filter>Enemies</Filter>
@@ -539,6 +539,12 @@
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="src\projectileManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\weaponManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obstacleManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -587,14 +593,14 @@
     <Filter Include="SteeringBehavior">
       <UniqueIdentifier>{5a407342-0b5b-410d-8eb8-617539f50aaa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FormationManager">
-      <UniqueIdentifier>{a570b2ee-a21a-46fd-977c-bb412b77d7e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DecisionMaking">
       <UniqueIdentifier>{ef891053-09ce-4151-ae9e-be9d83df221a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Managers">
       <UniqueIdentifier>{2330f724-11fb-44ec-af85-d2416ac6e785}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Formations">
+      <UniqueIdentifier>{a570b2ee-a21a-46fd-977c-bb412b77d7e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

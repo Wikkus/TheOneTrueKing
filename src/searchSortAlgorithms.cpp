@@ -1,5 +1,5 @@
 #include "searchSortAlgorithms.h"
-#include "formationManager.h"
+#include "formationHandler.h"
 
 int SearchSortAlgorithms::Partition(std::vector<int>& objectVector, const int& start, const int& end) {
 	_pivotInt = objectVector[start];

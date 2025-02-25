@@ -13,9 +13,9 @@ enum class ProjectileType {
 
 class Projectile : public ObjectBase {
 public:
-	Projectile(unsigned int objectID, ProjectileType projectileType, const char* spritePath);
+	Projectile(ProjectileType projectileType, const char* spritePath);
 	~Projectile();
-
+	
 	void Init() override;
 	void Update() override;
 	void Render() override;

@@ -5,23 +5,26 @@
 #include "obstacleWall.h"
 
 void ObstacleManager::CreateWall(Vector2<float> position, float width, float height, SDL_Color color) {
-	std::shared_ptr<Wall> wall = std::make_shared<Wall>(lastObjectID);
-	wall->Activate(position, width, height, _walls.size(), color);
-	_walls.emplace_back(wall);
+	std::shared_ptr<Wall> wall = std::make_shared<Wall>();
+	wall->Activate(position, width, height, color);
+	_activeObjects.insert(std::make_pair(wall->GetObjectID(), wall));
 }
 
-void ObstacleManager::UpdateObstacles() {
-	for (int i = 0; i < _walls.size(); i++) {
-		_walls[i]->Update();
+void ObstacleManager::Update() {
+	for (auto& objectBase : _activeObjects) {
+		_currentWall = CastAsWall(objectBase.second);
+		_currentWall->Update();
+		_currentWall->QueryObjects();		
 	}
 }
 
-void ObstacleManager::RenderObstacles() {
-	for (int i = 0; i < _walls.size(); i++) {
-		_walls[i]->Render();
+void ObstacleManager::Render() {
+	for (auto& objectBase : _activeObjects) {
+		_currentWall = CastAsWall(objectBase.second);
+		_currentWall->Render();
 	}
 }
 
-std::vector<std::shared_ptr<Wall>> const ObstacleManager::GetWalls() {
-	return _walls;
+std::shared_ptr<Wall> ObstacleManager::CastAsWall(std::shared_ptr<ObjectBase> objectBase) {
+	return std::static_pointer_cast<Wall>(objectBase);
 }

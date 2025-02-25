@@ -11,7 +11,7 @@ class WeaponComponent;
 
 class PlayerCharacter : public ObjectBase {
 public:
-	PlayerCharacter(float characterOrientation, unsigned int objectID, Vector2<float> characterPosition);
+	PlayerCharacter(float characterOrientation, Vector2<float> characterPosition);
 	~PlayerCharacter();
 
 	void Init() override;

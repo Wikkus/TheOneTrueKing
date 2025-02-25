@@ -13,6 +13,7 @@
 #include "steeringBehavior.h"
 #include "timerManager.h"
 #include "weaponComponent.h"
+#include "weaponManager.h"
 
 EnemyManager::EnemyManager() {
 	//Creates an unordered map with objectpool of the different enemy types
@@ -20,11 +21,6 @@ EnemyManager::EnemyManager() {
 	for (unsigned int i = 0; i < _numberOfEnemyTypes; i++) {
 		_enemyPools[(EnemyType)i] = std::make_shared<ObjectPool<std::shared_ptr<EnemyBase>>>(_enemyAmountLimit);
 	}
-	_numberOfWeaponTypes = (unsigned int)WeaponType::Count;
-	for (unsigned int i = 0; i < _numberOfWeaponTypes; i++) {
-		_weaponPools[(WeaponType)i] = std::make_shared<ObjectPool<std::shared_ptr<WeaponComponent>>>(_weaponAmountLimit);
-	}
-
 	_spawnPositions = {
 		Vector2<float>(windowWidth, windowHeight * 0.5f),
 		Vector2<float>(windowWidth * 0.5f, windowHeight),
@@ -33,9 +29,7 @@ EnemyManager::EnemyManager() {
 	};
 }
 
-EnemyManager::~EnemyManager() {
-	RemoveAllEnemies();
-}
+EnemyManager::~EnemyManager() {}
 
 void EnemyManager::Init() {
 	_spawnTimer = timerManager->CreateTimer(3.f);
@@ -45,21 +39,18 @@ void EnemyManager::Init() {
 			CreateNewEnemy(EnemyType(k), 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
 		}
 	}
-	for (unsigned i = 0; i < _weaponAmountLimit / _numberOfWeaponTypes; i++) {
-		for (unsigned int k = 0; k < _numberOfWeaponTypes; k++) {
-			CreateWeapon((WeaponType)k);
-		}
-	}
 }
 
 void EnemyManager::Update() {
-	if (_spawnTimer->GetTimerFinished() && _activeObjects.size() < _enemyAmountLimit) {
+	if (_spawnTimer->GetTimerFinished()) {
 		_spawnEnemy = true;
 	}
-	for (unsigned i = 0; i < _activeObjects.size(); i++) {
-		_activeObjects[i]->Update();
-		_activeObjects[i]->QueryObjects();
+	for (auto& objectBase : _activeObjects) {
+		_currentEnemy = CastAsEnemy(objectBase.second);
+		_currentEnemy->Update();
+		_currentEnemy->QueryObjects();
 	}
+	_currentEnemy = nullptr;
 }
 void EnemyManager::UpdateBossRush() {
 	if (_spawnEnemy && _activeObjects.size() <= 0) {
@@ -84,37 +75,30 @@ void EnemyManager::UpdateSurvival() {
 }
 
 void EnemyManager::Render() {
-	for (unsigned i = 0; i < _activeObjects.size(); i++) {
-		_activeObjects[i]->Render();
+	for (auto& objectBase : _activeObjects) {
+		objectBase.second->Render();
 	}
 }
 
 void EnemyManager::RenderText() {
-	for (unsigned i = 0; i < _activeObjects.size(); i++) {
-		_activeObjects[i]->RenderText();
+	for (auto& objectBase : _activeObjects) {
+		objectBase.second->RenderText();
 	}
 }
 
-const std::vector<std::shared_ptr<FormationManager>> EnemyManager::GetFormationManagers() const {
+const std::vector<std::shared_ptr<FormationHandler>> EnemyManager::GetFormationManagers() const {
 	return _formationManagers;
-}
-
-std::shared_ptr<WeaponComponent> EnemyManager::AccessWeapon(WeaponType weaponType) {
-	if (_weaponPools[weaponType]->IsEmpty()) {
-		CreateWeapon(weaponType);	
-	}
-	return _weaponPools[weaponType]->SpawnObject();
 }
 
 //Creates a specific enemy based on the enemyType enum
 void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position) {
 	switch (enemyType) {
 	case EnemyType::Boar:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>(lastObjectID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>());
 		break;
 
 	case EnemyType::Human:
-		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>(lastObjectID, enemyType));
+		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyHuman>());
 		break;
 	
 	default:
@@ -122,31 +106,11 @@ void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector
 	}
 }
 
-void EnemyManager::CreateWeapon(WeaponType weaponType) {
-	switch (weaponType) {
-	case WeaponType::Shield:
-		_weaponPools[weaponType]->PoolObject(std::make_shared<ShieldComponent>());
-		break;
-	case WeaponType::Staff:
-		_weaponPools[weaponType]->PoolObject(std::make_shared<StaffComponent>());
-		break;			
-	case WeaponType::SuperStaff:
-		_weaponPools[weaponType]->PoolObject(std::make_shared<SuperStaffComponent>());
-		break;
-	case WeaponType::Sword:
-		_weaponPools[weaponType]->PoolObject(std::make_shared<SwordComponent>());
-		break;
-	case WeaponType::Tusks:
-		_weaponPools[weaponType]->PoolObject(std::make_shared<TusksComponent>());
-		break;
-	default:
-		break;
-	}
-}
-
 void EnemyManager::BossSpawner() {
-	_activeObjects.emplace_back(std::make_shared<BoarBoss>(lastObjectID, EnemyType::Boss));
-	_activeObjects.back()->Init();
+	_currentEnemy = std::make_shared<BoarBoss>();
+	_currentEnemy->Init();
+	_activeObjects.insert(std::make_pair(_currentEnemy->GetObjectID(), _currentEnemy));
+	_currentEnemy = nullptr;
 }
 
 void EnemyManager::FormationEnemySpawner() {
@@ -172,7 +136,7 @@ void EnemyManager::FormationEnemySpawner() {
 }
 
 void EnemyManager::SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType) {
-	_formationManagers.emplace_back(std::make_shared<FormationManager>(formationType, spawnCountPerRow, _latestAnchorPoint, false));	
+	_formationManagers.emplace_back(std::make_shared<FormationHandler>(formationType, spawnCountPerRow, _latestAnchorPoint, false));	
 	_currentWeaponType = WeaponType::Count;
 
 	for (unsigned int i = 0; i < (unsigned int)SlotAttackType::Count; i++) {
@@ -195,8 +159,7 @@ void EnemyManager::SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow,
 		}
 		_currentSpawnAmount = _formationManagers.back()->GetFormationPattern()->GetSlotsPerType()[_currentAttackType];
 		for (unsigned int k = 0; k < _currentSpawnAmount; k++) {
-			enemyManager->SpawnEnemy(EnemyType::Human, 0, Vector2<float>(0.f, 0.f), _latestAnchorPoint->position, _currentWeaponType);
-			_currentEnemy = CastAsEnemy(_activeObjects.back());
+			enemyManager->SpawnEnemy(EnemyType::Human, 0, Vector2<float>(0.f, 0.f), _latestAnchorPoint->position, _currentWeaponType);	
 			_currentEnemy->SetFormationIndex(_formationManagers.size() - 1);
 			_formationManagers.back()->AddCharacter(_currentEnemy);
 		}
@@ -253,61 +216,47 @@ void EnemyManager::SurvivalEnemySpawner() {
 }
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type
-void EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation, 
+std::shared_ptr<EnemyBase> EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation,
 	Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
 	if (_enemyPools[enemyType]->IsEmpty()) {
 		CreateNewEnemy(enemyType, orientation, direction, position);
 	}
 	//Then add the enemy to the active enemies vector which is called in Update
-	_activeObjects.emplace_back(_enemyPools[enemyType]->SpawnObject());
-	CastAsEnemy(_activeObjects.back())->ActivateEnemy(orientation, direction, position, weaponType);
-	_objectIDs.emplace_back(_activeObjects.back()->GetObjectID());
+	_currentEnemy = _enemyPools[enemyType]->SpawnObject();			
+	_currentEnemy->ActivateEnemy(orientation, direction, position, weaponType);
+	_activeObjects.insert(std::make_pair(_currentEnemy->GetObjectID(), _currentEnemy));
+	return _currentEnemy;
 }
 
-void EnemyManager::RemoveAllEnemies() {
-	while (_activeObjects.size() > 0) {
-		_currentEnemy = CastAsEnemy(_activeObjects.back());
+void EnemyManager::RemoveAllObjects() {
+	for (auto& enemy : _activeObjects) {
+		_currentEnemy = CastAsEnemy(enemy.second);
 		_currentEnemy->DeactivateObject();
 		_enemyPools[_currentEnemy->GetEnemyType()]->PoolObject(_currentEnemy);
-		_activeObjects.pop_back();
 	}
+	_activeObjects.clear();
 	_currentEnemy = nullptr;
-	_objectIDs.clear();
 }
 
-//Using Quicksort and Binary search to locate a specific enemy
-void EnemyManager::RemoveEnemy(EnemyType enemyType, unsigned int objectID) {
+void EnemyManager::RemoveObject(unsigned int objectID) {
 	if (_activeObjects.empty()) {
 		return;
 	}
-
-	//Sorts the active enemies vector based on their ID from lowest to highest
-	QuickSort(_objectIDs, 0, _objectIDs.size() - 1);
-	
-	//Search through the sorted vector to find the enemy with a specific ID
-	_targetEnemyIndex = quickSort->BinarySearch(_objectIDs, 0, _objectIDs.size() - 1, objectID);
-
-	if (_targetEnemyIndex < 0) {
-		return;
-	}
-	_currentEnemy = CastAsEnemy(_activeObjects[_targetEnemyIndex]);
+	_currentEnemy = CastAsEnemy(_activeObjects[objectID]);
 
 	if (_formationManagers.size() > 0) {
 		_formationManagers[_currentEnemy->GetFormationIndex()]->RemoveCharacter(_currentEnemy);
 	}
 	//Deactivate the enemy by setting its position to a far away place
-	_activeObjects[_targetEnemyIndex]->DeactivateObject();
-
+	_currentEnemy->DeactivateObject();
+	
 	//Adds the enemy to the object pool and place it at the back of the vector
-	_enemyPools[enemyType]->PoolObject(_currentEnemy);
-	std::swap(_activeObjects[_targetEnemyIndex], _activeObjects.back());
-	std::swap(_objectIDs[_targetEnemyIndex], _objectIDs.back());
+	_enemyPools[_currentEnemy->GetEnemyType()]->PoolObject(_currentEnemy);
 
 	//Removes the enemy from active enemies
-	_activeObjects.pop_back();
-	_objectIDs.pop_back();
+	_activeObjects.erase(objectID);
 
-	if (_activeObjects.size() <= 0) {
+	if (_activeObjects.empty()) {
 		_waveNumber++;
 		_spawnTimer->ResetTimer();
 		if (gameStateHandler->GetGameMode() == GameMode::Formation) {
@@ -324,7 +273,7 @@ void EnemyManager::Reset() {
 	_formationManagers.clear();
 	_latestAnchorPoint = nullptr;
 	_waveNumber = 1;
-	RemoveAllEnemies();
+	RemoveAllObjects();
 	_spawnTimer->ResetTimer();
 }
 

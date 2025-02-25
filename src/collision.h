@@ -11,25 +11,27 @@ enum class ColliderType {
 
 class Collider {
 public:
-	Collider() {}
+	Collider(bool isActive);
 	~Collider() {}
 
 
+	const bool GetIsActive() const;
 	const ColliderType GetColliderType() const;
 	const Vector2<float> GetPosition() const;
 
 	virtual void SetPosition(Vector2<float> position);
+	virtual void SetIsActive(bool isActive);
 
 protected:
 	std::shared_ptr<ObjectBase> _owner = nullptr;
 	ColliderType _colliderType = ColliderType::Count;
-
+	bool _isActive = false;
 	Vector2<float> _position = { 0.f, 0.f };
 };
 
 class AABB : public Collider {
 public:
-	AABB();
+	AABB(bool isActive);
 	~AABB() {}
 
 	void Init(Vector2<float> position, float h, float w);
@@ -54,7 +56,7 @@ private:
 
 class Circle : public Collider {
 public:
-	Circle();
+	Circle(bool isActive);
 	~Circle() {}
 
 	void Init(Vector2<float> position, float radius);

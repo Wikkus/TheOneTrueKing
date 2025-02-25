@@ -12,7 +12,7 @@ class Timer;
 
 class BoarBoss : public EnemyBase {
 public:
-	BoarBoss(unsigned int objectID, EnemyType enemyType);
+	BoarBoss();
 	~BoarBoss();
 
 	void Init() override;

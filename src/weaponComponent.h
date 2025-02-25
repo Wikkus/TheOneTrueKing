@@ -9,6 +9,8 @@ class Circle;
 class Sprite;
 class Timer;
 
+class EnemyBase;
+
 enum class WeaponType {
 	Shield,
 	Staff,
@@ -18,16 +20,14 @@ enum class WeaponType {
 	Count
 };
 
-class EnemyBase;
-
-class WeaponComponent {
+class WeaponComponent : public ObjectBase {
 public:
 	WeaponComponent();
 	~WeaponComponent() {}
 
-	virtual void Init(std::shared_ptr<ObjectBase> owner);
-	void Update();
-	void Render();
+	virtual void Init() override;
+	void Update() override;
+	void Render() override;
 
 	virtual void Attack() {}
 
@@ -40,12 +40,15 @@ public:
 
 	const virtual WeaponType GetWeaponType() const;
 
-	virtual void DeactivateTimers();
+	void DeactivateTimers();
+	void ResetTimers();
+
+	void SetOwner(std::shared_ptr<ObjectBase> owner);
+	
+	void DeactivateObject() override;
 
 protected:
 	std::shared_ptr<ObjectBase> _owner = nullptr;
-
-	std::shared_ptr<Sprite> _sprite = nullptr;
 
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
 	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
@@ -75,17 +78,14 @@ public:
 	StaffComponent();
 	~StaffComponent();
 
-	void Init(std::shared_ptr<ObjectBase> owner) override;
+	void Init() override;
 	void Attack() override;
 
 protected:
 	ProjectileType _projectileType = ProjectileType::Count;
 
 	bool _unlimitedRange = false;
-
-	float _projectileOrientation = 0;
 	float _projectileSpeed = 200.f;
-	Vector2<float> _projectileDirection = { 0.f, 0.f };
 };
 class SuperStaffComponent : public StaffComponent {
 public:

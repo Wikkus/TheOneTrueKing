@@ -8,16 +8,16 @@
 #include "projectileManager.h"
 #include "stateStack.h"
 #include "timerManager.h"
+#include "weaponManager.h"
 
 #include <string>
 
-PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int objectID, Vector2<float> characterPosition) : 
-	ObjectBase(objectID, ObjectType::Player) {
+PlayerCharacter::PlayerCharacter(float characterOrientation, Vector2<float> characterPosition) :  ObjectBase(ObjectType::Player) {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_kingSprite);
 	_orientation = characterOrientation;
 	_position = characterPosition;
-	_collider = std::make_shared<Circle>();
+	_collider = std::make_shared<Circle>(true);
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.45f);
 
 	_oldPosition = _position;
@@ -27,7 +27,7 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, unsigned int object
 	_healthTextSprite = std::make_shared<TextSprite>();
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
 
-	_dummyTarget = std::make_shared<ObjectBase>(INT_MAX, ObjectType::Count); 
+	_dummyTarget = std::make_shared<ObjectBase>(ObjectType::Count);
 }
 
 PlayerCharacter::~PlayerCharacter() {}
@@ -36,8 +36,9 @@ void PlayerCharacter::Init() {
 	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_regenerationTimer = timerManager->CreateTimer(_regenerationCooldown);
 
-	_weaponComponent = enemyManager->AccessWeapon(WeaponType::SuperStaff);
-	_weaponComponent->Init(shared_from_this());
+	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff);
+	_weaponComponent->SetOwner(shared_from_this());
+	_weaponComponent->Init();
 }
 
 void PlayerCharacter::Update() {
@@ -75,9 +76,10 @@ void PlayerCharacter::ExecuteDeath() {
 void PlayerCharacter::Respawn() {
 	_position = Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f);
 	_orientation = 0.f;
-
+	
 	_currentHealth = _maxHealth;
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
+	_weaponComponent->ResetTimers();
 }
 
 void PlayerCharacter::UpdateHealthRegen() {

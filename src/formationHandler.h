@@ -180,11 +180,11 @@ private:
 
 };
 
-class FormationManager {
+class FormationHandler {
 public:
-	FormationManager(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow, 
+	FormationHandler(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow, 
 		std::shared_ptr<AnchorPoint> anchorPoint, bool posWithAnchorOri);
-	~FormationManager() {}
+	~FormationHandler() {}
 
 	bool AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter);
 	void UpdateAnchorPoint();

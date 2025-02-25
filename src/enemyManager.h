@@ -1,13 +1,9 @@
 #pragma once
-#include "formationManager.h"
+#include "formationHandler.h"
 #include "managerBase.h"
 #include "quadTree.h"
 #include "universalFunctions.h"
 #include "vector2.h"
-
-#include <vector>
-#include <unordered_map>
-#include <memory>
 
 class EnemyBase;
 class SteeringBehavior;
@@ -17,13 +13,7 @@ template<typename T> class ObjectPool;
 template<typename T> class QuadTree;
 
 enum class EnemyType;
-
-enum class EnemyType {
-	Boss,
-	Boar,
-	Human,
-	Count
-};
+enum class WeaponType;
 
 struct BehaviorData {
 	float targetOrientation = 0.f;
@@ -69,25 +59,24 @@ public:
 	EnemyManager();
 	~EnemyManager();
 
-	void Init();
-	void Update();
+	void Init() override;
+	void Update() override;
 
 	void UpdateBossRush();
 	void UpdateSurvival();
 	void UpdateFormation();
 
-	void Render();
-	void RenderText();
+	void Render() override;
+	void RenderText() override;
+	void RemoveAllObjects() override;
+	void RemoveObject(unsigned int objectID) override;
+	void Reset() override;
 
-	const std::vector<std::shared_ptr<FormationManager>>  GetFormationManagers() const;
+	const std::vector<std::shared_ptr<FormationHandler>>  GetFormationManagers() const;
 	const unsigned int GetWaveNumber() const;
 
-	std::shared_ptr<WeaponComponent> AccessWeapon(WeaponType weaponType);
-	
 	void CreateNewEnemy(EnemyType enemyType, float orientation,
 		Vector2<float> direction, Vector2<float> position);
-
-	void CreateWeapon(WeaponType weaponType);
 
 	void BossSpawner();
 
@@ -96,34 +85,28 @@ public:
 	
 	void SurvivalEnemySpawner();
 
-	void SpawnEnemy(EnemyType enemyType, float orientation, 
+	std::shared_ptr<EnemyBase> SpawnEnemy(EnemyType enemyType, float orientation,
 		Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
-
-	void RemoveAllEnemies();
-	void RemoveEnemy(EnemyType enemyType, unsigned int objectID);
-
-	void Reset();
-
 
 private:
 	std::shared_ptr<EnemyBase> CastAsEnemy(std::shared_ptr<ObjectBase> currentObject);
 	std::shared_ptr<EnemyBase> _currentEnemy = nullptr;
+	WeaponType _currentWeaponType = WeaponType::Count;
 
 	std::array<Vector2<float>, 4> _spawnPositions;
 
 	std::shared_ptr<AnchorPoint> _latestAnchorPoint = nullptr;
-	std::vector<std::shared_ptr<FormationManager>> _formationManagers;
+	std::vector<std::shared_ptr<FormationHandler>> _formationManagers;
 
 	std::shared_ptr<Timer> _spawnTimer = nullptr;
 
 	std::unordered_map<EnemyType, std::shared_ptr<ObjectPool<std::shared_ptr<EnemyBase>>>> _enemyPools;
-	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
 
 	bool _spawnEnemy = false;
 
 	unsigned int _currentSpawnAmount = 0;
 	SlotAttackType _currentAttackType = SlotAttackType::Count;
-	WeaponType _currentWeaponType = WeaponType::Count;
+
 	Vector2<float> _currentSpawnPosition;
 	Vector2<float> _currentSpawnDirection;
 
@@ -132,21 +115,11 @@ private:
 	unsigned int _minRowSpawn = 1;
 	std::array<unsigned int, 2> _spawnCountPerRow = { 6, 1 };
 
-	unsigned int _enemyAmountLimit = 1000;
-	unsigned int _weaponAmountLimit = 2000;
+	unsigned int _enemyAmountLimit = 3000;
 	unsigned int _numberOfEnemyTypes = 0;
-	unsigned int _numberOfWeaponTypes = 0;
+
 	unsigned int _spawnNumberOfEnemies = 5;
 	unsigned int _waveNumber = 1;
 
-	int _targetEnemyIndex = -1;
-
-	//Quicksort variables
-	int _pivot = 0;
-	int _pivotIndex = 0;
-	int _count = 0;
-	int _i = 0;
-	int _k = 0;
-	int _partition = 0;
 };
 

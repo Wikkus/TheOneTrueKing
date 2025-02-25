@@ -5,17 +5,15 @@
 #include "enemyManager.h"
 #include "gameEngine.h"
 
-Projectile::Projectile(unsigned int objectID, ProjectileType projectileType, const char* spritePath)
-	: ObjectBase(objectID, ObjectType::Projectile) {
+Projectile::Projectile(ProjectileType projectileType, const char* spritePath) : ObjectBase(ObjectType::Projectile) {
 	_projectileType = projectileType;
 
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(spritePath);
 	_position = { 10000.f, 10000.f };
 
-	_collider = std::make_shared<Circle>();
+	_collider = std::make_shared<Circle>(true);
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
-
 }
 
 Projectile::~Projectile() {}

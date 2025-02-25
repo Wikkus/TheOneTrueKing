@@ -9,7 +9,7 @@
 #include "gameEngine.h"
 
 struct QuadTreeNode {
-	AABB rectangle;
+	std::shared_ptr<AABB> rectangle = nullptr;
 
 	bool Contains(std::shared_ptr<Collider> collider);
 	bool Intersect(std::shared_ptr<Collider> range);
@@ -186,28 +186,32 @@ inline void QuadTree<T>::Clear() {
 and sets devided to true to prevent the node from calling Subdevide more than once*/
 template<typename T>
 inline void QuadTree<T>::Subdevide() {
-	_upperLeft.rectangle.Init(Vector2<float>(
-		_quadTreeNode.rectangle.GetPosition().x - (_quadTreeNode.rectangle.GetWidth() * 0.25f),
-		_quadTreeNode.rectangle.GetPosition().y - (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
-		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
+	_upperLeft.rectangle = std::make_shared<AABB>(true);
+	_upperLeft.rectangle->Init(Vector2<float>(
+		_quadTreeNode.rectangle->GetPosition().x - (_quadTreeNode.rectangle->GetWidth() * 0.25f),
+		_quadTreeNode.rectangle->GetPosition().y - (_quadTreeNode.rectangle->GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle->GetHeight() * 0.5f, _quadTreeNode.rectangle->GetWidth() * 0.5f);
 	_quadTreeChildren[0] = std::make_shared<QuadTree<T>>(_upperLeft, _capacity);
 
-	_upperRight.rectangle.Init(Vector2<float>(
-		_quadTreeNode.rectangle.GetPosition().x + (_quadTreeNode.rectangle.GetWidth() * 0.25f),
-		_quadTreeNode.rectangle.GetPosition().y - (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
-		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
+	_upperRight.rectangle = std::make_shared<AABB>(true);
+	_upperRight.rectangle->Init(Vector2<float>(
+		_quadTreeNode.rectangle->GetPosition().x + (_quadTreeNode.rectangle->GetWidth() * 0.25f),
+		_quadTreeNode.rectangle->GetPosition().y - (_quadTreeNode.rectangle->GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle->GetHeight() * 0.5f, _quadTreeNode.rectangle->GetWidth() * 0.5f);
 	_quadTreeChildren[1] = std::make_shared<QuadTree<T>>(_upperRight, _capacity);
 
-	_lowerLeft.rectangle.Init(Vector2<float>(
-		_quadTreeNode.rectangle.GetPosition().x - (_quadTreeNode.rectangle.GetWidth() * 0.25f),
-		_quadTreeNode.rectangle.GetPosition().y + (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
-		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
+	_lowerLeft.rectangle = std::make_shared<AABB>(true);
+	_lowerLeft.rectangle->Init(Vector2<float>(
+		_quadTreeNode.rectangle->GetPosition().x - (_quadTreeNode.rectangle->GetWidth() * 0.25f),
+		_quadTreeNode.rectangle->GetPosition().y + (_quadTreeNode.rectangle->GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle->GetHeight() * 0.5f, _quadTreeNode.rectangle->GetWidth() * 0.5f);
 	_quadTreeChildren[2] = std::make_shared<QuadTree<T>>(_lowerLeft, _capacity);
 
-	_lowerRight.rectangle.Init(Vector2<float>(
-		_quadTreeNode.rectangle.GetPosition().x + (_quadTreeNode.rectangle.GetWidth() * 0.25f),
-		_quadTreeNode.rectangle.GetPosition().y + (_quadTreeNode.rectangle.GetHeight() * 0.25f)),
-		_quadTreeNode.rectangle.GetHeight() * 0.5f, _quadTreeNode.rectangle.GetWidth() * 0.5f);
+	_lowerRight.rectangle = std::make_shared<AABB>(true);
+	_lowerRight.rectangle->Init(Vector2<float>(
+		_quadTreeNode.rectangle->GetPosition().x + (_quadTreeNode.rectangle->GetWidth() * 0.25f),
+		_quadTreeNode.rectangle->GetPosition().y + (_quadTreeNode.rectangle->GetHeight() * 0.25f)),
+		_quadTreeNode.rectangle->GetHeight() * 0.5f, _quadTreeNode.rectangle->GetWidth() * 0.5f);
 	_quadTreeChildren[3] = std::make_shared<QuadTree<T>>(_lowerRight, _capacity);
 	_divided = true;
 }

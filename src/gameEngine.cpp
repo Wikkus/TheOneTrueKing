@@ -14,25 +14,28 @@
 #include "stateStack.h"
 #include "steeringBehavior.h"
 #include "timerManager.h"
+#include "weaponManager.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
 
 std::shared_ptr<CollisionCheck> collisionCheck;
-std::shared_ptr<EnemyManager> enemyManager;
+std::shared_ptr<RayCast> rayCast;
+
 std::shared_ptr<DebugDrawer> debugDrawer;
 std::shared_ptr<GameStateHandler> gameStateHandler;
 std::shared_ptr<ImGuiHandler> imGuiHandler;
-std::shared_ptr<ObstacleManager> obstacleManager;
-std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
-std::shared_ptr<ProjectileManager> projectileManager;
-
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
-
-std::shared_ptr<SearchSortAlgorithms> quickSort;
-std::shared_ptr<RayCast> rayCast;
-std::shared_ptr<TimerManager> timerManager;
+std::shared_ptr<SearchSortAlgorithms> searchSort;
 std::shared_ptr<UniversalFunctions> universalFunctions;
+
+std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
+std::shared_ptr<EnemyManager> enemyManager;
+std::shared_ptr<ObstacleManager> obstacleManager;
+std::shared_ptr<ProjectileManager> projectileManager;
+std::shared_ptr<TimerManager> timerManager;
+std::shared_ptr<WeaponManager> weaponManager;
+
 std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 
 bool runningGame = false;

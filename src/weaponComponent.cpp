@@ -9,19 +9,28 @@
 #include "projectileManager.h"
 #include "sprite.h"
 #include "timerManager.h"
+#include "weaponManager.h"
 
-WeaponComponent::WeaponComponent() {
+WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
 	_sprite = std::make_shared<Sprite>();
+	_position = Vector2<float>(-10000.f, -10000.f);
+
+	_maxHealth = 100;
+	_currentHealth = _maxHealth;
+
+	_collider = std::make_shared<Circle>(false);
 }
 
-void WeaponComponent::Init(std::shared_ptr<ObjectBase> owner) {
-	_owner = owner;
-}
+void WeaponComponent::Init() {}
 
-void WeaponComponent::Update() {}
+void WeaponComponent::Update() {
+	_position = _owner->GetPosition();
+	_orientation = _owner->GetOrientation();
+	_direction = (_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition()).normalized();
+}
 
 void WeaponComponent::Render() {
-	_sprite->RenderWithOrientation(_owner->GetPosition(), _owner->GetOrientation());
+	_sprite->RenderWithOrientation(_position, _orientation);
 }
 const bool WeaponComponent::GetIsAttacking() const {
 	return _isAttacking;
@@ -41,6 +50,26 @@ const WeaponType WeaponComponent::GetWeaponType() const {
 void WeaponComponent::DeactivateTimers() {
 	_attackCooldownTimer->DeactivateTimer();
 	_chargeAttackTimer->DeactivateTimer();
+}
+
+void WeaponComponent::ResetTimers() {
+	_attackCooldownTimer->ResetTimer();
+	_chargeAttackTimer->ResetTimer();
+}
+
+void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner) {
+	_owner = owner;
+}
+
+void WeaponComponent::DeactivateObject() {
+	_orientation = 0.f;
+	_direction = { 0.f, 0.f };
+	_position = { -10000.f, 10000.f };
+	_rotation = 0.f;
+	_collider->SetPosition(_position);
+	_velocity = { 0.f, 0.f };
+	DeactivateTimers();
+	_owner = nullptr;
 }
 
 ShieldComponent::ShieldComponent() {
@@ -63,18 +92,9 @@ ShieldComponent::ShieldComponent() {
 ShieldComponent::~ShieldComponent() {}
 
 void ShieldComponent::Attack() {
-	//if (_attackCooldownTimer->GetTimerActive()) {
-	//	return;
-	//}
-	//if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-	//	_isAttacking = false;
-	//	_attackCooldownTimer->ResetTimer();
-
-	//} else if (IsInDistance(playerCharacter->GetPosition(), position, _attackRange) && !_isAttacking) {
-	//	_chargeAttackTimer->ResetTimer();
-	//	_isAttacking = true;
-	//}
+	
 }
+
 StaffComponent::StaffComponent() {
 	_sprite->Load("res/sprites/Staff.png");
 
@@ -87,12 +107,13 @@ StaffComponent::StaffComponent() {
 	_healthModifier = -25;
 	
 	_weaponType = WeaponType::Staff;
+
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 StaffComponent::~StaffComponent() {}
 
-void StaffComponent::Init(std::shared_ptr<ObjectBase> owner) {
-	_owner = owner;
+void StaffComponent::Init() {
 	switch (_owner->GetObjectType()) {
 	case ObjectType::Enemy:
 		_projectileType = ProjectileType::EnemyFireball;
@@ -117,11 +138,8 @@ void StaffComponent::Attack() {
 		return;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		_projectileDirection = Vector2<float>(_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition()).normalized();
-		_projectileOrientation = universalFunctions->VectorAsOrientation(_projectileDirection);
-
-		projectileManager->SpawnProjectile(_owner, _projectileType,
-			_projectileOrientation, _projectileDirection, _owner->GetPosition(), _attackDamage, _projectileSpeed);
+		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
+			_direction, _position, _attackDamage, _projectileSpeed);
 		
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
@@ -148,6 +166,7 @@ SuperStaffComponent::SuperStaffComponent() {
 
 	_weaponType = WeaponType::Staff;
 
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 SuperStaffComponent::~SuperStaffComponent() {
@@ -157,15 +176,14 @@ void SuperStaffComponent::Attack() {
 	if (_attackCooldownTimer->GetTimerActive()) {
 		return;
 	}
-	_projectileDirection = _owner->GetTargetPosition() - _owner->GetPosition();
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
 	_multiShotAngle /= _multiShotAmount;
 
 	for (unsigned int i = 0; i < _multiShotAmount; i++) {
-		_multiShotDirection = _projectileDirection.rotated(_multiShotAngle);
+		_multiShotDirection = _direction.rotated(_multiShotAngle);
 
-		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_projectileDirection) + _multiShotAngle,
-			_multiShotDirection, _owner->GetPosition(), _attackDamage, _projectileSpeed);
+		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction) + _multiShotAngle,
+			_multiShotDirection, _position, _attackDamage, _projectileSpeed);
 		_multiShotAngle += _angleOffset;
 	}
 	_attackCooldownTimer->ResetTimer();
@@ -182,6 +200,8 @@ SwordComponent::SwordComponent() {
 	_healthModifier = 25;
 
 	_weaponType = WeaponType::Sword;
+
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 SwordComponent::~SwordComponent() {}
@@ -215,6 +235,8 @@ TusksComponent::TusksComponent() {
 	_healthModifier = 75;
 
 	_weaponType = WeaponType::Tusks;
+
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 TusksComponent::~TusksComponent() {}

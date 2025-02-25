@@ -32,89 +32,79 @@ void ProjectileManager::Init() {
 }
 
 void ProjectileManager::Update() {
-	for (unsigned int i = 0; i < _activeObjects.size(); i++) {
-		_currentProjectile = CastAsProjectile(_activeObjects[i]);
+	for (auto projectile : _activeObjects) {
+		_currentProjectile = CastAsProjectile(projectile.second);
 		_currentProjectile->Update();
 		_currentProjectile->QueryObjects();
-
-		if (universalFunctions->OutsideBorderX(_currentProjectile->GetPosition().x, 0.f) ||
-			universalFunctions->OutsideBorderY(_currentProjectile->GetPosition().y, 0.f)) {
-			RemoveProjectile(_currentProjectile->GetProjectileType(), _currentProjectile->GetObjectID());
+		if (CheckCollision(_currentProjectile->GetProjectileType(), _currentProjectile->GetObjectID())) {
+			_removeObjects.emplace_back(_currentProjectile);
 			continue;
-		}
-		if (CheckCollision(_currentProjectile->GetProjectileType(), i)) {
-			continue;
-		}
+		}	
+	}
+	while (_removeObjects.size() > 0) {
+		RemoveObject(_removeObjects.back()->GetObjectID());
+		_removeObjects.pop_back();
 	}
 	_currentProjectile = nullptr;
 }
 
 void ProjectileManager::Render() {
-	for (unsigned int i = 0; i < _activeObjects.size(); i++) {
-		_activeObjects[i]->Render();
+	for (auto& projectile : _activeObjects) {
+		projectile.second->Render();	
 	}
 }
 
 void ProjectileManager::CreateNewProjectile(ProjectileType projectileType) {
-	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(lastObjectID, projectileType, _spritePaths[projectileType]));
+	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(projectileType, _spritePaths[projectileType]));
 }
 
-void ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
+std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
 	Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
 	if (_projectilePools[projectileType]->IsEmpty()) {
 		CreateNewProjectile(projectileType);
 	}
-	_activeObjects.emplace_back(_projectilePools[projectileType]->SpawnObject());
-	_objectIDs.emplace_back(_activeObjects.back()->GetObjectID());
-	CastAsProjectile(_activeObjects.back())->ActivateProjectile(owner, orientation, direction, position, damage, speed);
+	_currentProjectile = _projectilePools[projectileType]->SpawnObject();
+	_currentProjectile->ActivateProjectile(owner, orientation, direction, position, damage, speed);
+	_activeObjects.insert(std::make_pair(_currentProjectile->GetObjectID(), _currentProjectile));
+	return _currentProjectile;
 }
 
-bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int projectileIndex) {
-	_objectsHit = _activeObjects[projectileIndex]->GetQueriedObjects();
+bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int objectID) {
+	if (universalFunctions->OutsideBorderX(_activeObjects[objectID]->GetPosition().x, 0.f) ||
+		universalFunctions->OutsideBorderY(_activeObjects[objectID]->GetPosition().y, 0.f)) {
+		return true;
+	}
+	_objectsHit = _activeObjects[objectID]->GetQueriedObjects();
 	for (unsigned int i = 0; i < _objectsHit.size(); i++) {
-		if (_objectsHit[i]->GetObjectType() == ObjectType::Projectile ||
-			_objectsHit[i]->GetObjectType() == CastAsProjectile(_activeObjects[projectileIndex])->GetOwner()->GetObjectType()) {
+		if (_objectsHit[i]->GetObjectType() == _activeObjects[objectID]->GetObjectType() ||
+			_objectsHit[i]->GetObjectType() == CastAsProjectile(_activeObjects[objectID])->GetOwner()->GetObjectType()) {
 			continue;
 		}
-		_objectsHit[i]->TakeDamage(CastAsProjectile(_activeObjects[projectileIndex])->GetDamage());
-		RemoveProjectile(projectileType, _activeObjects[projectileIndex]->GetObjectID());
+		_objectsHit[i]->TakeDamage(CastAsProjectile(_activeObjects[objectID])->GetDamage());
 		return true;
 	}
 	return false;
 }
 
-void ProjectileManager::RemoveAllProjectiles() {
-	while (_activeObjects.size() > 0) {
-		_currentProjectile = CastAsProjectile(_activeObjects.back());
+void ProjectileManager::RemoveAllObjects() {
+	for (auto& projectile : _activeObjects) {
+		_currentProjectile = CastAsProjectile(projectile.second);
 		_currentProjectile->DeactivateObject();
 		_projectilePools[_currentProjectile->GetProjectileType()]->PoolObject(_currentProjectile);
-		_activeObjects.pop_back();
 	}
-	_objectIDs.clear();
-}
-
-void ProjectileManager::RemoveProjectile(ProjectileType projectileType, unsigned int projectileID) {
-	if (_activeObjects.empty()) {
-		return;
-	}
-	QuickSort(_objectIDs, 0, _objectIDs.size() - 1);
-	_latestProjectileIndex = quickSort->BinarySearch(_objectIDs, 0, _objectIDs.size() - 1, projectileID);
-	if (_latestProjectileIndex < 0) {
-		return;
-	}
-	_currentProjectile = CastAsProjectile(_activeObjects[_latestProjectileIndex]);
-	_currentProjectile->DeactivateObject();
-	_projectilePools[projectileType]->PoolObject(_currentProjectile);
-	std::swap(_activeObjects[_latestProjectileIndex], _activeObjects.back());
-	std::swap(_objectIDs[_latestProjectileIndex], _objectIDs.back());
-	_activeObjects.pop_back();
-	_objectIDs.pop_back();
-	_latestProjectileIndex = -1;
+	_activeObjects.clear();
 	_currentProjectile = nullptr;
 }
 
-void ProjectileManager::Reset() {
-	RemoveAllProjectiles();
+void ProjectileManager::RemoveObject(unsigned int objectID) {
+	if (_activeObjects.empty()) {
+		return;
+	}	
+	_currentProjectile = CastAsProjectile(_activeObjects[objectID]);
+	_currentProjectile->DeactivateObject();
+	_projectilePools[_currentProjectile->GetProjectileType()]->PoolObject(_currentProjectile);
+	_activeObjects.erase(objectID);
+	_currentProjectile = nullptr;
 }
 
 std::shared_ptr<Projectile> ProjectileManager::CastAsProjectile(std::shared_ptr<ObjectBase> object) {

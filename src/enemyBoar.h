@@ -8,7 +8,7 @@
 
 class EnemyBoar : public EnemyBase {
 public:
-	EnemyBoar(unsigned int objectID, EnemyType enemyType);
+	EnemyBoar();
 	~EnemyBoar();
 
 	void Init() override;

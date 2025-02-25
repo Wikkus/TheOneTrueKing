@@ -7,6 +7,14 @@
 #include <minmax.h>
 #include <SDL2/SDL.h>
 
+Collider::Collider(bool isActive) {
+	_isActive = isActive;
+}
+
+const bool Collider::GetIsActive() const {
+	return _isActive;
+}
+
 const ColliderType Collider::GetColliderType() const {
 	return _colliderType;
 }
@@ -19,7 +27,11 @@ void Collider::SetPosition(Vector2<float> position) {
 	_position = position;
 }
 
-AABB::AABB() {
+void Collider::SetIsActive(bool isActive) {
+	_isActive = isActive;
+}
+
+AABB::AABB(bool isActive) : Collider(isActive) {
 	_colliderType = ColliderType::AABB;
 }
 
@@ -65,7 +77,7 @@ void AABB::SetPosition(Vector2<float> newPosition) {
 	_max.y = _position.y + (_height * 0.5f);
 }
 
-Circle::Circle() {
+Circle::Circle(bool isActive) : Collider(isActive) {
 	_colliderType = ColliderType::Circle;
 }
 

@@ -11,6 +11,7 @@ enum class ObjectType {
 	Player,
 	Projectile,
 	Obstacle,
+	Weapon,
 	Count
 };
 
@@ -19,7 +20,7 @@ class Timer;
 
 class ObjectBase : public std::enable_shared_from_this<ObjectBase> {
 public:
-	ObjectBase(unsigned int objectID, ObjectType objectType);
+	ObjectBase(ObjectType objectType);
 	~ObjectBase() {}
 
 	virtual void Init() {}
@@ -32,9 +33,9 @@ public:
 	virtual void SetPosition(Vector2<float> position);
 	virtual void TakeDamage(unsigned int damageAmount);
 
-	virtual void DeactivateObject() {}
+	virtual void ActivateObject(Vector2<float> position, Vector2<float> direction, float orienation);
+	virtual void DeactivateObject();
 	
-
 	const unsigned int GetObjectID() const;	
 	const float GetOrientation() const;
 	const float GetRotation() const;

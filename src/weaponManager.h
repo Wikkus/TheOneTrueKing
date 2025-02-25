@@ -1,0 +1,34 @@
+#pragma once
+#include "managerBase.h"
+
+class WeaponComponent;
+
+template<typename T> class ObjectPool;
+
+enum class WeaponType;
+
+class WeaponManager : public ManagerBase {
+public:
+	WeaponManager();
+	~WeaponManager() {}
+
+	void Init() override;
+	void Update() override;
+	void Render() override;
+	void RemoveAllObjects() override;
+	void RemoveObject(unsigned int objectID) override;
+	void Reset() override;
+
+	std::shared_ptr<WeaponComponent> SpawnWeapon(WeaponType weaponType);
+
+	void CreateWeapon(WeaponType weaponType);
+
+private:
+	std::shared_ptr<WeaponComponent> CastAsWeapon(std::shared_ptr<ObjectBase> currentObject);
+	std::shared_ptr<WeaponComponent> _currentWeapon = nullptr;
+	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
+	
+	unsigned int _numberOfWeaponTypes = 0;
+	unsigned int _weaponAmountLimit = 2000;
+};
+

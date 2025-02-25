@@ -31,6 +31,7 @@
 #include "src/textSprite.h"
 #include "src/universalFunctions.h"
 #include "src/vector2.h"
+#include "src/WeaponManager.h"
 
 int main(int argc, char* argv[]) {
 	HWND windowHandle = GetConsoleWindow();
@@ -50,15 +51,17 @@ int main(int argc, char* argv[]) {
 	imGuiHandler = std::make_shared<ImGuiHandler>();
 	obstacleManager = std::make_shared<ObstacleManager>();
 	projectileManager = std::make_shared<ProjectileManager>();
-	playerCharacters.emplace_back(std::make_shared<PlayerCharacter>(0.f, lastObjectID, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f)));
-	quickSort = std::make_shared<SearchSortAlgorithms>();
+	playerCharacters.emplace_back(std::make_shared<PlayerCharacter>(0.f, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f)));
+	searchSort = std::make_shared<SearchSortAlgorithms>();
 	rayCast = std::make_shared<RayCast>();
 
 	timerManager = std::make_shared<TimerManager>();
 	universalFunctions = std::make_shared<UniversalFunctions>();
+	weaponManager = std::make_shared<WeaponManager>();
 
 	QuadTreeNode quadTreeNode;
-	quadTreeNode.rectangle.Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
+	quadTreeNode.rectangle = std::make_shared<AABB>(true);
+	quadTreeNode.rectangle->Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
 	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 50);
 
 	//Init here
@@ -68,6 +71,7 @@ int main(int argc, char* argv[]) {
 	}
 	imGuiHandler->Init();
 	projectileManager->Init();
+	weaponManager->Init();
 
 	gameStateHandler->AddState(std::make_shared<MenuState>());
 

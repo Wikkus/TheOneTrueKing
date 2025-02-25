@@ -28,6 +28,7 @@ class RayCast;
 class SteeringBehavior;
 class TimerManager;
 class UniversalFunctions;
+class WeaponManager;
 
 enum class ButtonType;
 
@@ -49,12 +50,12 @@ extern std::shared_ptr<ProjectileManager> projectileManager;
 
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
 
-extern std::shared_ptr<SearchSortAlgorithms> quickSort;
+extern std::shared_ptr<SearchSortAlgorithms> searchSort;
 extern std::shared_ptr<RayCast> rayCast;
 extern std::shared_ptr<SteeringBehavior> separationBehavior;
 extern std::shared_ptr<TimerManager> timerManager;
 extern std::shared_ptr<UniversalFunctions> universalFunctions;
-
+extern std::shared_ptr<WeaponManager> weaponManager;
 
 extern std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 extern bool runningGame;

@@ -4,11 +4,11 @@
 #include "debugDrawer.h"
 #include "gameEngine.h"
 
-Wall::Wall(unsigned int objectID) : ObjectBase(objectID, ObjectType::Obstacle) {
-	_boxCollider = std::make_shared<AABB>();
+Wall::Wall() : ObjectBase(ObjectType::Obstacle) {
+	_boxCollider = std::make_shared<AABB>(true);
 }
 
-void Wall::Activate(Vector2<float> position, float width, float height, unsigned int wallID, SDL_Color color) {
+void Wall::Activate(Vector2<float> position, float width, float height, SDL_Color color) {
 	_width = width;
 	_height = height;
 	_position = position;

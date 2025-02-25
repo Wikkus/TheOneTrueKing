@@ -7,7 +7,7 @@
 
 class Wall : public ObjectBase {
 public:
-	Wall(unsigned int objectID);
+	Wall();
 	~Wall() {}
 
 	void Init() override;
@@ -15,7 +15,7 @@ public:
 	void Render() override;
 	void RenderText() override;
 
-	void Activate(Vector2<float> position, float width, float height, unsigned int wallID, SDL_Color color);
+	void Activate(Vector2<float> position, float width, float height, SDL_Color color);
 
 	const std::shared_ptr<Collider> GetCollider() const override;
 

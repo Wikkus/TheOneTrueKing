@@ -40,7 +40,7 @@
     <ClCompile Include="src\enemyBase.cpp" />
     <ClCompile Include="src\enemyManager.cpp" />
     <ClCompile Include="src\enemyHuman.cpp" />
-    <ClCompile Include="src\formationManager.cpp" />
+    <ClCompile Include="src\formationHandler.cpp" />
     <ClCompile Include="src\gameEngine.cpp" />
     <ClCompile Include="src\imGuiManager.cpp" />
     <ClCompile Include="src\enemyBoar.cpp" />
@@ -63,6 +63,7 @@
     <ClCompile Include="src\timerManager.cpp" />
     <ClCompile Include="src\vector2.cpp" />
     <ClCompile Include="src\weaponComponent.cpp" />
+    <ClCompile Include="src\weaponManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGui\imconfig.h" />
@@ -178,7 +179,7 @@
     <ClInclude Include="src\enemyBase.h" />
     <ClInclude Include="src\enemyManager.h" />
     <ClInclude Include="src\enemyHuman.h" />
-    <ClInclude Include="src\formationManager.h" />
+    <ClInclude Include="src\formationHandler.h" />
     <ClInclude Include="src\gameEngine.h" />
     <ClInclude Include="src\imGuiManager.h" />
     <ClInclude Include="src\enemyBoar.h" />
@@ -201,6 +202,7 @@
     <ClInclude Include="src\timerManager.h" />
     <ClInclude Include="src\vector2.h" />
     <ClInclude Include="src\weaponComponent.h" />
+    <ClInclude Include="src\weaponManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\SDL2\SDL_config.h.cmake" />
