@@ -1,26 +1,58 @@
 #include "sprite.h"
 #include "gameEngine.h"
 
+Sprite::Sprite() {}
+
 void Sprite::Load(const char* path) {
-	texture = IMG_LoadTexture(renderer, path);
-	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+	_texture = IMG_LoadTexture(renderer, path);
+	SDL_QueryTexture(_texture, NULL, NULL, &_widthI, &_heightI);
+	_widthF = _widthI;
+	_heightF = _heightI;
 }
 
-void Sprite::Render(Vector2<float> position) {
-	SDL_Rect rect = { (int)position.x, (int)position.y, w, h };
-	SDL_RenderCopy(renderer, texture, NULL, &rect);
+void Sprite::Render(const int& spriteIndex, const Vector2<float>& position) {
+	_rect = { position.x, position.y, _widthF, _heightF };	
+	SDL_RenderCopyF(renderer, _texture, NULL, &_rect);
 }
 
-void Sprite::RenderCentered(Vector2<float> position) {
-	SDL_Rect rect = { (int)position.x - w / 2, (int)position.y - h / 2, w, h };
-	SDL_RenderCopy(renderer, texture, nullptr, &rect);
+void Sprite::RenderCentered(const int& spriteIndex, const Vector2<float>& position) {
+	_rect = { position.x - _widthF / 2, position.y - _heightF / 2, _widthF, _heightF };
+	SDL_RenderCopyF(renderer, _texture, nullptr, &_rect);
 }
 
-void Sprite::RenderWithOrientation(Vector2<float> position, float orientation) {
-	SDL_Rect source = { 0, 0, w, h };
-	SDL_Rect destination = { (int)position.x - w / 2, (int)position.y - h / 2, w, h };
-	SDL_Point center = { w / 2, h / 2 };
-	SDL_RenderCopyEx(renderer, texture, &source, &destination, orientation * 180 / PI, &center, SDL_FLIP_NONE);
+void Sprite::RenderWithOrientation(const int& spriteIndex, const Vector2<float>& position, const float& orientation) {
+	_rectCopy = { 0, 0, _widthI, _heightI };
+	_rectDest = { position.x - _widthF / 2, position.y - _heightF / 2, _widthF, _heightF };
+	_center = { _widthF / 2, _heightF / 2 };
+	SDL_RenderCopyExF(renderer, _texture, &_rectCopy, &_rectDest, orientation * 180 / PI, &_center, SDL_FLIP_NONE);
 }
 
+const float Sprite::GetWidth() const {
+	return _widthF;
+}
 
+const float Sprite::GetHeight() const {
+	return _heightF;
+}
+
+SpriteSheet::SpriteSheet() {}
+
+void SpriteSheet::Render(const int& spriteIndex, const Vector2<float>& position) {
+	_rectCopy = { spriteIndex * _widthI, 0, _widthI, _heightI };
+	_rectDest = { position.x, position.y, _widthF, _heightF };
+	SDL_RenderCopyF(renderer, _texture, &_rectCopy, &_rectDest);
+}
+
+void SpriteSheet::RenderCentered(const int& spriteIndex, const Vector2<float>& position) {
+	_rectCopy = { spriteIndex * _widthI, 0, _widthI, _heightI };
+	_rectDest = { position.x - _widthF / 2, position.y - _heightF / 2, _widthF, _heightF };
+	SDL_RenderCopyF(renderer, _texture, &_rectCopy, &_rectDest);
+}
+
+void SpriteSheet::RenderWithOrientation(const int& spriteIndex, const Vector2<float>& position, const float& orientation) {
+	_rectCopy = { spriteIndex * _widthI, 0, _widthI, _heightI };
+	_rectDest = { position.x - _widthF / 2, position.y - _heightF / 2, _widthF, _heightF };
+	_center = { _widthF / 2, _heightF / 2 };
+	SDL_RenderCopyExF(renderer, _texture, &_rectCopy, &_rectDest,
+		orientation * 180 / PI, &_center, SDL_FLIP_NONE);
+}

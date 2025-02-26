@@ -27,7 +27,6 @@ public:
 
 	virtual void Init() override;
 	void Update() override;
-	void Render() override;
 
 	virtual void Attack() {}
 
@@ -71,6 +70,9 @@ public:
 	~ShieldComponent();
 
 	void Attack() override;
+
+private:
+	const char* _path = "res/sprites/Shield.png";
 };
 
 class StaffComponent : public WeaponComponent {
@@ -82,6 +84,7 @@ public:
 	void Attack() override;
 
 protected:
+	const char* _path = "res/sprites/Staff.png";
 	ProjectileType _projectileType = ProjectileType::Count;
 
 	bool _unlimitedRange = false;
@@ -109,6 +112,9 @@ public:
 	~SwordComponent();
 
 	void Attack() override;	
+
+private:
+	const char* _path = "res/sprites/Sword.png";
 };
 
 class TusksComponent : public WeaponComponent {
@@ -119,6 +125,7 @@ public:
 	void Attack() override;
 
 private:
+	const char* _path = "res/sprites/Tusks.png";
 	std::shared_ptr<Timer> _damageCooldown = nullptr;
 
 	float _dashDistance = 0.f;

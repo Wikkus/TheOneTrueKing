@@ -10,7 +10,7 @@ void ImGuiHandler::Init() {
 	ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
 }
 
-void ImGuiHandler::ShowFloatValue(const char* name, const char* label, float a) {
+void ImGuiHandler::ShowFloatValue(const char* name, const char* label, const float& a) {
 	ImGui::Begin(name);
 	ImGui::Text(label); 
 	ImGui::SameLine(); 
@@ -18,7 +18,7 @@ void ImGuiHandler::ShowFloatValue(const char* name, const char* label, float a) 
 	ImGui::End();
 }
 
-void ImGuiHandler::ShowFloat2Value(const char* name, const char* label, float a, float b) {
+void ImGuiHandler::ShowFloat2Value(const char* name, const char* label, const float& a, const float& b) {
 	ImGui::Begin(name);
 	ImGui::Text(label);
 	ImGui::SameLine();
@@ -26,7 +26,7 @@ void ImGuiHandler::ShowFloat2Value(const char* name, const char* label, float a,
 	ImGui::End();
 }
 
-void ImGuiHandler::ShowVector2Value(const char* name, const char* label, Vector2<float> value) {
+void ImGuiHandler::ShowVector2Value(const char* name, const char* label, const Vector2<float>& value) {
 	ImGui::Begin(name);
 	ImGui::Text(label);
 	ImGui::SameLine();
@@ -46,13 +46,13 @@ void ImGuiHandler::InputFloat2(const char* name, const char* label, float& a, fl
 	ImGui::End();
 }
 
-void ImGuiHandler::SliderFloat2(const char* name, const char* label, float& a, float& b, float min, float max) {
+void ImGuiHandler::SliderFloat2(const char* name, const char* label, float& a, float& b, const float& min, const float& max) {
 	ImGui::Begin(name);
 	ImGui::SliderFloat2(label, (&b, &a), min, max);
 	ImGui::End();
 }
 
-void ImGuiHandler::SliderFloat(const char* name, const char* label, float& a,float min, float max) {
+void ImGuiHandler::SliderFloat(const char* name, const char* label, float& a, const float& min, const float& max) {
 	ImGui::Begin(name);
 	ImGui::SliderFloat(label, &a, min, max);
 	ImGui::End();

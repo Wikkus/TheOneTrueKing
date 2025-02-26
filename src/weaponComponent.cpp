@@ -13,12 +13,13 @@
 
 WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
 	_sprite = std::make_shared<Sprite>();
-	_position = Vector2<float>(-10000.f, -10000.f);
+	_position = deactivatedPosition;
 
 	_maxHealth = 100;
 	_currentHealth = _maxHealth;
 
-	_collider = std::make_shared<Circle>(false);
+	_collider = std::make_shared<Circle>();
+	_collider->SetIsActive(false);
 }
 
 void WeaponComponent::Init() {}
@@ -29,9 +30,6 @@ void WeaponComponent::Update() {
 	_direction = (_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition()).normalized();
 }
 
-void WeaponComponent::Render() {
-	_sprite->RenderWithOrientation(_position, _orientation);
-}
 const bool WeaponComponent::GetIsAttacking() const {
 	return _isAttacking;
 }
@@ -62,18 +60,14 @@ void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner) {
 }
 
 void WeaponComponent::DeactivateObject() {
-	_orientation = 0.f;
-	_direction = { 0.f, 0.f };
-	_position = { -10000.f, 10000.f };
-	_rotation = 0.f;
+	_position = deactivatedPosition;
 	_collider->SetPosition(_position);
-	_velocity = { 0.f, 0.f };
 	DeactivateTimers();
 	_owner = nullptr;
 }
 
 ShieldComponent::ShieldComponent() {
-	_sprite->Load("res/sprites/Shield.png");
+	_sprite->Load(_path);
 
 	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
@@ -96,7 +90,7 @@ void ShieldComponent::Attack() {
 }
 
 StaffComponent::StaffComponent() {
-	_sprite->Load("res/sprites/Staff.png");
+	_sprite->Load(_path);
 
 	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
@@ -107,8 +101,6 @@ StaffComponent::StaffComponent() {
 	_healthModifier = -25;
 	
 	_weaponType = WeaponType::Staff;
-
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 StaffComponent::~StaffComponent() {}
@@ -157,7 +149,7 @@ void StaffComponent::Attack() {
 }
 
 SuperStaffComponent::SuperStaffComponent() {
-	_sprite->Load("res/sprites/Staff.png");
+	_sprite->Load(_path);
 
 	_attackCooldownTimer = timerManager->CreateTimer(0.25f);
 
@@ -165,8 +157,6 @@ SuperStaffComponent::SuperStaffComponent() {
 	_healthModifier = 0;
 
 	_weaponType = WeaponType::Staff;
-
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 SuperStaffComponent::~SuperStaffComponent() {
@@ -191,7 +181,7 @@ void SuperStaffComponent::Attack() {
 
 
 SwordComponent::SwordComponent() {
-	_sprite->Load("res/sprites/Sword.png");
+	_sprite->Load(_path);
 	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
 	_attackRange = 25.f;
@@ -200,8 +190,6 @@ SwordComponent::SwordComponent() {
 	_healthModifier = 25;
 
 	_weaponType = WeaponType::Sword;
-
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 SwordComponent::~SwordComponent() {}
@@ -225,7 +213,7 @@ void SwordComponent::Attack() {
 }
 
 TusksComponent::TusksComponent() {
-	_sprite->Load("res/sprites/Tusks.png");
+	_sprite->Load(_path);
 	_attackCooldownTimer = timerManager->CreateTimer(1.5f);
 	_chargeAttackTimer = timerManager->CreateTimer(1.f);
 	_damageCooldown = timerManager->CreateTimer(0.5f);
@@ -235,8 +223,6 @@ TusksComponent::TusksComponent() {
 	_healthModifier = 75;
 
 	_weaponType = WeaponType::Tusks;
-
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
 }
 
 TusksComponent::~TusksComponent() {}

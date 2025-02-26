@@ -28,7 +28,8 @@ std::shared_ptr<DecisionTreeNode> Action::MakeDecision(EnemyBase& owner) {
 	return shared_from_this();
 }
 
-MeleeAttackAction::MeleeAttackAction(float attackRange, float attackCooldown, float attackChargeTime, int attackDamage) {
+MeleeAttackAction::MeleeAttackAction(const float& attackRange, const float& attackCooldown, 
+	const float& attackChargeTime, const int& attackDamage) {
 	_attackCooldownTimer = timerManager->CreateTimer(attackCooldown);
 	_chargeAttackTimer = timerManager->CreateTimer(attackChargeTime);
 	_attackDamage = attackDamage;
@@ -119,11 +120,11 @@ std::shared_ptr<DecisionTreeNode> WithinRangeDecision::GetBranch(EnemyBase& owne
 	return _falseNode;
 }
 
-float WithinRangeDecision::TestValue(Vector2<float> position, Vector2<float> targetPosition) {
+float WithinRangeDecision::TestValue(const Vector2<float>& position, const Vector2<float>& targetPosition) {
 	return Vector2<float>::distanceBetweenVectors(targetPosition, position);
 }
 
-RandomDecision::RandomDecision(float timeOut) {
+RandomDecision::RandomDecision(const float& timeOut) {
 	_timer = timerManager->CreateTimer(timeOut);
 }
 

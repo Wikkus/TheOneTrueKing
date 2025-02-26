@@ -15,6 +15,7 @@
 #include "steeringBehavior.h"
 #include "timerManager.h"
 #include "weaponManager.h"
+#include "vector2.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -46,27 +47,27 @@ float windowWidth = 800.f;
 MouseButtonState mouseButtons[6];
 
 KeyState keys[SDL_NUM_SCANCODES];
-bool GetMouseButton(Uint8 button) {
+bool GetMouseButton(const Uint8& button) {
 	return mouseButtons[button].state;
 }
 
-bool GetMouseButtonPressed(Uint8 button) {
+bool GetMouseButtonPressed(const Uint8& button) {
 	return mouseButtons[button].state && mouseButtons[button].changeFrame == frameNumber;
 }
 
-bool GetMouseButtonReleased(Uint8 button) {
+bool GetMouseButtonReleased(const Uint8& button) {
 	return !mouseButtons[button].state && mouseButtons[button].changeFrame == frameNumber;
 }
 
-bool GetKey(SDL_Scancode key) {
+bool GetKey(const SDL_Scancode& key) {
 	return keys[key].state;
 }
 
-bool GetKeyPressed(SDL_Scancode key) {
+bool GetKeyPressed(const SDL_Scancode& key) {
 	return keys[key].state && keys[key].changeFrame == frameNumber;
 }
 
-bool GetKeyReleased(SDL_Scancode key) {
+bool GetKeyReleased(const SDL_Scancode& key) {
 	return !keys[key].state && keys[key].changeFrame == frameNumber;
 }
 
@@ -79,6 +80,9 @@ void ClearText(SDL_Surface* textSurface, SDL_Texture* textTexture) {
 	SDL_DestroyTexture(textTexture);
 }
 
+const char* fontType = "res/roboto.ttf";
+const char* gameTitle = "TheOneTrueKing";
+
 float deltaTime = 0.f;
 int frameNumber = 0;
 
@@ -86,3 +90,5 @@ unsigned int lastObjectID = 0;
 
 std::random_device randomDevice;
 std::mt19937 randomEngine(randomDevice());
+
+const Vector2<float>& deactivatedPosition = { -10000.f, -10000.f };

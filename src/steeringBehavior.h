@@ -35,8 +35,8 @@ class SteeringBehavior {
 public:
 	SteeringBehavior() {}
 	~SteeringBehavior() {}
-	virtual SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) = 0;
-	virtual const SteeringBehaviorType GetBehaviorType() const = 0;
+	virtual SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
+	virtual const SteeringBehaviorType GetBehaviorType() const;
 
 
 protected:
@@ -48,8 +48,10 @@ class AlignBehavior : public SteeringBehavior {
 public:
 	AlignBehavior();
 	~AlignBehavior() {}
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
+
+protected:
+	float _targetOrientation = 0.f;
 
 private:
 	float _angularAcceleration = 0.f;
@@ -62,8 +64,7 @@ public:
 	FaceBehavior();
 	~FaceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	Vector2<float> _direction = { 0.f, 0.f };
@@ -74,8 +75,7 @@ public:
 	LookAtDirectionBehavior();
 	~LookAtDirectionBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 };
 
 class ArriveBehavior : public SteeringBehavior {
@@ -83,8 +83,7 @@ public:
 	ArriveBehavior();
 	~ArriveBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	Vector2<float> _targetVelocity = { 0.f, 0.f };
@@ -99,8 +98,7 @@ public:
 	CollisionAvoidanceBehavior();
 	~CollisionAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	std::shared_ptr<Circle> _currentCollider = nullptr;
@@ -127,11 +125,10 @@ private:
 
 class SeekBehavior : public SteeringBehavior {
 public:
-	SeekBehavior(SteeringBehaviorType behaviorType);
+	SeekBehavior(const SteeringBehaviorType& behaviorType);
 	~SeekBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 };
 class ObstacleAvoidanceBehavior : public SeekBehavior {
@@ -139,8 +136,7 @@ public:
 	ObstacleAvoidanceBehavior();
 	~ObstacleAvoidanceBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	std::shared_ptr<AABB> _currentCollider = nullptr;
@@ -151,11 +147,10 @@ private:
 };
 class PursueBehavior : public SeekBehavior {
 public:
-	PursueBehavior(SteeringBehaviorType behaviorType);
+	PursueBehavior(const SteeringBehaviorType& behaviorType);
 	~PursueBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	float _distance = 0.f;
@@ -168,8 +163,7 @@ public:
 	SeparationBehavior();
 	~SeparationBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	Vector2<float> _targetPosition = Vector2<float>(0, 0);
@@ -183,8 +177,7 @@ public:
 	VelocityMatchBehaviour();
 	~VelocityMatchBehaviour() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 };
 
 class WanderBehavior : public FaceBehavior {
@@ -192,8 +185,7 @@ public:
 	WanderBehavior();
 	~WanderBehavior() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase) override;
-	const SteeringBehaviorType GetBehaviorType() const override;
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 
 private:
 	Vector2<float> _targetPosition = { 0.f, 0.f };
@@ -211,13 +203,13 @@ public:
 	BlendSteering() {}
 	~BlendSteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase);
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
 
-	void AddSteeringBehaviour(BehaviorAndWeight behaviour);	
+	void AddSteeringBehaviour(const BehaviorAndWeight& behaviour);	
 	void ClearBehaviours();
 	
-	bool RemoveSteeringBehaviour(SteeringBehaviorType behaviorType);
-	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
+	bool RemoveSteeringBehaviour(const SteeringBehaviorType& behaviorType);
+	bool ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
 
 private:
 	float _currentWeight = 0.f;
@@ -231,15 +223,15 @@ public:
 	PrioritySteering() {}
 	~PrioritySteering() {}
 
-	SteeringOutput Steering(BehaviorData behaviorData, ObjectBase& objectBase);
+	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
 
-	void AddGroup(BlendSteering& behaviour);
+	void AddGroup(const BlendSteering& behavior);
 	void ClearGroups();
 	
-	void AddBehaviorInGroup(BehaviorAndWeight newBehavior, int groupIndex);
+	void AddBehaviorInGroup(const BehaviorAndWeight& newBehavior, const int& groupIndex);
 	
-	bool RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType);
-	bool ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior);
+	bool RemoveSteeringBheavior(const SteeringBehaviorType& oldBehaviorType);
+	bool ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
 
 private:
 	std::vector<BlendSteering> _groups;

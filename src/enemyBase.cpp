@@ -2,9 +2,9 @@
 #include "playerCharacter.h"
 #include "weaponManager.h"
 
-EnemyBase::EnemyBase(EnemyType enemyType) : ObjectBase(ObjectType::Enemy), _enemyType(enemyType) {
+EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy), _enemyType(enemyType) {
     _sprite = std::make_shared<Sprite>();
-    _position = Vector2<float>(-10000.f, -10000.f);
+    _position = deactivatedPosition;
 
     _maxHealth = 100.f;
     _currentHealth = _maxHealth;
@@ -13,7 +13,11 @@ EnemyBase::EnemyBase(EnemyType enemyType) : ObjectBase(ObjectType::Enemy), _enem
     _blendSteering = std::make_shared<BlendSteering>();
 
     _currentTarget = playerCharacters.back();
-    _collider = std::make_shared<Circle>(true);
+    _collider = std::make_shared<Circle>();
+}
+
+void EnemyBase::Render() {
+    _sprite->RenderWithOrientation(0, _position, _orientation);
 }
 
 const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
@@ -28,7 +32,7 @@ const EnemyType EnemyBase::GetEnemyType() const {
     return _enemyType;
 }
 
-void EnemyBase::TakeDamage(unsigned int damageAmount) {
+void EnemyBase::TakeDamage(const int& damageAmount) {
     _currentHealth -= damageAmount;
     if (_currentHealth <= 0) {
         enemyManager->RemoveObject(_objectID);
@@ -55,8 +59,6 @@ const std::shared_ptr<WeaponComponent> EnemyBase::GetWeaponComponent() const {
     return _weaponComponent;
 }
 
-void EnemyBase::HandleAttack() {}
-
 void EnemyBase::UpdateMovement() {
     UpdateAngularMovement();
     UpdateLinearMovement();
@@ -78,7 +80,8 @@ void EnemyBase::UpdateLinearMovement() {
     universalFunctions->LimitVelocity(_velocity, _behaviorData.maxSpeed);
 }
 
-void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
+void EnemyBase::ActivateEnemy(const float& orienation, const Vector2<float>& direction,
+    const Vector2<float>& position, const WeaponType& weaponType) {
     _orientation = orienation;
     _direction = direction;
     _position = position;
@@ -94,30 +97,26 @@ void EnemyBase::ActivateEnemy(float orienation, Vector2<float> direction, Vector
 }
 
 void EnemyBase::DeactivateObject() {
-    _orientation = 0.f;
-    _direction = { 0.f, 0.f };
-    _position = { -10000.f, 10000.f };
-    _rotation = 0.f;
+    _position = deactivatedPosition;
     _collider->SetPosition(_position);
-    _velocity = { 0.f, 0.f };
     _formationIndex = -1;
     weaponManager->RemoveObject(_weaponComponent->GetObjectID());
     _weaponComponent = nullptr;
 }
 
-void EnemyBase::SetFormationIndex(int formationIndex) {
+void EnemyBase::SetFormationIndex(const int& formationIndex) {
     _formationIndex = formationIndex;
 }
 
-void EnemyBase::SetPosition(Vector2<float> position) {
+void EnemyBase::SetPosition(const Vector2<float>& position) {
     _position = position;
     _collider->SetPosition(position);
 }
 
-void EnemyBase::SetTargetOrientation(float targetOrientation) {
+void EnemyBase::SetTargetOrientation(const float& targetOrientation) {
     _behaviorData.targetOrientation = targetOrientation;
 }
 
-bool EnemyBase::ReplaceSteeringBehavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+bool EnemyBase::ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
     return _prioritySteering->ReplaceSteeringBheavior(oldBehaviorType, newBehavior);
 }

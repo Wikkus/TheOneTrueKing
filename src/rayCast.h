@@ -15,10 +15,10 @@ public:
 	RayCast(){}
 	~RayCast(){}
 
-	RayPoint RayCastToAABB(std::shared_ptr<AABB> boxCollider, Ray ray);
+	RayPoint RayCastToAABB(std::shared_ptr<AABB> boxCollider, const Ray& ray);
 
-	RayPoint FindPoint(Vector2<float> wallStart, Vector2<float> wallEnd, Ray ray, Vector2<float> rayDir);
-	RayPoint ClosestPoint(Ray ray, std::array<RayPoint, 4> points);
+	RayPoint FindPoint(const Vector2<float>& wallStart, const Vector2<float>& wallEnd, const Ray& ray, const Vector2<float>& rayDir);
+	RayPoint ClosestPoint(const Ray& ray, const std::array<RayPoint, 4>& points);
 
 private:
 	std::array<float, 4> _distanceToWall = {0.f, 0.f, 0.f, 0.f };

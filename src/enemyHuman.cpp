@@ -16,9 +16,9 @@
 EnemyHuman::EnemyHuman() : EnemyBase(EnemyType::Human) {
 	_sprite->Load(_humanSprite);
 
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.5f);
 
-	_behaviorData.characterRadius = _sprite->h * 0.5f;
+	_behaviorData.characterRadius = _sprite->GetHeight() * 0.5f;
 
 	_numberOfWeaponTypes = (int)(WeaponType::Count);
 
@@ -86,21 +86,11 @@ void EnemyHuman::Init() {
 
 void EnemyHuman::Update() {
 	UpdateTarget();
-	HandleAttack();
+	//Depending on the weapon, the attack works differently
+	_weaponComponent->Attack();
 
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	UpdateMovement();
-	_weaponComponent->Update();
-}
-
-void EnemyHuman::Render() {
-	_sprite->RenderWithOrientation(_position, _orientation);
-	_weaponComponent->Render();
-}
-
-void EnemyHuman::HandleAttack() {
-	//Depending on the weapon, the attack works differently
-	_weaponComponent->Attack();
 }
 
 void EnemyHuman::UpdateTarget() {

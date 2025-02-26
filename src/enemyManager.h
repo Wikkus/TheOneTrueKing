@@ -69,24 +69,23 @@ public:
 	void Render() override;
 	void RenderText() override;
 	void RemoveAllObjects() override;
-	void RemoveObject(unsigned int objectID) override;
+	void RemoveObject(const unsigned int& objectID) override;
 	void Reset() override;
 
-	const std::vector<std::shared_ptr<FormationHandler>>  GetFormationManagers() const;
+	const std::vector<std::shared_ptr<FormationHandler>> GetFormationManagers() const;
 	const unsigned int GetWaveNumber() const;
 
-	void CreateNewEnemy(EnemyType enemyType, float orientation,
-		Vector2<float> direction, Vector2<float> position);
+	void CreateNewEnemy(const EnemyType& enemyType);
 
 	void BossSpawner();
 
 	void FormationEnemySpawner();
-	void SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType);
+	void SpawnFormation(const std::array<unsigned int, 2>&  spawnCountPerRow, const FormationType& formationType);
 	
 	void SurvivalEnemySpawner();
 
-	std::shared_ptr<EnemyBase> SpawnEnemy(EnemyType enemyType, float orientation,
-		Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
+	std::shared_ptr<EnemyBase> SpawnEnemy(const EnemyType& enemyType, const float& orientation,
+		const Vector2<float>& direction, const Vector2<float>& position, const WeaponType& weaponType);
 
 private:
 	std::shared_ptr<EnemyBase> CastAsEnemy(std::shared_ptr<ObjectBase> currentObject);

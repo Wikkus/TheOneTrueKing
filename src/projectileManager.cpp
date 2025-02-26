@@ -13,7 +13,7 @@ ProjectileManager::ProjectileManager() {
 	_spritePaths[ProjectileType::Energyblast] = _energyBlastSprite;
 	_spritePaths[ProjectileType::EnemyFireball] = _enemyProjectileSprite;
 	_spritePaths[ProjectileType::PlayerFireball] = _playerProjectileSprite;
-
+	
 	for (unsigned int i = 0; i < (unsigned int)ProjectileType::Count; i++) {
 		_projectilePools[(ProjectileType)i] = std::make_shared<ObjectPool<std::shared_ptr<Projectile>>>(_projectileAmountLimit);
 	}
@@ -54,12 +54,12 @@ void ProjectileManager::Render() {
 	}
 }
 
-void ProjectileManager::CreateNewProjectile(ProjectileType projectileType) {
+void ProjectileManager::CreateNewProjectile(const ProjectileType& projectileType) {
 	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(projectileType, _spritePaths[projectileType]));
 }
 
-std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
-	Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed) {
+std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<ObjectBase> owner, const ProjectileType& projectileType,
+	const float& orientation, const Vector2<float>& direction, const Vector2<float>& position, const unsigned int& damage, const float& speed) {
 	if (_projectilePools[projectileType]->IsEmpty()) {
 		CreateNewProjectile(projectileType);
 	}
@@ -69,7 +69,7 @@ std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<O
 	return _currentProjectile;
 }
 
-bool ProjectileManager::CheckCollision(ProjectileType projectileType, unsigned int objectID) {
+bool ProjectileManager::CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID) {
 	if (universalFunctions->OutsideBorderX(_activeObjects[objectID]->GetPosition().x, 0.f) ||
 		universalFunctions->OutsideBorderY(_activeObjects[objectID]->GetPosition().y, 0.f)) {
 		return true;
@@ -96,7 +96,7 @@ void ProjectileManager::RemoveAllObjects() {
 	_currentProjectile = nullptr;
 }
 
-void ProjectileManager::RemoveObject(unsigned int objectID) {
+void ProjectileManager::RemoveObject(const unsigned int& objectID) {
 	if (_activeObjects.empty()) {
 		return;
 	}	

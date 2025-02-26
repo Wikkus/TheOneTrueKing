@@ -43,7 +43,7 @@ public:
 
 class MeleeAttackAction : public Action {
 public:
-	MeleeAttackAction(float attackRange, float attackCooldown, float attackChargeTime, int attackDamage);
+	MeleeAttackAction(const float& attackRange, const float& attackCooldown, const float& attackChargeTime, const int& attackDamage);
 	~MeleeAttackAction() {}
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
@@ -106,7 +106,7 @@ public:
 
 	std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
 
-	float TestValue(Vector2<float> position, Vector2<float> targetPosition);
+	float TestValue(const Vector2<float>& position, const Vector2<float>& targetPosition);
 
 private:
 	float _minValue = 0.f;
@@ -116,7 +116,7 @@ private:
 
 class RandomDecision : public Decision {
 public:
-	RandomDecision(float timeOut);
+	RandomDecision(const float& timeOut);
 	~RandomDecision() {}
 
 	bool TestValue();

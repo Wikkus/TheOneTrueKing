@@ -70,25 +70,23 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 
 class FormationPattern {
 public:
-	FormationPattern() {}
+	FormationPattern(const bool& lockOrientation);
 	~FormationPattern() {}
 
-	virtual void CreateSlots(std::array<unsigned int, 2> spawnCountPerRow, std::shared_ptr<AnchorPoint> anchorPoint) = 0;
+	virtual void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {}
 
-	virtual unsigned int CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) = 0;
+	StaticCharacter GetDriftOffset(const AnchorPoint& anchorPoint, const std::vector<SlotAssignment>& slotAssignments);
+	StaticCharacter GetSlotLocation(const AnchorPoint& anchorPoint, const unsigned int& slotNumber, const unsigned int& numberOfSlots);
 
-	virtual StaticCharacter GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) = 0;
-	virtual StaticCharacter GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) = 0;
+	std::unordered_map<SlotAttackType, unsigned int> GetSlotsPerType() const;
 
-	virtual std::unordered_map<SlotAttackType, unsigned int> GetSlotsPerType() = 0;
+	virtual const float GetSlotCost(const WeaponType& weaponType, const unsigned int& index) const;
 
-	virtual float GetSlotCost(WeaponType weaponType, unsigned int index) = 0;
+	virtual const unsigned int GetNumberOfSlots() const;
 
-	virtual const unsigned int GetNumberOfSlots() const = 0;
-
-	virtual bool SupportsSlots(unsigned int slotCount) = 0;
+	virtual bool SupportsSlots(const unsigned int& slotCount);
 	
-	virtual void SetNumberOfSlots(unsigned int numberOfSlots) = 0;
+	virtual void SetNumberOfSlots(const unsigned int& numberOfSlots);
 
 protected:
 	unsigned int _numberOfSlots = 0;
@@ -96,40 +94,26 @@ protected:
 	StaticCharacter _location;
 	StaticCharacter _result;
 
-	StaticCharacter _tempLocation;
-	Vector2<float> _tempPosition;
+	StaticCharacter _currentLocation;
+	Vector2<float> _currentPosition;
 
 	unsigned int _amountSlots = 0;
 	
 	std::unordered_map<SlotAttackType, unsigned int> _amountSlotsPerType;
+	std::vector<SlotPositionAndType> _slotPositionAndType;
+
+	bool _lockOrientation = false;
 };
 
 class DefensiveCirclePattern : public FormationPattern {
 public:
-	DefensiveCirclePattern();
+	DefensiveCirclePattern(const bool& lockOrientation);
 	~DefensiveCirclePattern() {}
-	void CreateSlots(std::array<unsigned int, 2> spawnCountPerRow, std::shared_ptr<AnchorPoint> anchorPoint) override;
-
-	unsigned int CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) override;
-
-	StaticCharacter GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) override;
-	StaticCharacter GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) override;
-	
-	std::unordered_map<SlotAttackType, unsigned int> GetSlotsPerType() override;
-	
-	float GetSlotCost(WeaponType weaponType, unsigned int index) override;
-
-	const unsigned int GetNumberOfSlots() const override;
-
-	bool SupportsSlots(unsigned int slotCount) override;
-
-	void SetNumberOfSlots(unsigned int numberOfSlots) override;
+	void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) override;
 
 private:
-	void CreateSlotsOfType(std::shared_ptr<AnchorPoint> anchorPoint, unsigned int amountSlots, float radius,
-		SlotAttackType attackType, bool holdOrientation);
-
-	bool _lockOrientation = false;
+	void CreateSlotsOfType(const std::shared_ptr<AnchorPoint>& anchorPoint, const unsigned int& amountSlots, const float& radius,
+		const SlotAttackType& attackType, const bool& lockOrientation);
 	
 	float _angleAroundCircle = 0.f;
 	float _radius = 0.f;
@@ -137,36 +121,19 @@ private:
 
 	unsigned int _filledSlots = 0;
 
-	std::vector<SlotPositionAndType> _slotPositionAndType;
 };
 
 class VShapePattern : public FormationPattern {
 public:
-	VShapePattern();
+	VShapePattern(const bool& lockOrientation);
 	~VShapePattern() {}
 
-	void CreateSlots(std::array<unsigned int, 2> spawnCountPerRow, std::shared_ptr<AnchorPoint> anchorPoint) override;
-
-	unsigned int CalculateNumberOfSlots(std::vector<SlotAssignment> slotAssignments) override;
-
-	StaticCharacter GetDriftOffset(AnchorPoint anchorPoint, std::vector<SlotAssignment> slotAssignments) override;
-	StaticCharacter GetSlotLocation(AnchorPoint anchorPoint, unsigned int slotNumber, unsigned int numberOfSlots) override;
-	
-	std::unordered_map<SlotAttackType, unsigned int> GetSlotsPerType() override;
-
-	float GetSlotCost(WeaponType weaponType, unsigned int index) override;
-
-	const unsigned int GetNumberOfSlots() const override;
-
-	bool SupportsSlots(unsigned int slotCount) override;
-
-	void SetNumberOfSlots(unsigned int numberOfSlots) override;
+	void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) override;
 
 private:
-	void CreateSlotsOfType(std::shared_ptr<AnchorPoint> anchorPoint, unsigned int amountSlots,
-		Vector2<float> frontSlotPosition, SlotAttackType attackType);
+	void CreateSlotsOfType(const std::shared_ptr<AnchorPoint>& anchorPoint, const unsigned int& amountSlots,
+		const Vector2<float>& frontSlotPosition, const SlotAttackType& attackType, const bool& lockOrientation);
 
-	std::vector<SlotPositionAndType> _slotPositionAndType;
 	float _offset = 15.f;
 	float _rowDistance = 32.f;
 	unsigned int _multiplier = 0;
@@ -182,8 +149,8 @@ private:
 
 class FormationHandler {
 public:
-	FormationHandler(FormationType formationType, std::array<unsigned int, 2> spawnCountPerRow, 
-		std::shared_ptr<AnchorPoint> anchorPoint, bool posWithAnchorOri);
+	FormationHandler(const FormationType& formationType, const std::array<unsigned int, 2>& spawnCountPerRow, 
+		const std::shared_ptr<AnchorPoint>& anchorPoint, const bool& gotOrientation);
 	~FormationHandler() {}
 
 	bool AddCharacter(std::shared_ptr<EnemyBase> enemyCharacter);
@@ -197,7 +164,6 @@ public:
 
 	const bool GetInPosition() const;
 	const unsigned int GetNumberOfSlots() const;
-
 
 private:
 	std::shared_ptr<AnchorPoint> _anchorPoint;
@@ -219,7 +185,7 @@ private:
 	
 	bool _allSlotsOnScreen = false;
 	bool _inPosition = false;
-	bool _posWithAnchorOri = false;
+	bool _gotOrientation = false;
 
 	unsigned int _slotsOnScreen = 0;
 		

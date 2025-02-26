@@ -2,12 +2,12 @@
 
 class Timer {
 public:
-	Timer(float timeInSeconds);
+	Timer(const float& timeInSeconds);
 	~Timer();
 
 	const bool GetTimerActive() const;
 	const bool GetTimerFinished() const;
-	const bool IsWithinCertainTime(float decimalTime) const;
+	const bool IsWithinCertainTime(const float& decimalTime) const;
 	
 	const float GetCurrentTime() const;
 	const float GetTimeInSeconds() const;
@@ -16,7 +16,7 @@ public:
 	void DeactivateTimer();
 	void ResetTimer();
 	void Update();
-	void SetTimeInSeconds(float timeInSecond);
+	void SetTimeInSeconds(const float& timeInSecond);
 
 private:
 	bool _timerActive = false;

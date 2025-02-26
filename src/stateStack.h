@@ -18,26 +18,26 @@ enum class GameMode {
 };
 
 enum class ButtonType {
-	MainMenu,
 	BossRush,
 	FormationGame,
-	SurvivalGame,
+	MainMenu,
 	Quit,
 	Restart,
 	Resume,
+	SurvivalGame,
 	Count
 };
 
 class Button {
 public:
-	Button(const char* buttonText, int height, int width, Vector2<float> position);
+	Button(const char* buttonText, const Vector2<float>& position, const int& height, const int& width);
 	~Button() {}
 
 	bool ClickedOn();
 
 	void Render();
 	void RenderText();
-	void SetPosition(Vector2<float> position);
+	void SetPosition(const Vector2<float>& position);
 
 private:
 	SDL_Color _buttonColor = { 120,81,169, 255 };
@@ -74,20 +74,21 @@ public:
 	void RenderState();
 	void RenderStateText();
 
-	void SetGameMode(GameMode gameMode);
+	void SetGameMode(const GameMode& gameMode);
 
 	const GameMode GetGameMode() const;
 
 private:
-	const char* _mainMenuText = "Main Menu";
+	std::vector<std::shared_ptr<State>> _states;
+	GameMode _currentGameMode = GameMode::Count;
+
 	const char* _bossRushText = "Boss Rush";
 	const char* _formationText = "Formation";
-	const char* _survivalText = "Survival";
+	const char* _mainMenuText = "Main Menu";
 	const char* _quitText = "Quit";
 	const char* _restartText = "Restart";
 	const char* _resumeText = "Resume";
-	std::vector<std::shared_ptr<State>> _states;
-	GameMode _currentGameMode = GameMode::Count;
+	const char* _survivalText = "Survival";
 
 };
 
@@ -102,7 +103,9 @@ public:
 	void RenderText() override;
 
 private:
-	std::shared_ptr<TextSprite> _waveNumberText;
+	const char* _youDied = "You died on wave: ";
+
+	std::shared_ptr<TextSprite> _gameOverText;
 
 };
 
@@ -160,7 +163,6 @@ public:
 	void RenderText() override;
 
 private:
-	const char* _gameTitle = "TheOneTrueKing";
 	SDL_Color _textColor = { 212, 175, 55, 255 };
 	std::shared_ptr<TextSprite> _titleText;
 	Vector2<float> _titleTextPosition;

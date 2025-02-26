@@ -16,12 +16,12 @@ public:
 	void Update() override;
 	void Render() override;
 	void RemoveAllObjects() override;
-	void RemoveObject(unsigned int objectID) override;
+	void RemoveObject(const unsigned int& objectID) override;
 	void Reset() override;
 
-	std::shared_ptr<WeaponComponent> SpawnWeapon(WeaponType weaponType);
+	std::shared_ptr<WeaponComponent> SpawnWeapon(const WeaponType& weaponType);
 
-	void CreateWeapon(WeaponType weaponType);
+	void CreateWeapon(const WeaponType& weaponType);
 
 private:
 	std::shared_ptr<WeaponComponent> CastAsWeapon(std::shared_ptr<ObjectBase> currentObject);

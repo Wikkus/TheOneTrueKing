@@ -7,9 +7,7 @@
 #include <minmax.h>
 #include <SDL2/SDL.h>
 
-Collider::Collider(bool isActive) {
-	_isActive = isActive;
-}
+Collider::Collider() {}
 
 const bool Collider::GetIsActive() const {
 	return _isActive;
@@ -23,19 +21,19 @@ const Vector2<float> Collider::GetPosition() const {
 	return _position;
 }
 
-void Collider::SetPosition(Vector2<float> position) {
+void Collider::SetPosition(const Vector2<float>& position) {
 	_position = position;
 }
 
-void Collider::SetIsActive(bool isActive) {
+void Collider::SetIsActive(const bool& isActive) {
 	_isActive = isActive;
 }
 
-AABB::AABB(bool isActive) : Collider(isActive) {
+AABB::AABB() {
 	_colliderType = ColliderType::AABB;
 }
 
-void AABB::Init(Vector2<float> position, float h, float w) {
+void AABB::Init(const Vector2<float>& position, const float& h, const float& w) {
 	_position = position;
 	_min.x = position.x - (w * 0.5f);
 	_min.y = position.y - (h * 0.5f);
@@ -61,27 +59,27 @@ const Vector2<float> AABB::GetMin() const {
 	return _min;
 }
 
-void AABB::SetHeight(float height) {
+void AABB::SetHeight(const float& height) {
 	_height = height;
 }
 
-void AABB::SetWidth(float width) {
+void AABB::SetWidth(const float& width) {
 	_width = width;
 }
 
-void AABB::SetPosition(Vector2<float> newPosition) {
-	_position = newPosition;
+void AABB::SetPosition(const Vector2<float>& position) {
+	_position = position;
 	_min.x = _position.x - (_width * 0.5f);
 	_min.y = _position.y - (_height * 0.5f);
 	_max.x = _position.x + (_width * 0.5f);
 	_max.y = _position.y + (_height * 0.5f);
 }
 
-Circle::Circle(bool isActive) : Collider(isActive) {
+Circle::Circle() {
 	_colliderType = ColliderType::Circle;
 }
 
-void Circle::Init(Vector2<float> position, float radius) {
+void Circle::Init(const Vector2<float>& position, const float& radius) {
 	_position = position;
 	_radius = radius;
 }
@@ -90,7 +88,7 @@ const float Circle::GetRadius() const {
 	return _radius;
 }
 
-bool CollisionCheck::AABBIntersect(AABB& boxA, AABB& boxB) {
+bool CollisionCheck::AABBIntersect(const AABB& boxA, const AABB& boxB) {
 	return (
 		boxA.GetMax().x > boxB.GetMin().x &&
 		boxB.GetMax().x > boxA.GetMin().x &&
@@ -98,7 +96,7 @@ bool CollisionCheck::AABBIntersect(AABB& boxA, AABB& boxB) {
 		boxB.GetMax().y > boxA.GetMin().y);
 }
 
-bool CollisionCheck::AABBCircleIntersect(AABB& box, Circle& circle) {
+bool CollisionCheck::AABBCircleIntersect(const AABB& box, const Circle& circle) {
 	_clamped = { universalFunctions->Clamp(circle.GetPosition().x, box.GetMin().x, box.GetMax().x),
 		universalFunctions->Clamp(circle.GetPosition().y, box.GetMin().y, box.GetMax().y) };
 
@@ -106,7 +104,7 @@ bool CollisionCheck::AABBCircleIntersect(AABB& box, Circle& circle) {
 	return (_delta.absolute() < circle.GetRadius());
 }
 
-bool CollisionCheck::CircleIntersect(Circle circleA, Circle circleB) {
+bool CollisionCheck::CircleIntersect(const Circle& circleA, const Circle& circleB) {
 	_delta = circleB.GetPosition() - circleA.GetPosition();
 	return _delta.absolute() < (circleA.GetRadius() + circleB.GetRadius());
 }

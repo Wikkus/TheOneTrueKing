@@ -15,15 +15,15 @@ public:
 	void Update() override;
 	void Render() override;
 
-	bool CheckCollision(ProjectileType projectileType, unsigned int objectID);
+	bool CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID);
 
-	void CreateNewProjectile(ProjectileType projectileType);
+	void CreateNewProjectile(const ProjectileType& projectileType);
 	
-	std::shared_ptr<Projectile> SpawnProjectile(std::shared_ptr<ObjectBase> owner, ProjectileType projectileType, float orientation,
-		Vector2<float> direction, Vector2<float> position, unsigned int damage, float speed);	
+	std::shared_ptr<Projectile> SpawnProjectile(std::shared_ptr<ObjectBase> owner, const ProjectileType& projectileType, 
+		const float& orientation, const Vector2<float>& direction, const Vector2<float>& position, const unsigned int& damage, const float& speed);	
 	
 	void RemoveAllObjects() override;
-	void RemoveObject(unsigned int objectID) override;
+	void RemoveObject(const unsigned int& objectID) override;
 
 private:
 	std::shared_ptr<Projectile> CastAsProjectile(std::shared_ptr<ObjectBase> object);

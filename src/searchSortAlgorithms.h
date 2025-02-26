@@ -11,12 +11,6 @@ public:
 	SearchSortAlgorithms() {}
 	~SearchSortAlgorithms() {}
 
-	int Partition(std::vector<int>& objectVector, const int& start, const int& end);
-	void QuickSort(std::vector<int>& objectVector, const int& start, const int& end);
-
-	int Partition(std::vector<float>& objectVector, const int& start, const int& end);
-	void QuickSort(std::vector<float>& objectVector, const int& start, const int& end);
-
 	int Partition(std::vector<CostAndSlot>& objectVector, const int& start, const int& end);
 	void QuickSort(std::vector<CostAndSlot>& objectVector, const int& start, const int& end);
 

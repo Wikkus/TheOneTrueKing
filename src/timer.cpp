@@ -2,7 +2,7 @@
 
 #include "gameEngine.h"
 
-Timer::Timer(float timeInSeconds) {
+Timer::Timer(const float& timeInSeconds) {
 	_currentTime = timeInSeconds;
 	_timeInSeconds = timeInSeconds;
 }
@@ -17,7 +17,7 @@ const bool Timer::GetTimerFinished() const {
 	return _timerFinished;
 }
 
-const bool Timer::IsWithinCertainTime(float decimalTime) const {
+const bool Timer::IsWithinCertainTime(const float& decimalTime) const {
 	return _currentTime <= _timeInSeconds * decimalTime;
 }
 
@@ -56,7 +56,7 @@ void Timer::Update() {
 	}
 }
 
-void Timer::SetTimeInSeconds(float timeInSeconds) {
+void Timer::SetTimeInSeconds(const float& timeInSeconds) {
 	_timeInSeconds = timeInSeconds;
 	_currentTime = _timeInSeconds;
 }

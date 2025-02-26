@@ -11,7 +11,7 @@ enum class ColliderType {
 
 class Collider {
 public:
-	Collider(bool isActive);
+	Collider();
 	~Collider() {}
 
 
@@ -19,32 +19,32 @@ public:
 	const ColliderType GetColliderType() const;
 	const Vector2<float> GetPosition() const;
 
-	virtual void SetPosition(Vector2<float> position);
-	virtual void SetIsActive(bool isActive);
+	virtual void SetPosition(const Vector2<float>& position);
+	virtual void SetIsActive(const bool& isActive);
 
 protected:
 	std::shared_ptr<ObjectBase> _owner = nullptr;
 	ColliderType _colliderType = ColliderType::Count;
-	bool _isActive = false;
+	bool _isActive = true;
 	Vector2<float> _position = { 0.f, 0.f };
 };
 
 class AABB : public Collider {
 public:
-	AABB(bool isActive);
+	AABB();
 	~AABB() {}
 
-	void Init(Vector2<float> position, float h, float w);
+	void Init(const Vector2<float>& position, const float& h, const float& w);
 
-	void SetPosition(Vector2<float> position) override;
+	void SetPosition(const Vector2<float>& position) override;
 
 	const float GetHeight() const;
 	const float GetWidth() const;
 	const Vector2<float> GetMax() const;
 	const Vector2<float> GetMin() const;
 
-	void SetHeight(float height);
-	void SetWidth(float width);
+	void SetHeight(const float& height);
+	void SetWidth(const float& width);
 
 private:
 	float _height = 0.f;
@@ -56,18 +56,16 @@ private:
 
 class Circle : public Collider {
 public:
-	Circle(bool isActive);
+	Circle();
 	~Circle() {}
 
-	void Init(Vector2<float> position, float radius);
+	void Init(const Vector2<float>& position, const float& radius);
 
 	const float GetRadius() const;
 
 private:
 	float _radius = 0.f;
 };
-
-
 
 struct Ray {
 	Vector2<float> startPosition = { 0.f, 0.f };
@@ -84,11 +82,11 @@ struct Collision {
 
 class CollisionCheck {
 public:
-	bool AABBIntersect(AABB& boxA, AABB& boxB);
+	bool AABBIntersect(const AABB& boxA, const AABB& boxB);
 
-	bool AABBCircleIntersect(AABB& box, Circle& circle);
+	bool AABBCircleIntersect(const AABB& box, const Circle& circle);
 
-	bool CircleIntersect(Circle circleA, Circle circleB);
+	bool CircleIntersect(const Circle& circleA, const Circle& circleB);
 
 private:
 	Vector2<float> _clamped = { 0.f, 0.f };

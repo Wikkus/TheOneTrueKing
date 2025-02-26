@@ -4,27 +4,61 @@
 #include "gameEngine.h"
 #include "obstacleWall.h"
 
-void ObstacleManager::CreateWall(Vector2<float> position, float width, float height, SDL_Color color) {
-	std::shared_ptr<Wall> wall = std::make_shared<Wall>();
-	wall->Activate(position, width, height, color);
-	_activeObjects.insert(std::make_pair(wall->GetObjectID(), wall));
+ObstacleManager::ObstacleManager() {
+	_obstaclePool = std::make_shared<ObjectPool<std::shared_ptr<Obstacle>>>(_objectAmountLimit);
+}
+
+void ObstacleManager::Init() {
+	for (unsigned int i = 0; i < _objectAmountLimit; i++) {
+		CreateNewObstacle();
+	}
 }
 
 void ObstacleManager::Update() {
-	for (auto& objectBase : _activeObjects) {
-		_currentWall = CastAsWall(objectBase.second);
-		_currentWall->Update();
-		_currentWall->QueryObjects();		
+	for (auto& obstacle : _activeObjects) {
+		_currentObstacle = CastAsObstacle(obstacle.second);
+		_currentObstacle->Update();
+		_currentObstacle->QueryObjects();		
 	}
 }
 
 void ObstacleManager::Render() {
-	for (auto& objectBase : _activeObjects) {
-		_currentWall = CastAsWall(objectBase.second);
-		_currentWall->Render();
+	for (auto& obstacle : _activeObjects) {
+		_currentObstacle = CastAsObstacle(obstacle.second);
+		_currentObstacle->Render();
 	}
 }
 
-std::shared_ptr<Wall> ObstacleManager::CastAsWall(std::shared_ptr<ObjectBase> objectBase) {
-	return std::static_pointer_cast<Wall>(objectBase);
+void ObstacleManager::CreateNewObstacle() {	
+	_obstaclePool->PoolObject(std::make_shared<Obstacle>());
+}
+
+void ObstacleManager::SpawnObstacle(const Vector2<float>& position, const float& width, const float& height, const SDL_Color& color) {
+	_currentObstacle->ActivateObstacle(position, width, height, color);
+	_activeObjects.insert(std::make_pair(_currentObstacle->GetObjectID(), _currentObstacle));
+}
+
+void ObstacleManager::RemoveAllObjects() {
+	for (auto& obstacle : _activeObjects) {
+		_currentObstacle = CastAsObstacle(obstacle.second);
+		_currentObstacle->DeactivateObject();
+		_obstaclePool->PoolObject(_currentObstacle);
+	}
+	_activeObjects.clear();
+	_currentObstacle = nullptr;
+}
+
+void ObstacleManager::RemoveObject(const unsigned int& objectID) {
+	if (_activeObjects.empty()) {
+		return;
+	}
+	_currentObstacle = CastAsObstacle(_activeObjects[objectID]);
+	_currentObstacle->DeactivateObject();
+	_obstaclePool->PoolObject(_currentObstacle);
+	_activeObjects.erase(objectID);
+	_currentObstacle = nullptr;
+}
+
+std::shared_ptr<Obstacle> ObstacleManager::CastAsObstacle(std::shared_ptr<ObjectBase> objectBase) {
+	return std::static_pointer_cast<Obstacle>(objectBase);
 }

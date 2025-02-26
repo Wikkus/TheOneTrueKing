@@ -36,7 +36,7 @@ void EnemyManager::Init() {
 	//Create all enemies in the object pool at the start of the project
 	for (unsigned i = 0; i < _enemyAmountLimit / _numberOfEnemyTypes; i++) {
 		for (unsigned int k = 0; k < _numberOfEnemyTypes; k++) {
-			CreateNewEnemy(EnemyType(k), 0.f, {0.f, 0.f}, {-10000.f, -10000.f});
+			CreateNewEnemy(EnemyType(k));
 		}
 	}
 }
@@ -91,7 +91,7 @@ const std::vector<std::shared_ptr<FormationHandler>> EnemyManager::GetFormationM
 }
 
 //Creates a specific enemy based on the enemyType enum
-void EnemyManager::CreateNewEnemy(EnemyType enemyType, float orientation, Vector2<float> direction, Vector2<float> position) {
+void EnemyManager::CreateNewEnemy(const EnemyType& enemyType) {
 	switch (enemyType) {
 	case EnemyType::Boar:
 		_enemyPools[enemyType]->PoolObject(std::make_shared<EnemyBoar>());
@@ -135,7 +135,7 @@ void EnemyManager::FormationEnemySpawner() {
 	_spawnTimer->DeactivateTimer();
 }
 
-void EnemyManager::SpawnFormation(std::array<unsigned int, 2>  spawnCountPerRow, FormationType formationType) {
+void EnemyManager::SpawnFormation(const std::array<unsigned int, 2>& spawnCountPerRow, const FormationType& formationType) {
 	_formationManagers.emplace_back(std::make_shared<FormationHandler>(formationType, spawnCountPerRow, _latestAnchorPoint, false));	
 	_currentWeaponType = WeaponType::Count;
 
@@ -216,10 +216,10 @@ void EnemyManager::SurvivalEnemySpawner() {
 }
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type
-std::shared_ptr<EnemyBase> EnemyManager::SpawnEnemy(EnemyType enemyType, float orientation,
-	Vector2<float> direction, Vector2<float> position, WeaponType weaponType) {
+std::shared_ptr<EnemyBase> EnemyManager::SpawnEnemy(const EnemyType& enemyType, const float& orientation,
+	const Vector2<float>& direction, const Vector2<float>& position, const WeaponType& weaponType) {
 	if (_enemyPools[enemyType]->IsEmpty()) {
-		CreateNewEnemy(enemyType, orientation, direction, position);
+		CreateNewEnemy(enemyType);
 	}
 	//Then add the enemy to the active enemies vector which is called in Update
 	_currentEnemy = _enemyPools[enemyType]->SpawnObject();			
@@ -238,7 +238,7 @@ void EnemyManager::RemoveAllObjects() {
 	_currentEnemy = nullptr;
 }
 
-void EnemyManager::RemoveObject(unsigned int objectID) {
+void EnemyManager::RemoveObject(const unsigned int& objectID) {
 	if (_activeObjects.empty()) {
 		return;
 	}

@@ -11,15 +11,15 @@ public:
 	~ImGuiHandler() {}
 
 	void Init();
-	void ShowFloatValue(const char* name, const char* label, float a);
-	void ShowFloat2Value(const char* name, const char* label, float a, float b);
-	void ShowVector2Value(const char* name, const char* label, Vector2<float> value);
+	void ShowFloatValue(const char* name, const char* label, const float& a);
+	void ShowFloat2Value(const char* name, const char* label, const float& a, const float& b);
+	void ShowVector2Value(const char* name, const char* label, const Vector2<float>& value);
 	
 	void InputFloat(const char* name, const char* label, float& a);
 	void InputFloat2(const char* name, const char* label, float& a, float& b);
 	
-	void SliderFloat(const char* name, const char* label, float& a, float min, float max);
-	void SliderFloat2(const char* name, const char* label, float& a, float& b, float min, float max);
+	void SliderFloat(const char* name, const char* label, float& a, const float& min, const float& max);
+	void SliderFloat2(const char* name, const char* label, float& a, float& b, const float& min, const float& max);
 
 	void Render();
 	void ShutDown();

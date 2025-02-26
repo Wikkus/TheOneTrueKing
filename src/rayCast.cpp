@@ -3,7 +3,7 @@
 #include "debugDrawer.h"
 #include "gameEngine.h"
 
-RayPoint RayCast::RayCastToAABB(std::shared_ptr<AABB> boxCollider, Ray ray) {
+RayPoint RayCast::RayCastToAABB(std::shared_ptr<AABB> boxCollider, const Ray& ray) {
 	_rayDirection = ray.startPosition + ray.direction;
 	RayPoint rayPoint = ClosestPoint(ray, { 
 		FindPoint(boxCollider->GetMin(), {boxCollider->GetMin().x, boxCollider->GetMax().y}, ray, _rayDirection),
@@ -19,7 +19,7 @@ RayPoint RayCast::RayCastToAABB(std::shared_ptr<AABB> boxCollider, Ray ray) {
 	return rayPoint;
 }
 
-RayPoint RayCast::FindPoint(Vector2<float> wallStart, Vector2<float> wallEnd, Ray ray, Vector2<float> rayDir) {
+RayPoint RayCast::FindPoint(const Vector2<float>& wallStart, const Vector2<float>& wallEnd, const Ray& ray, const Vector2<float>& rayDir) {
 	_denominator = (wallStart.x - wallEnd.x) * (ray.startPosition.y - rayDir.y) -
 		(wallStart.y - wallEnd.y) * (ray.startPosition.x - rayDir.x);
 	if (_denominator == 0) {
@@ -51,7 +51,7 @@ RayPoint RayCast::FindPoint(Vector2<float> wallStart, Vector2<float> wallEnd, Ra
 	return _rayPoint;
 }
 
-RayPoint RayCast::ClosestPoint(Ray ray, std::array<RayPoint, 4> points) {
+RayPoint RayCast::ClosestPoint(const Ray& ray, const std::array<RayPoint, 4>& points) {
 	_distanceToWall[0] = Vector2<float>::distanceBetweenVectors(ray.startPosition, points[0].position);
 	_distanceToWall[1] = Vector2<float>::distanceBetweenVectors(ray.startPosition, points[1].position);
 	_distanceToWall[2] = Vector2<float>::distanceBetweenVectors(ray.startPosition, points[2].position);

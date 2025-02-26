@@ -11,10 +11,9 @@
 BoarBoss::BoarBoss() : EnemyBase(EnemyType::Boss) {
 	_sprite->Load(_bossBoarSpritePath);
 
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.5f);
 
-
-	_behaviorData.characterRadius = _sprite->h * 0.5f;
+	_behaviorData.characterRadius = _sprite->GetHeight() * 0.5f;
 
 	_maxHealth = 15000;
 	_currentHealth = _maxHealth;
@@ -64,7 +63,7 @@ void BoarBoss::Init() {
 	_position = Vector2<float>(windowWidth * 0.9f, windowHeight * 0.3f);
 	_direction = _targetPosition - _position;
 
-	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
+	_healthTextSprite->Init(fontType, 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.9f));
 	
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Tusks);
@@ -85,14 +84,14 @@ void BoarBoss::Update() {
 }
 
 void BoarBoss::Render() {
-	_sprite->RenderWithOrientation(_position, _orientation);
+	_sprite->RenderWithOrientation(0, _position, _orientation);
 }
 
 void BoarBoss::RenderText() {
 	_healthTextSprite->Render();
 }
 
-void BoarBoss::TakeDamage(unsigned int damageAmount) {
+void BoarBoss::TakeDamage(const int& damageAmount) {
 	_currentHealth -= damageAmount;
 	if (_currentHealth <= 0) {
 		enemyManager->RemoveObject(_objectID);
@@ -100,7 +99,7 @@ void BoarBoss::TakeDamage(unsigned int damageAmount) {
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 }
 
-void BoarBoss::HandleAttack() {
+/*void BoarBoss::HandleAttack() {
 	if (!_isAttacking && !_attackCooldownTimer->GetTimerActive()) {
 		_isAttacking = true;
 		_targetPosition = _currentTarget->GetPosition();
@@ -148,7 +147,7 @@ void BoarBoss::HandleAttack() {
 			_attackCooldownTimer->DeactivateTimer();
 		}
 	}
-}
+}*/
 
 void BoarBoss::CreateDecisionTree() {
 	_decisionTree = std::make_shared<WithinRangeDecision>(75, 0);

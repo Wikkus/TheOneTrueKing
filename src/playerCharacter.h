@@ -11,12 +11,11 @@ class WeaponComponent;
 
 class PlayerCharacter : public ObjectBase {
 public:
-	PlayerCharacter(float characterOrientation, Vector2<float> characterPosition);
+	PlayerCharacter(const float& characterOrientation, const Vector2<float>& characterPosition);
 	~PlayerCharacter();
 
 	void Init() override;
 	void Update() override;
-	void Render() override;
 
 	void RenderText() override;
 
@@ -25,7 +24,7 @@ public:
 	void ExecuteDeath();
 	void Respawn();
 
-	void TakeDamage(unsigned int damageAmount) override;
+	void TakeDamage(const int& damageAmount) override;
 
 	const int GetCurrentHealth() const;
 

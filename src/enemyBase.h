@@ -19,15 +19,17 @@ enum class EnemyType {
 
 class EnemyBase : public ObjectBase {
 public:
-	EnemyBase(EnemyType enemyType);
+	EnemyBase(const EnemyType& enemyType);
 	~EnemyBase() {}
+
+	void Render() override;
 
 	const std::shared_ptr<Collider> GetCollider() const override;
 	const int GetDamage() const override;
 
 	virtual const EnemyType GetEnemyType() const;
 	 
-	void TakeDamage(unsigned int damageAmount) override;
+	void TakeDamage(const int& damageAmount) override;
 
 	virtual const float GetRotation() const;
 
@@ -39,21 +41,20 @@ public:
 
 	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
 
-	virtual void HandleAttack();
-
 	void UpdateMovement();
 	void UpdateAngularMovement();
 	void UpdateLinearMovement();
 
-	virtual void ActivateEnemy(float orienation, Vector2<float> direction, Vector2<float> position, WeaponType weaponType);
+	virtual void ActivateEnemy(const float& orienation, const Vector2<float>& direction, 
+		const Vector2<float>& position, const WeaponType& weaponType);
 	void DeactivateObject() override;
 
-	virtual void SetFormationIndex(int formationIndex);
-	virtual void SetTargetOrientation(float targetOrientation);
+	virtual void SetFormationIndex(const int& formationIndex);
+	virtual void SetTargetOrientation(const float& targetOrientation);
 
-	void SetPosition(Vector2<float> position) override;
+	void SetPosition(const Vector2<float>& position) override;
 	
-	bool ReplaceSteeringBehavior(SteeringBehaviorType oldBehavior, BehaviorAndWeight newBehavior);
+	bool ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
 
 protected:
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment = nullptr;

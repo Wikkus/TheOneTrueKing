@@ -9,11 +9,11 @@ class SDL_Texture;
 
 class TextSprite {
 public:
-	void Init(const char* fontType, int fontSize, const char* text, SDL_Color color);
+	void Init(const char* fontType, int fontSize, const char* text, const SDL_Color& color);
 
-	void ChangeText(const char* text, SDL_Color color);
+	void ChangeText(const char* text, const SDL_Color& color);
 
-	void SetPosition(Vector2<float> position);
+	void SetPosition(const Vector2<float>& position);
 
 	void ClearText();
 
@@ -24,8 +24,9 @@ private:
 	TTF_Font* _font;
 	SDL_Surface * _textSurface;
 	SDL_Texture* _textTexture;
+	
+	SDL_FRect _textDist;
 
-	float _posX;
-	float _posY;
+	Vector2<float> _position;
 };
 

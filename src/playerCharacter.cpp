@@ -12,19 +12,20 @@
 
 #include <string>
 
-PlayerCharacter::PlayerCharacter(float characterOrientation, Vector2<float> characterPosition) :  ObjectBase(ObjectType::Player) {
+PlayerCharacter::PlayerCharacter(const float& characterOrientation, const Vector2<float>& characterPosition) :  ObjectBase(ObjectType::Player) {
 	_sprite = std::make_shared<Sprite>();
 	_sprite->Load(_kingSprite);
 	_orientation = characterOrientation;
 	_position = characterPosition;
-	_collider = std::make_shared<Circle>(true);
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.45f);
+	_collider = std::make_shared<Circle>();
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.45f);
 
 	_oldPosition = _position;
 
 	_maxHealth = 1000.f;
 	_currentHealth = _maxHealth;
 	_healthTextSprite = std::make_shared<TextSprite>();
+	_healthTextSprite->Init(fontType, 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
 
 	_dummyTarget = std::make_shared<ObjectBase>(ObjectType::Count);
@@ -33,7 +34,6 @@ PlayerCharacter::PlayerCharacter(float characterOrientation, Vector2<float> char
 PlayerCharacter::~PlayerCharacter() {}
 
 void PlayerCharacter::Init() {
-	_healthTextSprite->Init("res/roboto.ttf", 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_regenerationTimer = timerManager->CreateTimer(_regenerationCooldown);
 
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff);
@@ -48,10 +48,6 @@ void PlayerCharacter::Update() {
 	UpdateMovement();
 }
 
-void PlayerCharacter::Render() {
-	_sprite->RenderWithOrientation(_position, _orientation);
-}
-
 void PlayerCharacter::RenderText() {
 	_healthTextSprite->Render();
 }
@@ -60,7 +56,7 @@ const std::shared_ptr<Collider> PlayerCharacter::GetCollider() const {
 	return _collider;
 }
 
-void PlayerCharacter::TakeDamage(unsigned int damageAmount) {
+void PlayerCharacter::TakeDamage(const int& damageAmount) {
 	_currentHealth -= damageAmount;	
 	if (_currentHealth <= 0) {
 		_currentHealth = 0;

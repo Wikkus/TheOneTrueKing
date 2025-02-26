@@ -13,9 +13,9 @@
 EnemyBoar::EnemyBoar() : EnemyBase(EnemyType::Boar) {
 	_sprite->Load(_boarSprite);
 
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->h * 0.5f);
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.5f);
 
-	_behaviorData.characterRadius = _sprite->h * 0.5f;
+	_behaviorData.characterRadius = _sprite->GetHeight() * 0.5f;
 
 	_attackDamage = 20;
 
@@ -36,6 +36,7 @@ EnemyBoar::EnemyBoar() : EnemyBase(EnemyType::Boar) {
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
 	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f));
 	_prioritySteering->AddGroup(*_blendSteering);
+	_blendSteering->ClearBehaviours();
 
 	_attackCooldownTimer = timerManager->CreateTimer(1.f);
 	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
@@ -56,8 +57,6 @@ void EnemyBoar::Init() {
 
 	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();
 
-	_isAttacking = false;
-	_damagedPlayer = false;
 	_chargeAttackTimer->DeactivateTimer();
 	_attackCooldownTimer->DeactivateTimer();
 }
@@ -69,15 +68,6 @@ void EnemyBoar::Update() {
 		UpdateMovement();
 	}
 	_weaponComponent->Update();
-	HandleAttack();
+	_weaponComponent->Attack();
 	_collider->SetPosition(_position);
 }
-
-void EnemyBoar::Render() {
-	_sprite->RenderWithOrientation(_position, _orientation);
-}
-
-void EnemyBoar::HandleAttack() {
-	_weaponComponent->Attack();
-}
-

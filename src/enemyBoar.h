@@ -13,9 +13,6 @@ public:
 
 	void Init() override;
 	void Update() override;
-	void Render() override;
-
-	void HandleAttack() override;
 
 private:
 	const char* _boarSprite = "res/sprites/MadBoar.png";
@@ -25,9 +22,6 @@ private:
 
 	Vector2<float> _dashDirection;
 	Vector2<float> _dashStartPosition;
-
-	bool _damagedPlayer = false;
-	bool _isAttacking = false;
 
 	float _dashDistance = 0.f;
 	float _dashSpeed = 300.f;

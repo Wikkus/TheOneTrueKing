@@ -11,9 +11,9 @@ public:
 
 	void Update();
 	
-	void RemoveTimer(unsigned int timerIndex);
+	void RemoveTimer(const unsigned int& timerIndex);
 	
-	std::shared_ptr<Timer> CreateTimer(float timeInSeconds);
+	std::shared_ptr<Timer> CreateTimer(const float& timeInSeconds);
 
 private:
 	std::vector<std::shared_ptr<Timer>> _timers;

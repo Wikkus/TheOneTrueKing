@@ -4,38 +4,37 @@
 #include "debugDrawer.h"
 #include "gameEngine.h"
 
-Wall::Wall() : ObjectBase(ObjectType::Obstacle) {
-	_boxCollider = std::make_shared<AABB>(true);
+Obstacle::Obstacle() : ObjectBase(ObjectType::Obstacle) {
+	_boxCollider = std::make_shared<AABB>();
 }
 
-void Wall::Activate(Vector2<float> position, float width, float height, SDL_Color color) {
+void Obstacle::ActivateObstacle(const Vector2<float>& position, const float& width, const float& height, const SDL_Color& color) {
+	_position = position;
 	_width = width;
 	_height = height;
-	_position = position;
 	_boxCollider->SetPosition(position);
-	_boxCollider->SetHeight(height);
-	_boxCollider->SetWidth(width);
+	_boxCollider->SetWidth(_width);
+	_boxCollider->SetHeight(_height);
 	_color = color;
 	Init();
 }
 
-void Wall::Init() {}
+void Obstacle::Init() {}
 
-void Wall::Update() {}
+void Obstacle::Update() {}
 
-void Wall::Render() {
-	SDL_Rect rect = {
-		_boxCollider->GetMin().x,
-		_boxCollider->GetMin().y,
-		_boxCollider->GetMax().x - _boxCollider->GetMin().x,
-		_boxCollider->GetMax().y - _boxCollider->GetMin().y,
-	};
+void Obstacle::Render() {
+	_rect.x = _boxCollider->GetMin().x;
+	_rect.y = _boxCollider->GetMin().y;
+	_rect.w = _boxCollider->GetMax().x - _boxCollider->GetMin().x;
+	_rect.h = _boxCollider->GetMax().y - _boxCollider->GetMin().y;
+
 	SDL_SetRenderDrawColor(renderer, _color.r, _color.g, _color.b, _color.a);
-	SDL_RenderFillRect(renderer, &rect);
+	SDL_RenderFillRect(renderer, &_rect);
 }
 
-void Wall::RenderText() {}
+void Obstacle::RenderText() {}
 
-const std::shared_ptr<Collider> Wall::GetCollider() const {
+const std::shared_ptr<Collider> Obstacle::GetCollider() const {
 	return _boxCollider;
 }

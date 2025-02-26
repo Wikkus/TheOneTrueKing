@@ -24,7 +24,6 @@
 #include "src/searchSortAlgorithms.h"
 #include "src/rayCast.h"
 #include "src/sprite.h"
-#include "src/spriteSheet.h"
 #include "src/stateStack.h"
 #include "src/steeringBehavior.h"
 #include "src/timerManager.h"
@@ -41,7 +40,7 @@ int main(int argc, char* argv[]) {
 	TTF_Init();
 	IMG_Init(1);
 
-	window = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);	
+	window = SDL_CreateWindow(gameTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	collisionCheck = std::make_shared<CollisionCheck>();
@@ -60,9 +59,9 @@ int main(int argc, char* argv[]) {
 	weaponManager = std::make_shared<WeaponManager>();
 
 	QuadTreeNode quadTreeNode;
-	quadTreeNode.rectangle = std::make_shared<AABB>(true);
+	quadTreeNode.rectangle = std::make_shared<AABB>();
 	quadTreeNode.rectangle->Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
-	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 50);
+	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 100);
 
 	//Init here
 	enemyManager->Init();
@@ -134,7 +133,6 @@ int main(int argc, char* argv[]) {
 		//Render images here
 		gameStateHandler->RenderState();
 
-		debugDrawer->DrawBoxes();
 		debugDrawer->DrawRectangles();
 		debugDrawer->DrawCircles();
 		debugDrawer->DrawLines();

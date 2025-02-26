@@ -5,21 +5,24 @@
 
 #include <array>
 
-class Wall : public ObjectBase {
+
+class Obstacle : public ObjectBase {
 public:
-	Wall();
-	~Wall() {}
+	Obstacle();
+	~Obstacle() {}
 
 	void Init() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
 
-	void Activate(Vector2<float> position, float width, float height, SDL_Color color);
-
+	void ActivateObstacle(const Vector2<float>& position, const float& width, const float& height, const SDL_Color& color);
+	
 	const std::shared_ptr<Collider> GetCollider() const override;
 
-private:
+private:	
+	SDL_Rect _rect;
+
 	float _height = 0.f;
 	float _width = 0.f;
 

@@ -1,26 +1,34 @@
 #pragma once
 #include "collision.h"
 #include "managerBase.h"
+#include "objectPool.h"
 #include "vector2.h"
 
 #include <SDL2/SDL.h>
 #include <vector>
 
-class Wall;
+class Obstacle;
 
 class ObstacleManager : public ManagerBase {
 public:
-	ObstacleManager(){}
+	ObstacleManager();
 	~ObstacleManager(){}
 
-	void CreateWall(Vector2<float> position, float width, float height, SDL_Color color);
 
+	void Init() override;
 	void Update() override;
 	void Render() override;
 
-	std::shared_ptr<Wall> CastAsWall(std::shared_ptr<ObjectBase> objectBase);
+	void CreateNewObstacle();
+	void SpawnObstacle(const Vector2<float>& position,
+		const float& width, const float& height, const SDL_Color& color);
+
+	void RemoveAllObjects() override;
+	void RemoveObject(const unsigned int& objectID) override;
 
 private:
-	std::shared_ptr<Wall> _currentWall = nullptr;
+	std::shared_ptr<ObjectPool<std::shared_ptr<Obstacle>>> _obstaclePool;
+	std::shared_ptr<Obstacle> CastAsObstacle(std::shared_ptr<ObjectBase> objectBase);
+	std::shared_ptr<Obstacle> _currentObstacle = nullptr;
 
 };

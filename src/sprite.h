@@ -3,13 +3,39 @@
 
 #include "vector2.h"
 
-struct Sprite {
-	void Load(const char* path);
-	void Render(Vector2<float> position);
-	void RenderCentered(Vector2<float> position);
-	void RenderWithOrientation(Vector2<float> position, float orientation);
+class Sprite {
+public:
+	Sprite();
+	~Sprite() {}
 
-	SDL_Texture* texture;
-	int w;
-	int h;
+	void Load(const char* path);
+
+	virtual void Render(const int& spriteIndex, const Vector2<float>& position);
+	virtual void RenderCentered(const int& spriteIndex, const Vector2<float>& position);
+	virtual void RenderWithOrientation(const int& spriteIndex, const Vector2<float>& position, const float& orientation);
+
+	const float GetWidth() const;
+	const float GetHeight() const;
+
+protected:
+	SDL_FPoint _center;
+	SDL_FRect _rect;
+	SDL_Rect _rectCopy;
+	SDL_FRect _rectDest;
+	SDL_Texture* _texture;
+
+	float _widthF = 0.f;
+	float _heightF = 0.f;
+	int _widthI = 0;
+	int _heightI = 0;
+};
+
+class SpriteSheet : public Sprite {
+public:
+	SpriteSheet();
+	~SpriteSheet() {}
+
+	void Render(const int& spriteIndex, const Vector2<float>& position) override;
+	void RenderCentered(const int& spriteIndex, const Vector2<float>& position) override;
+	void RenderWithOrientation(const int& spriteIndex, const Vector2<float>& position, const float& orientation) override;
 };

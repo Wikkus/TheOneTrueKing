@@ -13,23 +13,24 @@ enum class ProjectileType {
 
 class Projectile : public ObjectBase {
 public:
-	Projectile(ProjectileType projectileType, const char* spritePath);
+	Projectile(const ProjectileType& projectileType, const char* spritePath);
 	~Projectile();
 	
 	void Init() override;
 	void Update() override;
-	void Render() override;
+
 	const std::shared_ptr<Collider> GetCollider() const override;
 	const std::shared_ptr<ObjectBase> GetOwner() const;
-	void SetPosition(Vector2<float> position) override;
+	void SetPosition(const Vector2<float>& position) override;
 
 	const ProjectileType GetProjectileType() const;
 
 	const int GetDamage() const override;
 	
-	void SetDirection(Vector2<float> direction);
+	void SetDirection(const Vector2<float>& direction);
 
-	void ActivateProjectile(std::shared_ptr<ObjectBase> owner, float orientation, Vector2<float> direction, Vector2<float> position, int damage, float speed);
+	void ActivateProjectile(std::shared_ptr<ObjectBase> owner, const float& orientation, const Vector2<float>& direction, 
+		const Vector2<float>& position, const int& damage, const float& speed);
 	void DeactivateObject() override;
 
 private:

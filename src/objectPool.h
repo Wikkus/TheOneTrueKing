@@ -3,7 +3,7 @@
 template<typename T>
 class ObjectPool {
 public:
-	ObjectPool(unsigned int numberOfObjects);
+	ObjectPool(const unsigned int& numberOfObjects);
 	~ObjectPool(){}
 
 	bool IsEmpty();
@@ -20,7 +20,7 @@ private:
 };
 
 template<typename T>
-inline ObjectPool<T>::ObjectPool(unsigned int numberOfObjects) {
+inline ObjectPool<T>::ObjectPool(const unsigned int& numberOfObjects) {
 	_objectPool.reserve(numberOfObjects);
 }
 

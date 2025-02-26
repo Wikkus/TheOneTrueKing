@@ -54,7 +54,6 @@
     <ClCompile Include="src\quadTree.cpp" />
     <ClCompile Include="src\rayCast.cpp" />
     <ClCompile Include="src\sprite.cpp" />
-    <ClCompile Include="src\spriteSheet.cpp" />
     <ClCompile Include="src\stateMachine.cpp" />
     <ClCompile Include="src\stateStack.cpp" />
     <ClCompile Include="src\steeringBehavior.cpp" />
@@ -193,7 +192,6 @@
     <ClInclude Include="src\quadTree.h" />
     <ClInclude Include="src\rayCast.h" />
     <ClInclude Include="src\sprite.h" />
-    <ClInclude Include="src\spriteSheet.h" />
     <ClInclude Include="src\stateMachine.h" />
     <ClInclude Include="src\stateStack.h" />
     <ClInclude Include="src\steeringBehavior.h" />

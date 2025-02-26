@@ -20,20 +20,20 @@ class Timer;
 
 class ObjectBase : public std::enable_shared_from_this<ObjectBase> {
 public:
-	ObjectBase(ObjectType objectType);
+	ObjectBase(const ObjectType& objectType);
 	~ObjectBase() {}
 
 	virtual void Init() {}
 	virtual void Update() {}
-	virtual void Render() {}
+	virtual void Render();
 	virtual void RenderText() {}
 
 	virtual const std::shared_ptr<Collider> GetCollider() const;
 
-	virtual void SetPosition(Vector2<float> position);
-	virtual void TakeDamage(unsigned int damageAmount);
+	virtual void SetPosition(const Vector2<float>& position);
+	virtual void TakeDamage(const int& damageAmount);
 
-	virtual void ActivateObject(Vector2<float> position, Vector2<float> direction, float orienation);
+	virtual void ActivateObject(const Vector2<float>& position, const Vector2<float>& direction, const float& orienation);
 	virtual void DeactivateObject();
 	
 	const unsigned int GetObjectID() const;	
@@ -53,10 +53,10 @@ public:
 
 	virtual const int GetDamage() const;
 
-	void SetOrientation(float orientation);
-	void SetRotation(float rotation);
-	void SetTargetPosition(Vector2<float> targetPosition);
-	void SetVelocity(Vector2<float> velocity);
+	void SetOrientation(const float& orientation);
+	void SetRotation(const float& rotation);
+	void SetTargetPosition(const Vector2<float>& targetPosition);
+	void SetVelocity(const Vector2<float>& velocity);
 
 	void QueryObjects();
 

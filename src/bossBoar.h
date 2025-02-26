@@ -20,8 +20,7 @@ public:
 	void Render() override;
 	void RenderText() override;
 
-	void TakeDamage(unsigned int damageAmount) override;
-	void HandleAttack() override;
+	void TakeDamage(const int& damageAmount) override;
 
 private:
 	void CreateDecisionTree();

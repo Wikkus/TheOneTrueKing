@@ -11,9 +11,9 @@ AlignBehavior::AlignBehavior() {
 	_behaviorType = SteeringBehaviorType::Align;
 }
 
-SteeringOutput AlignBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput AlignBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Calculates the speed that the enemy will rotate and clamps it between -PI, PI radians(-180, 180 degree)
-	_rotation = behaviorData.targetOrientation - objectBase.GetOrientation();
+	_rotation = _targetOrientation - objectBase.GetOrientation();
 	_rotation = universalFunctions->WrapMinMax(_rotation, -PI, PI);
 
 	//Uses a variable that will always be the positive value and use it for the if statements
@@ -49,49 +49,38 @@ SteeringOutput AlignBehavior::Steering(BehaviorData behaviorData, ObjectBase& ob
 	return _result;
 }
 
-const SteeringBehaviorType AlignBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
 FaceBehavior::FaceBehavior() {
 	_behaviorType = SteeringBehaviorType::Face;
 }
 
-SteeringOutput FaceBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput FaceBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	_direction = objectBase.GetTargetPosition() - objectBase.GetPosition();
 	if (_direction.absolute() == 0) {
 		return SteeringOutput();
 	}
 	//Sets the targetOrientation based on the direction using atan2f
-	behaviorData.targetOrientation = universalFunctions->VectorAsOrientation(_direction);
+	_targetOrientation = universalFunctions->VectorAsOrientation(_direction);
 
 	//returns the steering function from alignBehavior which aligns the character with the targetOrientation
 	return AlignBehavior::Steering(behaviorData, objectBase);
 }
-const SteeringBehaviorType FaceBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
 LookAtDirectionBehavior::LookAtDirectionBehavior() {}
 
-SteeringOutput LookAtDirectionBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput LookAtDirectionBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//If the enemy doesn't have a veolcity, return 0
 	if (objectBase.GetVelocity().absolute() == 0) {
 		return SteeringOutput();
 	}
 	//Sets the targetOrientation to the velocity as orientation using atan2f
-	behaviorData.targetOrientation = universalFunctions->VectorAsOrientation(objectBase.GetVelocity().absolute());
+	_targetOrientation = universalFunctions->VectorAsOrientation(objectBase.GetVelocity().absolute());
 	return AlignBehavior::Steering(behaviorData, objectBase);
-}
-
-const SteeringBehaviorType LookAtDirectionBehavior::GetBehaviorType() const {
-	return _behaviorType;
 }
 
 ArriveBehavior::ArriveBehavior() {
 	_behaviorType = SteeringBehaviorType::Arrive;
 }
 
-SteeringOutput ArriveBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput ArriveBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Calculates the direction and distance between target and enemy
 	_direction = objectBase.GetTargetPosition() - objectBase.GetPosition();
 	_distance = _direction.absolute();
@@ -123,15 +112,11 @@ SteeringOutput ArriveBehavior::Steering(BehaviorData behaviorData, ObjectBase& o
 	return _result;
 }
 
-const SteeringBehaviorType ArriveBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
 CollisionAvoidanceBehavior::CollisionAvoidanceBehavior() {
 	_behaviorType = SteeringBehaviorType::CollisionAbvoidance;
 }
 
-SteeringOutput CollisionAvoidanceBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	_currentCollider = std::static_pointer_cast<Circle>(objectBase.GetCollider());
 
 	//Gets all objectBase that has collided with this enemy through the quadTree
@@ -190,15 +175,11 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(BehaviorData behaviorData, O
 	return _result;
 }
 
-const SteeringBehaviorType CollisionAvoidanceBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
-SeekBehavior::SeekBehavior(SteeringBehaviorType behaviorType) {
+SeekBehavior::SeekBehavior(const SteeringBehaviorType& behaviorType) {
 	_behaviorType = behaviorType;
 }
 
-SteeringOutput SeekBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput SeekBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	if (_behaviorType == SteeringBehaviorType::Evade || _behaviorType == SteeringBehaviorType::Flee) {
 		//If the target is using the seek behavior, calculate the velocity from the targetPosition and enemyPosition
 		_result.linearVelocity = objectBase.GetPosition() - objectBase.GetTargetPosition();
@@ -223,14 +204,12 @@ SteeringOutput SeekBehavior::Steering(BehaviorData behaviorData, ObjectBase& obj
 	_result.angularVelocity = 0.f;
 	return _result;
 }
-const SteeringBehaviorType SeekBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
+
 ObstacleAvoidanceBehavior::ObstacleAvoidanceBehavior() : SeekBehavior(SteeringBehaviorType::Seek) {
 	_behaviorType = SteeringBehaviorType::ObstacleAvoidance;
 }
 
-SteeringOutput ObstacleAvoidanceBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput ObstacleAvoidanceBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Sets that values for the ray cast and its smaller, rotated rays called whiskers
 	_rayPoint.pointHit = false;
 	_ray.length = behaviorData.lookAhead;
@@ -280,14 +259,11 @@ SteeringOutput ObstacleAvoidanceBehavior::Steering(BehaviorData behaviorData, Ob
 	//Avoid the object by using seekBehavior toward the target position
 	return SeekBehavior::Steering(behaviorData, objectBase);
 }
-const SteeringBehaviorType ObstacleAvoidanceBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-PursueBehavior::PursueBehavior(SteeringBehaviorType behaviorType) : SeekBehavior(behaviorType) {
+PursueBehavior::PursueBehavior(const SteeringBehaviorType& behaviorType) : SeekBehavior(behaviorType) {
 	_behaviorType = behaviorType;
 }
 
-SteeringOutput PursueBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput PursueBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Calculate the distance between enemy and target 
 	_distance = (objectBase.GetPosition() - objectBase.GetTargetPosition()).absolute();
 	//Set the current speed the enemy is travelling
@@ -307,15 +283,11 @@ SteeringOutput PursueBehavior::Steering(BehaviorData behaviorData, ObjectBase& o
 	return SeekBehavior::Steering(behaviorData, objectBase);
 }
 
-const SteeringBehaviorType PursueBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
 SeparationBehavior::SeparationBehavior() {
 	_behaviorType = SteeringBehaviorType::Separation;
 }
 
-SteeringOutput SeparationBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput SeparationBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	_result.angularVelocity = 0.f;
 	_result.linearVelocity = { 0.f, 0.f };
 
@@ -346,15 +318,11 @@ SteeringOutput SeparationBehavior::Steering(BehaviorData behaviorData, ObjectBas
 	return _result;
 }
 
-const SteeringBehaviorType SeparationBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
 VelocityMatchBehaviour::VelocityMatchBehaviour() {
 	_behaviorType = SteeringBehaviorType::VelocityMatch;
 }
 
-SteeringOutput VelocityMatchBehaviour::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput VelocityMatchBehaviour::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Calculates the velocity between the targets and current enemy
 	_result.linearVelocity = behaviorData.targetsVelocity - objectBase.GetVelocity();
 	_result.linearVelocity /= behaviorData.timeToTarget;
@@ -365,20 +333,16 @@ SteeringOutput VelocityMatchBehaviour::Steering(BehaviorData behaviorData, Objec
 	return _result;
 }
 
-const SteeringBehaviorType VelocityMatchBehaviour::GetBehaviorType() const {
-	return _behaviorType;
-}
-
 WanderBehavior::WanderBehavior() {
 	_behaviorType = SteeringBehaviorType::Wander;
 }
 
-SteeringOutput WanderBehavior::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput WanderBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Set the current wander orientation based on a random value combined with the wander rate
 	_wanderOrientation += universalFunctions->RandomBinomialFloat(-1, 1) * behaviorData.wanderRate;
 
 	//Calculates the combined orientation between the enemy and the current wanderOrientation
-	behaviorData.targetOrientation = _wanderOrientation + objectBase.GetOrientation();
+	_targetOrientation = _wanderOrientation + objectBase.GetOrientation();
 	
 	//Calculates the center position of the target
 	_targetPosition = objectBase.GetPosition() + 
@@ -398,11 +362,7 @@ SteeringOutput WanderBehavior::Steering(BehaviorData behaviorData, ObjectBase& o
 	return _result;
 }
 
-const SteeringBehaviorType WanderBehavior::GetBehaviorType() const {
-	return _behaviorType;
-}
-
-SteeringOutput BlendSteering::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput BlendSteering::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	_currentWeight = 0.f;
 	_result.angularVelocity = 0.f;
 	_result.linearVelocity = { 0.f, 0.f };
@@ -417,11 +377,11 @@ SteeringOutput BlendSteering::Steering(BehaviorData behaviorData, ObjectBase& ob
 	return _result;
 }
 
-void BlendSteering::AddSteeringBehaviour(BehaviorAndWeight behaviour) {
+void BlendSteering::AddSteeringBehaviour(const BehaviorAndWeight& behaviour) {
 	_behaviors.emplace_back(behaviour);
 }
 
-bool BlendSteering::RemoveSteeringBehaviour(SteeringBehaviorType behaviorType) {
+bool BlendSteering::RemoveSteeringBehaviour(const SteeringBehaviorType& behaviorType) {
 	//Loops through and tries to find the target behavior type and removes it if found
 	for (unsigned int i = 0; i < _behaviors.size(); i++) {
 		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == behaviorType) {
@@ -436,7 +396,7 @@ void BlendSteering::ClearBehaviours() {
 	_behaviors.clear();
 }
 
-bool BlendSteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+bool BlendSteering::ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
 	//Loops through and tries to find the target behavior type and replaces it with the new be
 	for (unsigned int i = 0; i < _behaviors.size(); i++) {
 		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == oldBehaviorType) {
@@ -448,7 +408,7 @@ bool BlendSteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType
 	return false;
 }
 
-SteeringOutput PrioritySteering::Steering(BehaviorData behaviorData, ObjectBase& objectBase) {
+SteeringOutput PrioritySteering::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	_result.linearVelocity = { 0.f, 0.f };
 	_result.angularVelocity = 0.f;
 
@@ -463,20 +423,19 @@ SteeringOutput PrioritySteering::Steering(BehaviorData behaviorData, ObjectBase&
 	return _result;
 }
 
-void PrioritySteering::AddGroup(BlendSteering& behaviour) {
+void PrioritySteering::AddGroup(const BlendSteering& behaviour) {
 	_groups.emplace_back(behaviour);
-	behaviour.ClearBehaviours();
 }
 
 void PrioritySteering::ClearGroups() {
 	_groups.clear();
 }
 
-void PrioritySteering::AddBehaviorInGroup(BehaviorAndWeight newBehavior, int groupIndex) {
+void PrioritySteering::AddBehaviorInGroup(const BehaviorAndWeight& newBehavior, const int& groupIndex) {
 	_groups[groupIndex].AddSteeringBehaviour(newBehavior);
 }
 
-bool PrioritySteering::RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorType) {
+bool PrioritySteering::RemoveSteeringBheavior(const SteeringBehaviorType& oldBehaviorType) {
 	for (unsigned int i = 0; i < _groups.size(); i++) {
 		if (_groups[i].RemoveSteeringBehaviour(oldBehaviorType)) {
 			return true;
@@ -485,11 +444,19 @@ bool PrioritySteering::RemoveSteeringBheavior(SteeringBehaviorType oldBehaviorTy
 	return false;
 }
 
-bool PrioritySteering::ReplaceSteeringBheavior(SteeringBehaviorType oldBehaviorType, BehaviorAndWeight newBehavior) {
+bool PrioritySteering::ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
 	for (unsigned int i = 0; i < _groups.size(); i++) {
 		if (_groups[i].ReplaceSteeringBheavior(oldBehaviorType, newBehavior)) {
 			return true;
 		}
 	}	
 	return false;
+}
+
+SteeringOutput SteeringBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
+	return SteeringOutput();
+}
+
+const SteeringBehaviorType SteeringBehavior::GetBehaviorType() const {
+	return _behaviorType;
 }

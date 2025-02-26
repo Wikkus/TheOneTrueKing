@@ -77,9 +77,6 @@
     <ClCompile Include="src\sprite.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
-    <ClCompile Include="src\spriteSheet.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
     <ClCompile Include="src\stateStack.cpp">
       <Filter>StateStack</Filter>
     </ClCompile>
@@ -469,9 +466,6 @@
     <ClInclude Include="src\objectBase.h">
       <Filter>Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\obstacleWall.h">
-      <Filter>Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\objectPool.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
@@ -482,9 +476,6 @@
       <Filter>GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\sprite.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\spriteSheet.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\stateStack.h">
@@ -546,6 +537,9 @@
     </ClInclude>
     <ClInclude Include="src\obstacleManager.h">
       <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obstacleWall.h">
+      <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,16 @@
 #include "gameEngine.h"
 #include "quadTree.h"
 
-ObjectBase::ObjectBase(ObjectType objectType) : _objectID(lastObjectID), _objectType(objectType) {
+ObjectBase::ObjectBase(const ObjectType& objectType) : _objectID(lastObjectID), _objectType(objectType) {
     lastObjectID++;
 }
 
 const unsigned int ObjectBase::GetObjectID() const {
     return _objectID;
+}
+
+void ObjectBase::Render() {
+    _sprite->RenderWithOrientation(0, _position, _orientation);
 }
 
 const std::shared_ptr<Collider> ObjectBase::GetCollider() const {
@@ -40,7 +44,6 @@ const std::shared_ptr<Sprite> ObjectBase::GetSprite() const {
     return _sprite;
 }
 
-
 const Vector2<float> ObjectBase::GetDirection() const {
     return _direction;
 }
@@ -61,23 +64,23 @@ const int ObjectBase::GetDamage() const {
     return 0;
 }
 
-void ObjectBase::SetOrientation(float orientation) {
+void ObjectBase::SetOrientation(const float& orientation) {
     _orientation = orientation;
 }
 
-void ObjectBase::SetRotation(float rotation) {
+void ObjectBase::SetRotation(const float& rotation) {
     _rotation = rotation;
 }
 
-void ObjectBase::SetPosition(Vector2<float> position) {
+void ObjectBase::SetPosition(const Vector2<float>& position) {
     _position = position;
 }
 
-void ObjectBase::SetTargetPosition(Vector2<float> targetPosition) {
+void ObjectBase::SetTargetPosition(const Vector2<float>& targetPosition) {
     _targetPosition = targetPosition;
 }
 
-void ObjectBase::SetVelocity(Vector2<float> velocity) {
+void ObjectBase::SetVelocity(const Vector2<float>& velocity) {
     _velocity = velocity;
 }
 
@@ -85,19 +88,15 @@ void ObjectBase::QueryObjects() {
     _queriedObjects = objectBaseQuadTree->Query(_collider);
 }
 
-void ObjectBase::TakeDamage(unsigned int damageAmount) {}
+void ObjectBase::TakeDamage(const int& damageAmount) {}
 
-void ObjectBase::ActivateObject(Vector2<float> position, Vector2<float> direction, float orienation) {
+void ObjectBase::ActivateObject(const Vector2<float>& position, const Vector2<float>& direction, const float& orienation) {
     _position = position;
     _direction = direction;
     _orientation = orienation;
 }
 
 void ObjectBase::DeactivateObject() {
-    _orientation = 0.f;
-    _direction = { 0.f, 0.f };
-    _position = { -10000.f, 10000.f };
-    _rotation = 0.f;
+    _position = deactivatedPosition;
     _collider->SetPosition(_position);
-    _velocity = { 0.f, 0.f };
 }

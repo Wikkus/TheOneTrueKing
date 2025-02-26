@@ -32,7 +32,7 @@ void WeaponManager::Render() {
 }
 
 
-std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(WeaponType weaponType) {
+std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(const WeaponType& weaponType) {
 	if (_weaponPools[weaponType]->IsEmpty()) {
 		CreateWeapon(weaponType);
 	}
@@ -41,7 +41,7 @@ std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(WeaponType weaponTyp
 	return _currentWeapon;
 }
 
-void WeaponManager::CreateWeapon(WeaponType weaponType) {
+void WeaponManager::CreateWeapon(const WeaponType& weaponType) {
 	switch (weaponType) {
 	case WeaponType::Shield:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<ShieldComponent>());
@@ -73,7 +73,7 @@ void WeaponManager::RemoveAllObjects() {
 	_currentWeapon = nullptr;
 }
 
-void WeaponManager::RemoveObject(unsigned int objectID) {
+void WeaponManager::RemoveObject(const unsigned int& objectID) {
 	if (_activeObjects.empty()) {
 		return;
 	}

@@ -14,18 +14,18 @@
 #include <vector>
 #include <string>
 
-Button::Button(const char* buttonText, int height, int width, Vector2<float> position) {
+Button::Button(const char* buttonText, const Vector2<float>& position, const int& height, const int& width) {
 	_position = position;
 	
-	_boxCollider = std::make_shared<AABB>(true);
+	_boxCollider = std::make_shared<AABB>();
 	_boxCollider->Init(position, height, width);
 
-	_cursorCollider = std::make_shared<Circle>(true);
+	_cursorCollider = std::make_shared<Circle>();
 	_cursorCollider->Init({ 0.f, 0.f }, 10.f);
 
 	_text = std::make_shared<TextSprite>();
 	
-	_text->Init("res/roboto.ttf", 24, buttonText, _textColor);
+	_text->Init(fontType, 24, buttonText, _textColor);
 	_text->SetPosition(_position);
 }
 
@@ -40,26 +40,26 @@ bool Button::ClickedOn() {
 }
 
 void Button::Render() {
-	debugDrawer->AddDebugBox(_position, _boxCollider->GetMin(), _boxCollider->GetMax(), _buttonColor);
+	debugDrawer->AddDebugRectangle(_position, _boxCollider->GetMin(), _boxCollider->GetMax(), _buttonColor, true);
 }
 
 void Button::RenderText() {
 	_text->RenderCentered();
 }
 
-void Button::SetPosition(Vector2<float> position) {
+void Button::SetPosition(const Vector2<float>& position) {
 	_position = position;
 	_boxCollider->SetPosition(position);
 	_text->SetPosition(_position);
 }
 GameStateHandler::GameStateHandler() {
-	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f));
-	_buttons[ButtonType::BossRush] = std::make_shared<Button>(_bossRushText, 64, 128, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
-	_buttons[ButtonType::FormationGame] = std::make_shared<Button>(_formationText, 64, 128, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f));
-	_buttons[ButtonType::SurvivalGame] = std::make_shared<Button>(_survivalText, 64, 128, Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f));
-	_buttons[ButtonType::Quit] = std::make_shared<Button>(_quitText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f));
-	_buttons[ButtonType::Restart] = std::make_shared<Button>(_restartText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f));
-	_buttons[ButtonType::Resume] = std::make_shared<Button>(_resumeText, 64, 128, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f));
+	_buttons[ButtonType::BossRush] = std::make_shared<Button>(_bossRushText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), 64, 128);
+	_buttons[ButtonType::FormationGame] = std::make_shared<Button>(_formationText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), 64, 128);
+	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f), 64, 128);
+	_buttons[ButtonType::Quit] = std::make_shared<Button>(_quitText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f), 64, 128);
+	_buttons[ButtonType::Restart] = std::make_shared<Button>(_restartText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f), 64, 128);
+	_buttons[ButtonType::Resume] = std::make_shared<Button>(_resumeText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f), 64, 128);
+	_buttons[ButtonType::SurvivalGame] = std::make_shared<Button>(_survivalText, Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f), 64, 128);
 }
 
 GameStateHandler::~GameStateHandler() {}
@@ -99,7 +99,7 @@ void GameStateHandler::RenderStateText() {
 	_states.back()->RenderText();
 }
 
-void GameStateHandler::SetGameMode(GameMode gameMode) {
+void GameStateHandler::SetGameMode(const GameMode& gameMode) {
 	_currentGameMode = gameMode;
 }
 
@@ -201,9 +201,9 @@ void SurvivalGameState::RenderText() {
 }
 
 GameOverState::GameOverState() {
-	_waveNumberText = std::make_shared<TextSprite>();
-	_waveNumberText->Init("res/roboto.ttf", 24, ("You died on wave: " + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
-	_waveNumberText->SetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
+	_gameOverText = std::make_shared<TextSprite>();
+	_gameOverText->Init(fontType, 24, (_youDied + std::to_string(enemyManager->GetWaveNumber())).c_str(), { 255, 255, 255, 255});
+	_gameOverText->SetPosition({ windowWidth * 0.2f, windowHeight * 0.35f });
 	SetButtonPositions();
 }
 
@@ -244,14 +244,14 @@ void GameOverState::RenderText() {
 	_buttons[ButtonType::MainMenu]->RenderText();
 	_buttons[ButtonType::Quit]->RenderText();
 	_buttons[ButtonType::Restart]->RenderText();
-	_waveNumberText->RenderCentered();
+	_gameOverText->RenderCentered();
 }
 
 MenuState::MenuState() {
 	_titleTextPosition = { windowWidth * 0.5f, windowHeight * 0.125f };
 
 	_titleText = std::make_shared<TextSprite>();
-	_titleText->Init("res/roboto.ttf", 48, _gameTitle, _textColor);
+	_titleText->Init(fontType, 48, gameTitle, _textColor);
 	_titleText->SetPosition(_titleTextPosition);
 	
 	SetButtonPositions();

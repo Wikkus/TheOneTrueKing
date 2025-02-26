@@ -47,8 +47,8 @@ extern "C" {
  */
 typedef struct SDL_Point
 {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
 } SDL_Point;
 
 /**
@@ -59,8 +59,8 @@ typedef struct SDL_Point
  */
 typedef struct SDL_FPoint
 {
-    float x;
-    float y;
+    float x = 0.f;
+    float y = 0.f;
 } SDL_FPoint;
 
 
@@ -77,8 +77,8 @@ typedef struct SDL_FPoint
  */
 typedef struct SDL_Rect
 {
-    int x, y;
-    int w, h;
+    int x = 0, y = 0;
+    int w = 0, h = 0;
 } SDL_Rect;
 
 
@@ -97,10 +97,10 @@ typedef struct SDL_Rect
  */
 typedef struct SDL_FRect
 {
-    float x;
-    float y;
-    float w;
-    float h;
+    float x = 0.f;
+    float y = 0.f;
+    float w = 0.f;
+    float h = 0.f;
 } SDL_FRect;
 
 
