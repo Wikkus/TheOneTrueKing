@@ -14,10 +14,7 @@ public:
 	ObstacleManager();
 	~ObstacleManager(){}
 
-
 	void Init() override;
-	void Update() override;
-	void Render() override;
 
 	void CreateNewObstacle();
 	void SpawnObstacle(const Vector2<float>& position,

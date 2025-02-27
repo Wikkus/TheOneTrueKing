@@ -12,10 +12,6 @@ const unsigned int ObjectBase::GetObjectID() const {
     return _objectID;
 }
 
-void ObjectBase::Render() {
-    _sprite->RenderWithOrientation(0, _position, _orientation);
-}
-
 const std::shared_ptr<Collider> ObjectBase::GetCollider() const {
     return _collider;
 }
@@ -36,7 +32,7 @@ const std::vector<std::shared_ptr<ObjectBase>> ObjectBase::GetQueriedObjects() c
     return _queriedObjects;
 }
 
-const std::shared_ptr<ObjectBase> ObjectBase::GetCurrentTarget() const {
+const std::shared_ptr<ObjectBase> ObjectBase::GetTargetObject() const {
     return _currentTarget;
 }
 

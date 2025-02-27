@@ -9,15 +9,27 @@ EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy)
     _maxHealth = 100.f;
     _currentHealth = _maxHealth;
 
+    _currentTarget = playerCharacters.back();
+    _collider = std::make_shared<Circle>();
+
     _prioritySteering = std::make_shared<PrioritySteering>();
     _blendSteering = std::make_shared<BlendSteering>();
 
-    _currentTarget = playerCharacters.back();
-    _collider = std::make_shared<Circle>();
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Align, BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Arrive, BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Face, BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Separation, BehaviorAndWeight(std::make_shared<SeparationBehavior>(SteeringBehaviorType::Separation), 1.5f)));
+
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Arrive]);
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Face]);
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Separation]);
+    _prioritySteering->AddGroup(*_blendSteering);
+    _blendSteering->ClearBehaviors();
 }
 
 void EnemyBase::Render() {
     _sprite->RenderWithOrientation(0, _position, _orientation);
+    _weaponComponent->Render();
 }
 
 const std::shared_ptr<Collider> EnemyBase::GetCollider() const {
@@ -89,7 +101,7 @@ void EnemyBase::ActivateEnemy(const float& orienation, const Vector2<float>& dir
 
     if (weaponType != WeaponType::Count) {
         _weaponComponent = weaponManager->SpawnWeapon(weaponType);
-        _weaponComponent->SetOwner(shared_from_this());
+        _weaponComponent->SetOwner(shared_from_this(), true);
         _weaponComponent->ActivateObject(position, direction, orienation);
         _weaponComponent->Init();
     }
@@ -115,8 +127,4 @@ void EnemyBase::SetPosition(const Vector2<float>& position) {
 
 void EnemyBase::SetTargetOrientation(const float& targetOrientation) {
     _behaviorData.targetOrientation = targetOrientation;
-}
-
-bool EnemyBase::ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
-    return _prioritySteering->ReplaceSteeringBheavior(oldBehaviorType, newBehavior);
 }

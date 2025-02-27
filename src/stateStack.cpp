@@ -8,7 +8,7 @@
 #include "projectileManager.h"
 #include "quadTree.h"
 #include "textSprite.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponManager.h"
 
 #include <vector>
@@ -129,7 +129,7 @@ void InGameState::Update() {
 	enemyManager->Update();
 	obstacleManager->Update();
 	projectileManager->Update();
-	timerManager->Update();
+	timerHandler->Update();
 	weaponManager->Update();
 }
 
@@ -139,7 +139,6 @@ void InGameState::Render() {
 		playerCharacters[i]->Render();
 	}
 	projectileManager->Render();
-	weaponManager->Render();
 	obstacleManager->Render();
 }
 

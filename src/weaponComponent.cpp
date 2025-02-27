@@ -8,7 +8,7 @@
 #include "playerCharacter.h"
 #include "projectileManager.h"
 #include "sprite.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponManager.h"
 
 WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
@@ -19,7 +19,11 @@ WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
 	_currentHealth = _maxHealth;
 
 	_collider = std::make_shared<Circle>();
-	_collider->SetIsActive(false);
+	_collider->SetIsActive(false);	
+	
+	_attackCooldownTimer = timerHandler->SpawnTimer(1.f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(0.5f, false, false);
+	_isAttacking = false;
 }
 
 void WeaponComponent::Init() {}
@@ -27,7 +31,13 @@ void WeaponComponent::Init() {}
 void WeaponComponent::Update() {
 	_position = _owner->GetPosition();
 	_orientation = _owner->GetOrientation();
-	_direction = (_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition()).normalized();
+	_direction = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition()).normalized();
+}
+
+void WeaponComponent::Render() {
+	if (_renderWeapon) {
+		_sprite->RenderWithOrientation(0, _position, _orientation);
+	}
 }
 
 const bool WeaponComponent::GetIsAttacking() const {
@@ -46,8 +56,8 @@ const WeaponType WeaponComponent::GetWeaponType() const {
 	return _weaponType;
 }
 void WeaponComponent::DeactivateTimers() {
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
+	_attackCooldownTimer->SetTimer(false, false);
+	_chargeAttackTimer->SetTimer(false, false);
 }
 
 void WeaponComponent::ResetTimers() {
@@ -55,8 +65,9 @@ void WeaponComponent::ResetTimers() {
 	_chargeAttackTimer->ResetTimer();
 }
 
-void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner) {
+void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon) {
 	_owner = owner;
+	_renderWeapon = renderWeapon;
 }
 
 void WeaponComponent::DeactivateObject() {
@@ -69,11 +80,8 @@ void WeaponComponent::DeactivateObject() {
 ShieldComponent::ShieldComponent() {
 	_sprite->Load(_path);
 
-	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
-	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
-
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
+	_attackCooldownTimer = timerHandler->SpawnTimer(1.f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(0.5f, false, false);
 
 	_attackRange = 25.f;
 
@@ -91,9 +99,6 @@ void ShieldComponent::Attack() {
 
 StaffComponent::StaffComponent() {
 	_sprite->Load(_path);
-
-	_attackCooldownTimer = timerManager->CreateTimer(1.0f);
-	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
 
 	_attackRange = 300.f;
 
@@ -126,10 +131,10 @@ void StaffComponent::Init() {
 
 //If the weapon is a staff it shoots a fireball towards the player
 void StaffComponent::Attack() {
-	if (_attackCooldownTimer->GetTimerActive()) {
+	if (_attackCooldownTimer->GetIsActive()) {
 		return;
 	}
-	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
+	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
 		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
 			_direction, _position, _attackDamage, _projectileSpeed);
 		
@@ -141,7 +146,7 @@ void StaffComponent::Attack() {
 			_chargeAttackTimer->ResetTimer();
 			_isAttacking = true;
 
-		} else if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		} else if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 			_chargeAttackTimer->ResetTimer();
 			_isAttacking = true;
 		}
@@ -151,7 +156,7 @@ void StaffComponent::Attack() {
 SuperStaffComponent::SuperStaffComponent() {
 	_sprite->Load(_path);
 
-	_attackCooldownTimer = timerManager->CreateTimer(0.25f);
+	_attackCooldownTimer = timerHandler->SpawnTimer(0.25f, false, false);
 
 	_attackDamage = 150;
 	_healthModifier = 0;
@@ -163,7 +168,7 @@ SuperStaffComponent::~SuperStaffComponent() {
 }
 
 void SuperStaffComponent::Attack() {
-	if (_attackCooldownTimer->GetTimerActive()) {
+	if (_attackCooldownTimer->GetIsActive()) {
 		return;
 	}
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
@@ -182,8 +187,9 @@ void SuperStaffComponent::Attack() {
 
 SwordComponent::SwordComponent() {
 	_sprite->Load(_path);
-	_attackCooldownTimer = timerManager->CreateTimer(0.75f);
-	_chargeAttackTimer = timerManager->CreateTimer(0.25f);
+	_attackCooldownTimer = timerHandler->SpawnTimer(0.75f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(0.25f, false, false);
+
 	_attackRange = 25.f;
 
 	_attackDamage = 15;
@@ -196,12 +202,12 @@ SwordComponent::~SwordComponent() {}
 
 //If the weapon is a sword it damages the player if its close enough
 void SwordComponent::Attack() {
-	if (_attackCooldownTimer->GetTimerActive()) {
+	if (_attackCooldownTimer->GetIsActive()) {
 		return;
 	}
-	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
-			_owner->GetCurrentTarget()->TakeDamage(_attackDamage);
+	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
+		if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+			_owner->GetTargetObject()->TakeDamage(_attackDamage);
 		}
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
@@ -214,9 +220,9 @@ void SwordComponent::Attack() {
 
 TusksComponent::TusksComponent() {
 	_sprite->Load(_path);
-	_attackCooldownTimer = timerManager->CreateTimer(1.5f);
-	_chargeAttackTimer = timerManager->CreateTimer(1.f);
-	_damageCooldown = timerManager->CreateTimer(0.5f);
+	_attackCooldownTimer = timerHandler->SpawnTimer(1.5f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(1.f, false, false);
+	_damageCooldown = timerHandler->SpawnTimer(0.5f, false, false);
 	_attackRange = 200.f;
 
 	_attackDamage = 20;
@@ -228,14 +234,21 @@ TusksComponent::TusksComponent() {
 TusksComponent::~TusksComponent() {}
 
 void TusksComponent::Attack() {
-	if (_attackCooldownTimer->GetTimerActive()) {
+	if (_attackCooldownTimer->GetIsActive()) {
+		return;
+
+	} else if (_chargeAttackTimer->GetIsActive()) {
+		_dashDirection = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition());
+		_dashDistance = _dashDirection.absolute() + 100.f;
+		_dashDirection.normalize();
+		_dashStartPosition = _owner->GetPosition();
 		return;
 	}
 	if (_isAttacking) {
 		_owner->SetPosition(_owner->GetPosition() + _dashDirection * _dashSpeed * deltaTime);
-		if (!_damageCooldown->GetTimerActive()) {
+		if (!_damageCooldown->GetIsActive()) {
 			for (unsigned int i = 0; i < _owner->GetQueriedObjects().size(); i++) {
-				if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetCurrentTarget()->GetObjectType()) {
+				if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetTargetObject()->GetObjectType()) {
 					_owner->GetQueriedObjects()[i]->TakeDamage(_attackDamage);
 					_damageCooldown->ResetTimer();
 				}
@@ -243,18 +256,17 @@ void TusksComponent::Attack() {
 		}
 		if ((_dashStartPosition - _owner->GetPosition()).absolute() > _dashDistance) {
 			_attackCooldownTimer->ResetTimer();
+			_chargeAttackTimer->SetTimer(false, false);
 			_isAttacking = false;
 		}
-	} else {	
-		if (universalFunctions->IsInDistance(_owner->GetCurrentTarget()->GetPosition(), _owner->GetPosition(), _attackRange)) {
-			_chargeAttackTimer->DeactivateTimer();
-			_dashDirection = (_owner->GetCurrentTarget()->GetPosition() - _owner->GetPosition());
-			_dashDistance = _dashDirection.absolute() + 100.f;
-			_dashDirection.normalize();
-			_dashStartPosition = _owner->GetPosition();
+	} else {
+		if(_chargeAttackTimer->GetIsFinished()) {
+			_isAttacking = true;	
+		
+		} else if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+			_chargeAttackTimer->ResetTimer();
 			_owner->SetVelocity({ 0.f, 0.f });
 			_owner->SetRotation(0.f);
-			_isAttacking = true;
 		}
 	}
 }

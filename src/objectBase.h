@@ -25,7 +25,7 @@ public:
 
 	virtual void Init() {}
 	virtual void Update() {}
-	virtual void Render();
+	virtual void Render() {}
 	virtual void RenderText() {}
 
 	virtual const std::shared_ptr<Collider> GetCollider() const;
@@ -42,7 +42,7 @@ public:
 	const ObjectType GetObjectType() const;
 
 	const std::vector<std::shared_ptr<ObjectBase>> GetQueriedObjects() const;
-	const std::shared_ptr<ObjectBase> GetCurrentTarget() const;
+	const std::shared_ptr<ObjectBase> GetTargetObject() const;
 	
 	const std::shared_ptr<Sprite> GetSprite() const;
 

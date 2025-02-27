@@ -26,7 +26,7 @@
 #include "src/sprite.h"
 #include "src/stateStack.h"
 #include "src/steeringBehavior.h"
-#include "src/timerManager.h"
+#include "src/timerHandler.h"
 #include "src/textSprite.h"
 #include "src/universalFunctions.h"
 #include "src/vector2.h"
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	searchSort = std::make_shared<SearchSortAlgorithms>();
 	rayCast = std::make_shared<RayCast>();
 
-	timerManager = std::make_shared<TimerManager>();
+	timerHandler = std::make_shared<TimerHandler>();
 	universalFunctions = std::make_shared<UniversalFunctions>();
 	weaponManager = std::make_shared<WeaponManager>();
 
@@ -76,17 +76,22 @@ int main(int argc, char* argv[]) {
 
 	Uint64 previous_ticks = SDL_GetPerformanceCounter();
 	runningGame = true;
+
+	SDL_Event eventType;
+	int scanCode = 0;
+	Uint64 ticks;
+	Uint64 delta_ticks;
+
 	while (runningGame) {
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
 		frameNumber++;
-		const Uint64 ticks = SDL_GetPerformanceCounter();
-		const Uint64 delta_ticks = ticks - previous_ticks;
+		ticks = SDL_GetPerformanceCounter();
+		delta_ticks = ticks - previous_ticks;
 		previous_ticks = ticks;
 		deltaTime = (float)delta_ticks / (float)SDL_GetPerformanceFrequency();
 
-		SDL_Event eventType;
 		while (SDL_PollEvent(&eventType)) {
 			ImGui_ImplSDL2_ProcessEvent(&eventType);
 			switch (eventType.type) {
@@ -95,7 +100,7 @@ int main(int argc, char* argv[]) {
 					break;
 				}
 				case SDL_KEYDOWN: {
-					const int scanCode = eventType.key.keysym.scancode;
+					scanCode = eventType.key.keysym.scancode;
 					if (eventType.key.repeat) {
 						break;
 					}
@@ -104,7 +109,7 @@ int main(int argc, char* argv[]) {
 					break;
 				}
 				case SDL_KEYUP: {
-					const int scanCode = eventType.key.keysym.scancode;
+					scanCode = eventType.key.keysym.scancode;
 					keys[scanCode].changeFrame = frameNumber;
 					keys[scanCode].state = false;
 					break;

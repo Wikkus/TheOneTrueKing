@@ -13,7 +13,7 @@
 #include "rayCast.h"
 #include "stateStack.h"
 #include "steeringBehavior.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponManager.h"
 #include "vector2.h"
 
@@ -34,7 +34,7 @@ std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 std::shared_ptr<EnemyManager> enemyManager;
 std::shared_ptr<ObstacleManager> obstacleManager;
 std::shared_ptr<ProjectileManager> projectileManager;
-std::shared_ptr<TimerManager> timerManager;
+std::shared_ptr<TimerHandler> timerHandler;
 std::shared_ptr<WeaponManager> weaponManager;
 
 std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;

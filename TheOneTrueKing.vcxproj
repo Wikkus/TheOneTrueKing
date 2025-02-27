@@ -59,7 +59,7 @@
     <ClCompile Include="src\steeringBehavior.cpp" />
     <ClCompile Include="src\textSprite.cpp" />
     <ClCompile Include="src\timer.cpp" />
-    <ClCompile Include="src\timerManager.cpp" />
+    <ClCompile Include="src\timerHandler.cpp" />
     <ClCompile Include="src\vector2.cpp" />
     <ClCompile Include="src\weaponComponent.cpp" />
     <ClCompile Include="src\weaponManager.cpp" />
@@ -197,7 +197,7 @@
     <ClInclude Include="src\steeringBehavior.h" />
     <ClInclude Include="src\textSprite.h" />
     <ClInclude Include="src\timer.h" />
-    <ClInclude Include="src\timerManager.h" />
+    <ClInclude Include="src\timerHandler.h" />
     <ClInclude Include="src\vector2.h" />
     <ClInclude Include="src\weaponComponent.h" />
     <ClInclude Include="src\weaponManager.h" />

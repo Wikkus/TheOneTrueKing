@@ -30,8 +30,8 @@ std::shared_ptr<DecisionTreeNode> Action::MakeDecision(EnemyBase& owner) {
 
 MeleeAttackAction::MeleeAttackAction(const float& attackRange, const float& attackCooldown, 
 	const float& attackChargeTime, const int& attackDamage) {
-	_attackCooldownTimer = timerManager->CreateTimer(attackCooldown);
-	_chargeAttackTimer = timerManager->CreateTimer(attackChargeTime);
+	_attackCooldownTimer = timerHandler->SpawnTimer(attackCooldown, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(attackChargeTime, false, false);
 	_attackDamage = attackDamage;
 	_attackRange = attackRange;
 }
@@ -41,21 +41,21 @@ std::shared_ptr<DecisionTreeNode> MeleeAttackAction::MakeDecision(EnemyBase& own
 }
 
 bool MeleeAttackAction::ExecuteAction(EnemyBase& owner) {
-	if (_attackCooldownTimer->GetTimerActive()) {
+	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 	}
-	if (_chargeAttackTimer->GetTimerActive()) {
+	if (_chargeAttackTimer->GetIsActive()) {
 		owner.UpdateAngularMovement();
 	}
-	if (_isAttacking && _chargeAttackTimer->GetTimerFinished()) {
-		if (universalFunctions->IsInDistance(owner.GetCurrentTarget()->GetPosition(), owner.GetPosition(), _attackRange)) {
-			owner.GetCurrentTarget()->TakeDamage(_attackDamage);
+	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
+		if (universalFunctions->IsInDistance(owner.GetTargetObject()->GetPosition(), owner.GetPosition(), _attackRange)) {
+			owner.GetTargetObject()->TakeDamage(_attackDamage);
 		}
 		owner.SetVelocity({ 0.f, 0.f });
 		owner.SetRotation(0.f);
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
-		_chargeAttackTimer->DeactivateTimer();
+		_chargeAttackTimer->SetTimer(false, false);
 		return true;
 
 	} else if (!_isAttacking) {
@@ -125,11 +125,11 @@ float WithinRangeDecision::TestValue(const Vector2<float>& position, const Vecto
 }
 
 RandomDecision::RandomDecision(const float& timeOut) {
-	_timer = timerManager->CreateTimer(timeOut);
+	_timer = timerHandler->SpawnTimer(timeOut, false, false);
 }
 
 bool RandomDecision::TestValue() {
-	if (_timer->GetTimerActive()) {
+	if (_timer->GetIsActive()) {
 		return _currentDecision;
 	} else {
 		_currentDecision = universalFunctions->RandomBinomialInt(0, 1);

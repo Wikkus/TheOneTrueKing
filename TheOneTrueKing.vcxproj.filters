@@ -3,13 +3,13 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\enemyBase.cpp">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClCompile>
     <ClCompile Include="src\enemyBoar.cpp">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClCompile>
     <ClCompile Include="src\enemyHuman.cpp">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClCompile>
     <ClCompile Include="include\ImGui\example.cpp">
       <Filter>ImGui</Filter>
@@ -54,16 +54,13 @@
       <Filter>GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="src\projectile.cpp">
-      <Filter>Projectiles</Filter>
+      <Filter>Objects\Projectiles</Filter>
     </ClCompile>
     <ClCompile Include="src\playerCharacter.cpp">
-      <Filter>Player</Filter>
-    </ClCompile>
-    <ClCompile Include="src\objectBase.cpp">
-      <Filter>Objects</Filter>
+      <Filter>Objects\Player</Filter>
     </ClCompile>
     <ClCompile Include="src\obstacleWall.cpp">
-      <Filter>Objects</Filter>
+      <Filter>Objects\Obstacles</Filter>
     </ClCompile>
     <ClCompile Include="src\objectPool.cpp">
       <Filter>GameEngine</Filter>
@@ -81,12 +78,12 @@
       <Filter>StateStack</Filter>
     </ClCompile>
     <ClCompile Include="src\weaponComponent.cpp">
-      <Filter>Components</Filter>
+      <Filter>Objects\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\timer.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
-    <ClCompile Include="src\timerManager.cpp">
+    <ClCompile Include="src\timerHandler.cpp">
       <Filter>Timer</Filter>
     </ClCompile>
     <ClCompile Include="src\textSprite.cpp">
@@ -111,7 +108,7 @@
       <Filter>DecisionMaking</Filter>
     </ClCompile>
     <ClCompile Include="src\bossBoar.cpp">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClCompile>
     <ClCompile Include="src\searchSortAlgorithms.cpp">
       <Filter>GameEngine</Filter>
@@ -130,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="src\obstacleManager.cpp">
       <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objectBase.cpp">
+      <Filter>Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -407,13 +407,13 @@
       <Filter>SDLIncludes</Filter>
     </ClInclude>
     <ClInclude Include="src\enemyBase.h">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClInclude>
     <ClInclude Include="src\enemyBoar.h">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClInclude>
     <ClInclude Include="src\enemyHuman.h">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClInclude>
     <ClInclude Include="src\collision.h">
       <Filter>GameEngine</Filter>
@@ -458,13 +458,10 @@
       <Filter>GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="src\projectile.h">
-      <Filter>Projectiles</Filter>
+      <Filter>Objects\Projectiles</Filter>
     </ClInclude>
     <ClInclude Include="src\playerCharacter.h">
-      <Filter>Player</Filter>
-    </ClInclude>
-    <ClInclude Include="src\objectBase.h">
-      <Filter>Objects</Filter>
+      <Filter>Objects\Player</Filter>
     </ClInclude>
     <ClInclude Include="src\objectPool.h">
       <Filter>GameEngine</Filter>
@@ -482,12 +479,12 @@
       <Filter>StateStack</Filter>
     </ClInclude>
     <ClInclude Include="src\weaponComponent.h">
-      <Filter>Components</Filter>
+      <Filter>Objects\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\timer.h">
       <Filter>Timer</Filter>
     </ClInclude>
-    <ClInclude Include="src\timerManager.h">
+    <ClInclude Include="src\timerHandler.h">
       <Filter>Timer</Filter>
     </ClInclude>
     <ClInclude Include="src\vector2.h">
@@ -503,7 +500,7 @@
       <Filter>Formations</Filter>
     </ClInclude>
     <ClInclude Include="src\bossBoar.h">
-      <Filter>Enemies</Filter>
+      <Filter>Objects\Enemies</Filter>
     </ClInclude>
     <ClInclude Include="src\decisionTree.h">
       <Filter>DecisionMaking</Filter>
@@ -539,6 +536,9 @@
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="src\obstacleWall.h">
+      <Filter>Objects\Obstacles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objectBase.h">
       <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -557,29 +557,14 @@
     <Filter Include="SDLIncludes">
       <UniqueIdentifier>{8001d7cc-a988-4c25-8861-6bce781fd57d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Enemies">
-      <UniqueIdentifier>{5c4547c6-6bf5-4e01-b62a-e158957c3bf6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameEngine">
       <UniqueIdentifier>{37f265f8-68a3-46b7-b194-6ddbe2ea2768}</UniqueIdentifier>
     </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{96872763-036f-4743-9c44-214dc3048132}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Projectiles">
-      <UniqueIdentifier>{b8819732-f97a-48fe-be27-f9bd703e90e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Player">
-      <UniqueIdentifier>{eebacf11-a5fe-4959-826e-281a727f8f95}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Objects">
-      <UniqueIdentifier>{3855943f-9e21-4d1a-9e26-da7b2d478879}</UniqueIdentifier>
-    </Filter>
     <Filter Include="StateStack">
       <UniqueIdentifier>{554dff81-8a24-4de2-864a-c7db50bb2046}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Components">
-      <UniqueIdentifier>{df601023-7bd0-4237-a3df-32e75381e9ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Timer">
       <UniqueIdentifier>{6c5a5325-9274-434a-a45d-bb46d8e0bfe4}</UniqueIdentifier>
@@ -595,6 +580,24 @@
     </Filter>
     <Filter Include="Formations">
       <UniqueIdentifier>{a570b2ee-a21a-46fd-977c-bb412b77d7e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{1a15f09a-fbb1-42cb-a308-ed6f1c4f0249}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Obstacles">
+      <UniqueIdentifier>{3855943f-9e21-4d1a-9e26-da7b2d478879}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Player">
+      <UniqueIdentifier>{eebacf11-a5fe-4959-826e-281a727f8f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Enemies">
+      <UniqueIdentifier>{5c4547c6-6bf5-4e01-b62a-e158957c3bf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Components">
+      <UniqueIdentifier>{df601023-7bd0-4237-a3df-32e75381e9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Projectiles">
+      <UniqueIdentifier>{b8819732-f97a-48fe-be27-f9bd703e90e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

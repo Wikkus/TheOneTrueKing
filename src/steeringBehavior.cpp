@@ -1,17 +1,23 @@
 #include "steeringBehavior.h"
 
-#include "enemyBase.h"
+#include "debugDrawer.h"
 #include "gameEngine.h"
 #include "imGuiManager.h"
-#include "rayCast.h"
+#include "managerBase.h"
+#include "objectBase.h"
 #include "obstacleManager.h"
 #include "obstacleWall.h"
+#include "rayCast.h"
+#include "universalFunctions.h"
 
 AlignBehavior::AlignBehavior() {
 	_behaviorType = SteeringBehaviorType::Align;
 }
 
 SteeringOutput AlignBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
+	if (!fabs(_targetOrientation) > FLT_EPSILON) {
+		_targetOrientation = behaviorData.targetOrientation;
+	}
 	//Calculates the speed that the enemy will rotate and clamps it between -PI, PI radians(-180, 180 degree)
 	_rotation = _targetOrientation - objectBase.GetOrientation();
 	_rotation = universalFunctions->WrapMinMax(_rotation, -PI, PI);
@@ -46,6 +52,7 @@ SteeringOutput AlignBehavior::Steering(const BehaviorData& behaviorData, ObjectB
 	}
 	//Make sure to return the linearVelocity as 0, since this behavior will only change the angularVelocity
 	_result.linearVelocity = Vector2(0.f, 0.f);
+	_targetOrientation = 0.f;
 	return _result;
 }
 
@@ -283,8 +290,8 @@ SteeringOutput PursueBehavior::Steering(const BehaviorData& behaviorData, Object
 	return SeekBehavior::Steering(behaviorData, objectBase);
 }
 
-SeparationBehavior::SeparationBehavior() {
-	_behaviorType = SteeringBehaviorType::Separation;
+SeparationBehavior::SeparationBehavior(const SteeringBehaviorType& behaviorType) {
+	_behaviorType = behaviorType;
 }
 
 SteeringOutput SeparationBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
@@ -304,25 +311,36 @@ SteeringOutput SeparationBehavior::Steering(const BehaviorData& behaviorData, Ob
 		_targetPosition = objectBase.GetQueriedObjects()[i]->GetPosition();
 		_direction = objectBase.GetPosition() - _targetPosition;
 		_distance = _direction.absolute();
-		if (_distance < behaviorData.separationThreshold) {
-			//Using the inverse quare law to calculate the separation strength
-			_strength = std::min(behaviorData.decayCoefficient / (_distance * _distance), behaviorData.maxLinearAcceleration);
-			
-			//Using linear separation to calculate the separation strength
-			//_strength = behaviorData.maxLinearAcceleration * (behaviorData.separationThreshold - _distance) / behaviorData.separationThreshold;
-			
-			_direction.normalize();
-			_result.linearVelocity += _direction * _strength;
+		switch (_behaviorType) {
+		case SteeringBehaviorType::Attraction:
+			if (_distance > behaviorData.attractionThreshold) {
+				_strength = std::min(behaviorData.decayCoefficient / (_distance * _distance), behaviorData.maxLinearAcceleration);
+				_direction.normalize();
+				_result.linearVelocity -= _direction * _strength;
+			}
+			break;
+
+		case SteeringBehaviorType::Separation:
+			if (_distance < behaviorData.separationThreshold) {
+				//Using the inverse quare law to calculate the separation strength
+				_strength = std::min(behaviorData.decayCoefficient / (_distance * _distance), behaviorData.maxLinearAcceleration);	
+				_direction.normalize();
+				_result.linearVelocity += _direction * _strength;
+			}
+			break;
+
+		default:
+			break;
 		}
 	}
 	return _result;
 }
 
-VelocityMatchBehaviour::VelocityMatchBehaviour() {
+VelocityMatchBehavior::VelocityMatchBehavior() {
 	_behaviorType = SteeringBehaviorType::VelocityMatch;
 }
 
-SteeringOutput VelocityMatchBehaviour::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
+SteeringOutput VelocityMatchBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
 	//Calculates the velocity between the targets and current enemy
 	_result.linearVelocity = behaviorData.targetsVelocity - objectBase.GetVelocity();
 	_result.linearVelocity /= behaviorData.timeToTarget;
@@ -363,48 +381,41 @@ SteeringOutput WanderBehavior::Steering(const BehaviorData& behaviorData, Object
 }
 
 SteeringOutput BlendSteering::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
-	_currentWeight = 0.f;
 	_result.angularVelocity = 0.f;
 	_result.linearVelocity = { 0.f, 0.f };
 
-	//Loops through all the behaviors and adds their results together
-	for (int i = 0; i < _behaviors.size(); i++) {
-		_currentSteering = _behaviors[i].steeringBehaviour->Steering(behaviorData, objectBase);
-		_currentWeight = _behaviors[i].weight;
-		_result.linearVelocity += (_currentSteering.linearVelocity * _currentWeight);
-		_result.angularVelocity += _currentSteering.angularVelocity * _currentWeight;
+	for (auto& behavior : _behaviorsMap) {
+		_currentSteering = behavior.second.steeringBehavior->Steering(behaviorData, objectBase);
+		_result.linearVelocity += (_currentSteering.linearVelocity * behavior.second.weight);
+		_result.angularVelocity += _currentSteering.angularVelocity * behavior.second.weight;
 	}
 	return _result;
 }
 
-void BlendSteering::AddSteeringBehaviour(const BehaviorAndWeight& behaviour) {
-	_behaviors.emplace_back(behaviour);
+void BlendSteering::AddSteeringBehavior(const BehaviorAndWeight& behavior) {
+	if (!_behaviorsMap.contains(behavior.steeringBehavior->GetBehaviorType())) {
+		_behaviorsMap.insert(std::make_pair(behavior.steeringBehavior->GetBehaviorType(), behavior));
+	}
 }
 
-bool BlendSteering::RemoveSteeringBehaviour(const SteeringBehaviorType& behaviorType) {
-	//Loops through and tries to find the target behavior type and removes it if found
-	for (unsigned int i = 0; i < _behaviors.size(); i++) {
-		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == behaviorType) {
-			_behaviors.erase(_behaviors.begin() + i);
-			return true;
-		}
+bool BlendSteering::RemoveSteeringBehavior(const SteeringBehaviorType& behaviorType) {
+	if (_behaviorsMap.contains(behaviorType)) {
+		_behaviorsMap.erase(behaviorType);
+		return true;
 	}
 	return false;
 }
 
-void BlendSteering::ClearBehaviours() {
-	_behaviors.clear();
+void BlendSteering::ClearBehaviors() {
+	_behaviorsMap.clear();
 }
 
-bool BlendSteering::ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
-	//Loops through and tries to find the target behavior type and replaces it with the new be
-	for (unsigned int i = 0; i < _behaviors.size(); i++) {
-		if (_behaviors[i].steeringBehaviour->GetBehaviorType() == oldBehaviorType) {
-			_behaviors[i] = newBehavior;
-			return true;
-		}
+bool BlendSteering::ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
+	if (_behaviorsMap.contains(oldBehaviorType)) {
+		_behaviorsMap.erase(oldBehaviorType);
+		_behaviorsMap.insert(std::make_pair(newBehavior.steeringBehavior->GetBehaviorType(), newBehavior));
+		return true;
 	}
-	//If the behavior is not found, it returns false
 	return false;
 }
 
@@ -423,8 +434,8 @@ SteeringOutput PrioritySteering::Steering(const BehaviorData& behaviorData, Obje
 	return _result;
 }
 
-void PrioritySteering::AddGroup(const BlendSteering& behaviour) {
-	_groups.emplace_back(behaviour);
+void PrioritySteering::AddGroup(const BlendSteering& behaviors) {
+	_groups.emplace_back(behaviors);
 }
 
 void PrioritySteering::ClearGroups() {
@@ -432,24 +443,24 @@ void PrioritySteering::ClearGroups() {
 }
 
 void PrioritySteering::AddBehaviorInGroup(const BehaviorAndWeight& newBehavior, const int& groupIndex) {
-	_groups[groupIndex].AddSteeringBehaviour(newBehavior);
+	_groups[groupIndex].AddSteeringBehavior(newBehavior);
 }
 
 bool PrioritySteering::RemoveSteeringBheavior(const SteeringBehaviorType& oldBehaviorType) {
 	for (unsigned int i = 0; i < _groups.size(); i++) {
-		if (_groups[i].RemoveSteeringBehaviour(oldBehaviorType)) {
+		if (_groups[i].RemoveSteeringBehavior(oldBehaviorType)) {
 			return true;
 		}
 	}
 	return false;
 }
 
-bool PrioritySteering::ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
+bool PrioritySteering::ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior) {
 	for (unsigned int i = 0; i < _groups.size(); i++) {
-		if (_groups[i].ReplaceSteeringBheavior(oldBehaviorType, newBehavior)) {
+		if (_groups[i].ReplaceSteeringBehavior(oldBehaviorType, newBehavior)) {
 			return true;
 		}
-	}	
+	}
 	return false;
 }
 

@@ -11,7 +11,7 @@
 #include "searchSortAlgorithms.h"
 #include "stateStack.h"
 #include "steeringBehavior.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponComponent.h"
 #include "weaponManager.h"
 
@@ -32,7 +32,7 @@ EnemyManager::EnemyManager() {
 EnemyManager::~EnemyManager() {}
 
 void EnemyManager::Init() {
-	_spawnTimer = timerManager->CreateTimer(3.f);
+	_spawnTimer = timerHandler->SpawnTimer(3.f, false, false);
 	//Create all enemies in the object pool at the start of the project
 	for (unsigned i = 0; i < _enemyAmountLimit / _numberOfEnemyTypes; i++) {
 		for (unsigned int k = 0; k < _numberOfEnemyTypes; k++) {
@@ -42,15 +42,13 @@ void EnemyManager::Init() {
 }
 
 void EnemyManager::Update() {
-	if (_spawnTimer->GetTimerFinished()) {
+	if (_spawnTimer->GetIsFinished()) {
 		_spawnEnemy = true;
 	}
 	for (auto& objectBase : _activeObjects) {
-		_currentEnemy = CastAsEnemy(objectBase.second);
-		_currentEnemy->Update();
-		_currentEnemy->QueryObjects();
+		objectBase.second->Update();
+		objectBase.second->QueryObjects();
 	}
-	_currentEnemy = nullptr;
 }
 void EnemyManager::UpdateBossRush() {
 	if (_spawnEnemy && _activeObjects.size() <= 0) {
@@ -71,18 +69,6 @@ void EnemyManager::UpdateSurvival() {
 	if (_spawnEnemy) {
 		SurvivalEnemySpawner();
 		_spawnEnemy = false;
-	}
-}
-
-void EnemyManager::Render() {
-	for (auto& objectBase : _activeObjects) {
-		objectBase.second->Render();
-	}
-}
-
-void EnemyManager::RenderText() {
-	for (auto& objectBase : _activeObjects) {
-		objectBase.second->RenderText();
 	}
 }
 
@@ -132,7 +118,7 @@ void EnemyManager::FormationEnemySpawner() {
 		SpawnFormation(_spawnCountPerRow, (FormationType)dist(randomEngine));
 	}
 	_spawnCountPerRow[0] += 2;
-	_spawnTimer->DeactivateTimer();
+	_spawnTimer->SetTimer(false, false);
 }
 
 void EnemyManager::SpawnFormation(const std::array<unsigned int, 2>& spawnCountPerRow, const FormationType& formationType) {
@@ -196,8 +182,8 @@ void EnemyManager::SurvivalEnemySpawner() {
 			enemyManager->SpawnEnemy(EnemyType::Boar, universalFunctions->VectorAsOrientation(_currentSpawnDirection), _currentSpawnDirection, _currentSpawnPosition, WeaponType::Tusks);
 		} else {	
 			std::uniform_int_distribution decideWeapon{ 1, 2 };
-			unsigned int weaponPicked = decideWeapon(randomEngine);
-			switch (weaponPicked) {
+			_weaponPicked = decideWeapon(randomEngine);
+			switch (_weaponPicked) {
 			case 1:
 				_currentWeaponType = WeaponType::Staff;
 				break;

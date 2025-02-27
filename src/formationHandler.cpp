@@ -10,10 +10,10 @@ FormationHandler::FormationHandler(const FormationType& formationType, const std
 	const std::shared_ptr<AnchorPoint>& anchorPoint, const bool& gotOrientation) {
 	switch (formationType) {
 	case FormationType::DefensiveCircle:
-		_formationPattern = std::make_shared<DefensiveCirclePattern>(true);
+		_formationPattern = std::make_shared<DefensiveCirclePattern>();
 		break;
 	case FormationType::VShape:
-		_formationPattern = std::make_shared<VShapePattern>(false);
+		_formationPattern = std::make_shared<VShapePattern>();
 		break;
 	case FormationType::Count:
 		break;
@@ -174,8 +174,6 @@ const unsigned int FormationHandler::GetNumberOfSlots() const {
 	return _numberOfSlots;
 }
 
-DefensiveCirclePattern::DefensiveCirclePattern(const bool& lockOrientation) : FormationPattern(lockOrientation) {}
-
 void DefensiveCirclePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {
 	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
 
@@ -223,7 +221,7 @@ void DefensiveCirclePattern::CreateSlotsOfType(const std::shared_ptr<AnchorPoint
 	for (unsigned int i = 0; i < amountSlots; ++i) {
 		//I'm setting the slots orientation based on the current slot number compared to the amount of slots with the help of PI * 2,
 		//  which makes the slots orientation point away from the anchorPoint from where it will be positioned
-		_angleAroundCircle = (i / (float)amountSlots * PI * 2);
+		_angleAroundCircle = (i / (float)amountSlots * PI * 2.f);
 		_radius = radius / sin(PI / (float)amountSlots);
 
 		//Using sin and cos to set the position of the slot based on the orientation
@@ -265,28 +263,24 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 	return characterAndSlots;
 }
 
-VShapePattern::VShapePattern(const bool& lockOrientation) : FormationPattern(lockOrientation) {
-	_lockOrientation = lockOrientation;
-}
-
 void VShapePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {
 	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
 
 	//Creates the slots with a role based on the amounts of rows the circle will have
 	//At one row, every other slot role will be for a swordsman and mages
 	if (spawnCountPerRow[1] == 1) {
-		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Count, _lockOrientation);
+		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Count, false);
 
 	} else if (spawnCountPerRow[1] % 2 == 0) {
 		//If there are an even amount of rows, the slot roles in rows further out will be defenders, 
 		// the inner rows roles will be meages
 		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
 			if (i < spawnCountPerRow[1] / 2) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, _lockOrientation);
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, false);
 				_frontPosition.y += _rowDistance;
 
 			} else {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, _lockOrientation);
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, false);
 				_frontPosition.y += _rowDistance;
 			}
 		}
@@ -295,15 +289,15 @@ void VShapePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPer
 		// swordsmen in the middle row and mages in the inner row
 		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
 			if (i < std::round(spawnCountPerRow[1] * 0.33f)) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, _lockOrientation);
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, false);
 				_frontPosition.y += _rowDistance;
 
 			} else if (i < std::round(spawnCountPerRow[1] * 0.66f)) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Swordsman, _lockOrientation);
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Swordsman, false);
 				_frontPosition.y += _rowDistance;
 
 			} else {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, _lockOrientation);
+				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, false);
 				_frontPosition.y += _rowDistance;
 			}
 		}
@@ -345,10 +339,6 @@ void VShapePattern::CreateSlotsOfType(const std::shared_ptr<AnchorPoint>& anchor
 		}
 	}
 	_multiplier = 0;
-}
-
-FormationPattern::FormationPattern(const bool& lockOrientation) {
-	_lockOrientation = lockOrientation;
 }
 
 StaticCharacter FormationPattern::GetDriftOffset(const AnchorPoint& anchorPoint, const std::vector<SlotAssignment>& slotAssignments) {

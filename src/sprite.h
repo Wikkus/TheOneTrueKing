@@ -5,7 +5,7 @@
 
 class Sprite {
 public:
-	Sprite();
+	Sprite() {}
 	~Sprite() {}
 
 	void Load(const char* path);
@@ -22,7 +22,7 @@ protected:
 	SDL_FRect _rect;
 	SDL_Rect _rectCopy;
 	SDL_FRect _rectDest;
-	SDL_Texture* _texture;
+	SDL_Texture* _texture = nullptr;
 
 	float _widthF = 0.f;
 	float _heightF = 0.f;
@@ -32,7 +32,7 @@ protected:
 
 class SpriteSheet : public Sprite {
 public:
-	SpriteSheet();
+	SpriteSheet() {}
 	~SpriteSheet() {}
 
 	void Render(const int& spriteIndex, const Vector2<float>& position) override;

@@ -1,8 +1,6 @@
 #include "sprite.h"
 #include "gameEngine.h"
 
-Sprite::Sprite() {}
-
 void Sprite::Load(const char* path) {
 	_texture = IMG_LoadTexture(renderer, path);
 	SDL_QueryTexture(_texture, NULL, NULL, &_widthI, &_heightI);
@@ -34,8 +32,6 @@ const float Sprite::GetWidth() const {
 const float Sprite::GetHeight() const {
 	return _heightF;
 }
-
-SpriteSheet::SpriteSheet() {}
 
 void SpriteSheet::Render(const int& spriteIndex, const Vector2<float>& position) {
 	_rectCopy = { spriteIndex * _widthI, 0, _widthI, _heightI };

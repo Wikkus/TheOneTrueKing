@@ -2,62 +2,45 @@
 
 #include "gameEngine.h"
 
-Timer::Timer(const float& timeInSeconds) {
-	_currentTime = timeInSeconds;
-	_timeInSeconds = timeInSeconds;
+const bool Timer::GetIsActive() const {
+	return _isActive;
 }
 
-Timer::~Timer() {}
-
-const bool Timer::GetTimerActive() const {
-	return _timerActive;
+const bool Timer::GetIsFinished() const {
+	return _isFinished;
 }
 
-const bool Timer::GetTimerFinished() const {
-	return _timerFinished;
+void Timer::Update() {
+	if (!_isFinished && _isActive) {
+		if (_currentTime > 0) {
+			_currentTime -= deltaTime;
+		} else {
+			_isActive = false;
+			_isFinished = true;
+		}
+	}
 }
 
-const bool Timer::IsWithinCertainTime(const float& decimalTime) const {
-	return _currentTime <= _timeInSeconds * decimalTime;
+void Timer::SetTimer(const bool& isActive, const bool& isFinished) {
+	SetTimerActive(isActive);
+	SetTimerFinished(isFinished);
 }
 
-const float Timer::GetCurrentTime() const {
-	return _currentTime;
+void Timer::SetTimerActive(const bool& isActive) {
+	_isActive = isActive;
 }
 
-const float Timer::GetTimeInSeconds() const {
-	return _timeInSeconds;
-}
-
-void Timer::ActivateTimer() {
-	_timerActive = true;
-	_timerFinished = false;
-}
-
-void Timer::DeactivateTimer() {
-	_timerActive = false;
-	_timerFinished = false;
+void Timer::SetTimerFinished(const bool& isFinished) {
+	_isFinished = isFinished;
 }
 
 void Timer::ResetTimer() {
 	_currentTime = _timeInSeconds;
-	_timerActive = true;
-	_timerFinished = false;
-}
-
-void Timer::Update() {
-	if (!_timerFinished && _timerActive) {
-		if (_currentTime > 0) {
-			_currentTime -= deltaTime;
-		} else {
-			_timerActive = false;
-			_timerFinished = true;
-		}
-	}
+	_isActive = true;
+	_isFinished = false;
 }
 
 void Timer::SetTimeInSeconds(const float& timeInSeconds) {
 	_timeInSeconds = timeInSeconds;
 	_currentTime = _timeInSeconds;
 }
-

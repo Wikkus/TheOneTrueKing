@@ -16,7 +16,7 @@ public:
 
 	void Init() override;
 	void Update() override;
-
+	void Render() override;
 	void RenderText() override;
 
 	const std::shared_ptr<Collider> GetCollider() const override;
@@ -49,6 +49,7 @@ private:
 
 	std::shared_ptr<Timer> _regenerationTimer = nullptr;
 
-	Vector2<float> _oldPosition = Vector2<float>(0.f, 0.f);
+	Vector2<float> _oldPosition = { 0.f, 0.f };
+	Vector2<float> _spawnPosition = { 0.f, 0.f };
 };
 

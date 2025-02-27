@@ -19,19 +19,6 @@ void WeaponManager::Init() {
 	}
 }
 
-void WeaponManager::Update() {
-	for (auto& objectBase : _activeObjects) {
-		objectBase.second->Update();
-	}
-}
-
-void WeaponManager::Render() {
-	for (auto& objectBase : _activeObjects) {
-		objectBase.second->Render();
-	}
-}
-
-
 std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(const WeaponType& weaponType) {
 	if (_weaponPools[weaponType]->IsEmpty()) {
 		CreateWeapon(weaponType);

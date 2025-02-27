@@ -7,7 +7,6 @@
 #include "quadTree.h"
 #include "stateStack.h"
 #include "steeringBehavior.h"
-#include "timerManager.h"
 #include "weaponComponent.h"
 #include "weaponManager.h"
 
@@ -37,11 +36,6 @@ EnemyHuman::EnemyHuman() : EnemyBase(EnemyType::Human) {
 
 	_behaviorData.linearTargetRadius = 5.f;
 	_behaviorData.linearSlowDownRadius = 20.f;
-
-	_alignBehavior.steeringBehaviour = std::make_shared<AlignBehavior>();
-	_alignBehavior.weight = 1.f;
-	_faceBehavior.steeringBehaviour = std::make_shared<FaceBehavior>();
-	_faceBehavior.weight = 1.f;
 }
 
 EnemyHuman::~EnemyHuman() {}
@@ -65,23 +59,20 @@ void EnemyHuman::Init() {
 		_behaviorData.linearTargetRadius = _linearTargetRadius;
 		_behaviorData.linearSlowDownRadius = _linearTargetRadius * 2.f;
 	}
-
-	_prioritySteering->ClearGroups();
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-
 	switch (gameStateHandler->GetGameMode()) {
-	case GameMode::Formation:
-		_blendSteering->AddSteeringBehaviour(_alignBehavior);
+	case GameMode::Formation:				
+		if (!_prioritySteering->ReplaceSteeringBehavior(SteeringBehaviorType::Face, _steeringBehviors[SteeringBehaviorType::Align])) {
+			_prioritySteering->AddBehaviorInGroup(_steeringBehviors[SteeringBehaviorType::Align], 0);
+		}
 		break;
 	case GameMode::Survival:
-		_blendSteering->AddSteeringBehaviour(_faceBehavior);
+		if (!_prioritySteering->ReplaceSteeringBehavior(SteeringBehaviorType::Align, _steeringBehviors[SteeringBehaviorType::Face])) {
+			_prioritySteering->AddBehaviorInGroup(_steeringBehviors[SteeringBehaviorType::Face], 0);
+		}
 		break;
 	default:
 		break;
 	}
-
-	_prioritySteering->AddGroup(*_blendSteering);
 }
 
 void EnemyHuman::Update() {
@@ -103,8 +94,8 @@ void EnemyHuman::UpdateTarget() {
 				break;
 			case CurrentTarget::SlotFormation:
 				if (enemyManager->GetFormationManagers()[_formationIndex]->GetInPosition()) {
-					if (!ReplaceSteeringBehavior(SteeringBehaviorType::Align, _faceBehavior)) {
-						_prioritySteering->AddBehaviorInGroup(_faceBehavior, 0);	
+					if (!_prioritySteering->ReplaceSteeringBehavior(SteeringBehaviorType::Align, _steeringBehviors[SteeringBehaviorType::Face])) {
+						_prioritySteering->AddBehaviorInGroup(_steeringBehviors[SteeringBehaviorType::Face], 0);
 					}
 					_currentTargetState = CurrentTarget::Player;
 				}

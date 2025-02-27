@@ -27,18 +27,7 @@ private:
 	void MakeDecision();
 	const char* _bossBoarSpritePath = "res/sprites/BoarBoss.png";
 
-	float _dashDistance = 0.f;
-	float _dashSpeed = 300.f;
-
-	Vector2<float> _projectileDirection = { 0.f, 0.f };
-
 	int _attackDamage = 0;
-
-	bool _damagedPlayer = false;
-	bool _isAttacking = false;
-
-	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
-	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
 
 	std::shared_ptr<TextSprite> _healthTextSprite = nullptr;
 	

@@ -20,9 +20,11 @@ public:
 	RayPoint FindPoint(const Vector2<float>& wallStart, const Vector2<float>& wallEnd, const Ray& ray, const Vector2<float>& rayDir);
 	RayPoint ClosestPoint(const Ray& ray, const std::array<RayPoint, 4>& points);
 
+
 private:
 	std::array<float, 4> _distanceToWall = {0.f, 0.f, 0.f, 0.f };
-	
+	RayPoint _rayCastPoint;
+
 	float _denominator = 0.f;
 	float _t = 0.f;
 	float _u = 0.f;

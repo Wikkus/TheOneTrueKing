@@ -7,7 +7,6 @@
 #include "steeringBehavior.h"
 #include "vector2.h"
 
-class Timer;
 class WeaponComponent;
 
 enum class EnemyType {
@@ -54,9 +53,9 @@ public:
 
 	void SetPosition(const Vector2<float>& position) override;
 	
-	bool ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
-
 protected:
+	std::unordered_map<SteeringBehaviorType, BehaviorAndWeight> _steeringBehviors;
+
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment = nullptr;
 
 	SteeringOutput _steeringOutput;
@@ -65,12 +64,9 @@ protected:
 	std::shared_ptr<PrioritySteering> _prioritySteering = nullptr;
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 
-	BehaviorAndWeight _alignBehavior;
-	BehaviorAndWeight _faceBehavior;
 	BehaviorData _behaviorData;
 
 	const EnemyType _enemyType = EnemyType::Count;
 
 	int _formationIndex = -1;
 };
-

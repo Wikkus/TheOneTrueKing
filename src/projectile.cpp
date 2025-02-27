@@ -26,6 +26,10 @@ void Projectile::Update() {
 	_collider->SetPosition(_position + _direction * (_sprite->GetHeight() * 0.25f));
 }
 
+void Projectile::Render() {
+	_sprite->RenderWithOrientation(0, _position, _orientation);
+}
+
 const std::shared_ptr<Collider> Projectile::GetCollider() const {
 	return _collider;
 }

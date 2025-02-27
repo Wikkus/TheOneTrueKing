@@ -32,7 +32,7 @@ void ProjectileManager::Init() {
 }
 
 void ProjectileManager::Update() {
-	for (auto projectile : _activeObjects) {
+	for (auto& projectile : _activeObjects) {
 		_currentProjectile = CastAsProjectile(projectile.second);
 		_currentProjectile->Update();
 		_currentProjectile->QueryObjects();
@@ -46,12 +46,6 @@ void ProjectileManager::Update() {
 		_removeObjects.pop_back();
 	}
 	_currentProjectile = nullptr;
-}
-
-void ProjectileManager::Render() {
-	for (auto& projectile : _activeObjects) {
-		projectile.second->Render();	
-	}
 }
 
 void ProjectileManager::CreateNewProjectile(const ProjectileType& projectileType) {
@@ -70,9 +64,11 @@ std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<O
 }
 
 bool ProjectileManager::CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID) {
+	_projectileHit = false;
 	if (universalFunctions->OutsideBorderX(_activeObjects[objectID]->GetPosition().x, 0.f) ||
 		universalFunctions->OutsideBorderY(_activeObjects[objectID]->GetPosition().y, 0.f)) {
-		return true;
+		_projectileHit = true;
+		return _projectileHit;
 	}
 	_objectsHit = _activeObjects[objectID]->GetQueriedObjects();
 	for (unsigned int i = 0; i < _objectsHit.size(); i++) {
@@ -81,9 +77,9 @@ bool ProjectileManager::CheckCollision(const ProjectileType& projectileType, con
 			continue;
 		}
 		_objectsHit[i]->TakeDamage(CastAsProjectile(_activeObjects[objectID])->GetDamage());
-		return true;
+		_projectileHit = true;
 	}
-	return false;
+	return _projectileHit;
 }
 
 void ProjectileManager::RemoveAllObjects() {

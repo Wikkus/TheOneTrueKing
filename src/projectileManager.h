@@ -13,7 +13,6 @@ public:
 
 	void Init() override;
 	void Update() override;
-	void Render() override;
 
 	bool CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID);
 
@@ -38,5 +37,7 @@ private:
 	const char* _playerProjectileSprite = "res/sprites/Arcaneball.png";
 	
 	unsigned int _projectileAmountLimit = 3000;
+
+	bool _projectileHit = false;
 
 };

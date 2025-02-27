@@ -14,7 +14,7 @@ void ImGuiHandler::ShowFloatValue(const char* name, const char* label, const flo
 	ImGui::Begin(name);
 	ImGui::Text(label); 
 	ImGui::SameLine(); 
-	ImGui::Text(": %f", a);
+	ImGui::Text(_formatF, a);
 	ImGui::End();
 }
 
@@ -22,7 +22,7 @@ void ImGuiHandler::ShowFloat2Value(const char* name, const char* label, const fl
 	ImGui::Begin(name);
 	ImGui::Text(label);
 	ImGui::SameLine();
-	ImGui::Text(": %f, %f", a, b);
+	ImGui::Text(_formatV, a, b);
 	ImGui::End();
 }
 
@@ -30,7 +30,7 @@ void ImGuiHandler::ShowVector2Value(const char* name, const char* label, const V
 	ImGui::Begin(name);
 	ImGui::Text(label);
 	ImGui::SameLine();
-	ImGui::Text(": %f, %f", value.x, value.y);
+	ImGui::Text(_formatV, value.x, value.y);
 	ImGui::End();
 }
 

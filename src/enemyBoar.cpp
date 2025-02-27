@@ -6,7 +6,7 @@
 #include "playerCharacter.h"
 #include "quadTree.h"
 #include "steeringBehavior.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 
 #include <memory>
 
@@ -16,8 +16,6 @@ EnemyBoar::EnemyBoar() : EnemyBase(EnemyType::Boar) {
 	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.5f);
 
 	_behaviorData.characterRadius = _sprite->GetHeight() * 0.5f;
-
-	_attackDamage = 20;
 
 	_behaviorData.angularSlowDownRadius = PI * 0.5f;
 	_behaviorData.angularTargetRadius = PI * 0.005f;
@@ -32,15 +30,6 @@ EnemyBoar::EnemyBoar() : EnemyBase(EnemyType::Boar) {
 	_behaviorData.separationThreshold = _behaviorData.characterRadius * 1.5f;
 	_behaviorData.decayCoefficient = 10000.f;
 
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<SeparationBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f));
-	_prioritySteering->AddGroup(*_blendSteering);
-	_blendSteering->ClearBehaviours();
-
-	_attackCooldownTimer = timerManager->CreateTimer(1.f);
-	_chargeAttackTimer = timerManager->CreateTimer(0.5f);
-	_chargeAttackTimer->DeactivateTimer();
 }
 
 EnemyBoar::~EnemyBoar() {}
@@ -56,9 +45,6 @@ void EnemyBoar::Init() {
 	_behaviorData.linearSlowDownRadius = _weaponComponent->GetAttackRange() + 50.f;
 
 	_currentHealth = _maxHealth + _weaponComponent->GetHealthModifier();
-
-	_chargeAttackTimer->DeactivateTimer();
-	_attackCooldownTimer->DeactivateTimer();
 }
 
 void EnemyBoar::Update() {

@@ -1,12 +1,15 @@
 #pragma once
-#include "enemyManager.h"
 #include "rayCast.h"
 #include "vector2.h"
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 class Collider;
-class EnemyBase;
+class ObjectBase;
+
+struct BehaviorData;
 
 enum class SteeringBehaviorType {
 	Align,
@@ -160,7 +163,7 @@ private:
 
 class SeparationBehavior : public SteeringBehavior {
 public:
-	SeparationBehavior();
+	SeparationBehavior(const SteeringBehaviorType& behaviorType);
 	~SeparationBehavior() {}
 
 	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
@@ -172,10 +175,10 @@ private:
 	float _strength = 0.f;
 };
 
-class VelocityMatchBehaviour : public SteeringBehavior {
+class VelocityMatchBehavior : public SteeringBehavior {
 public:
-	VelocityMatchBehaviour();
-	~VelocityMatchBehaviour() {}
+	VelocityMatchBehavior();
+	~VelocityMatchBehavior() {}
 
 	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 };
@@ -194,7 +197,7 @@ private:
 };
 
 struct BehaviorAndWeight {
-	std::shared_ptr<SteeringBehavior> steeringBehaviour = nullptr;
+	std::shared_ptr<SteeringBehavior> steeringBehavior = nullptr;
 	float weight = 1.f;
 };
 
@@ -205,17 +208,17 @@ public:
 
 	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
 
-	void AddSteeringBehaviour(const BehaviorAndWeight& behaviour);	
-	void ClearBehaviours();
+	void AddSteeringBehavior(const BehaviorAndWeight& behavior);	
+	void ClearBehaviors();
 	
-	bool RemoveSteeringBehaviour(const SteeringBehaviorType& behaviorType);
-	bool ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
+	bool RemoveSteeringBehavior(const SteeringBehaviorType& behaviorType);
+	bool ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
 
 private:
-	float _currentWeight = 0.f;
 	SteeringOutput _result;
 	SteeringOutput _currentSteering;
-	std::vector<BehaviorAndWeight> _behaviors;
+
+	std::unordered_map<SteeringBehaviorType, BehaviorAndWeight>  _behaviorsMap;
 };
 
 class PrioritySteering {
@@ -225,13 +228,13 @@ public:
 
 	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
 
-	void AddGroup(const BlendSteering& behavior);
+	void AddGroup(const BlendSteering& behaviors);
 	void ClearGroups();
 	
 	void AddBehaviorInGroup(const BehaviorAndWeight& newBehavior, const int& groupIndex);
 	
 	bool RemoveSteeringBheavior(const SteeringBehaviorType& oldBehaviorType);
-	bool ReplaceSteeringBheavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
+	bool ReplaceSteeringBehavior(const SteeringBehaviorType& oldBehaviorType, const BehaviorAndWeight& newBehavior);
 
 private:
 	std::vector<BlendSteering> _groups;

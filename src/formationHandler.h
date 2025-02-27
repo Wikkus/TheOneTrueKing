@@ -70,7 +70,7 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 
 class FormationPattern {
 public:
-	FormationPattern(const bool& lockOrientation);
+	FormationPattern() {}
 	~FormationPattern() {}
 
 	virtual void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {}
@@ -101,13 +101,11 @@ protected:
 	
 	std::unordered_map<SlotAttackType, unsigned int> _amountSlotsPerType;
 	std::vector<SlotPositionAndType> _slotPositionAndType;
-
-	bool _lockOrientation = false;
 };
 
 class DefensiveCirclePattern : public FormationPattern {
 public:
-	DefensiveCirclePattern(const bool& lockOrientation);
+	DefensiveCirclePattern() {}
 	~DefensiveCirclePattern() {}
 	void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) override;
 
@@ -125,7 +123,7 @@ private:
 
 class VShapePattern : public FormationPattern {
 public:
-	VShapePattern(const bool& lockOrientation);
+	VShapePattern() {}
 	~VShapePattern() {}
 
 	void CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) override;

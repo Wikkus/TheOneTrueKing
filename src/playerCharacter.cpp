@@ -7,7 +7,7 @@
 #include "projectile.h"
 #include "projectileManager.h"
 #include "stateStack.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponManager.h"
 
 #include <string>
@@ -26,18 +26,19 @@ PlayerCharacter::PlayerCharacter(const float& characterOrientation, const Vector
 	_currentHealth = _maxHealth;
 	_healthTextSprite = std::make_shared<TextSprite>();
 	_healthTextSprite->Init(fontType, 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
-	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.05f, windowHeight * 0.9f));
+	_healthTextSprite->SetPosition({ windowWidth * 0.05f, windowHeight * 0.9f });
 
 	_dummyTarget = std::make_shared<ObjectBase>(ObjectType::Count);
+	_spawnPosition = { windowWidth * 0.5f, windowHeight * 0.5f };
 }
 
 PlayerCharacter::~PlayerCharacter() {}
 
 void PlayerCharacter::Init() {
-	_regenerationTimer = timerManager->CreateTimer(_regenerationCooldown);
+	_regenerationTimer = timerHandler->SpawnTimer(_regenerationCooldown, true, false);
 
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff);
-	_weaponComponent->SetOwner(shared_from_this());
+	_weaponComponent->SetOwner(shared_from_this(), true);
 	_weaponComponent->Init();
 }
 
@@ -46,6 +47,11 @@ void PlayerCharacter::Update() {
 	UpdateHealthRegen();
 	UpdateInput();
 	UpdateMovement();
+}
+
+void PlayerCharacter::Render() {
+	_sprite->RenderWithOrientation(0, _position, _orientation);
+	_weaponComponent->Render();
 }
 
 void PlayerCharacter::RenderText() {
@@ -70,7 +76,7 @@ void PlayerCharacter::ExecuteDeath() {
 }
 
 void PlayerCharacter::Respawn() {
-	_position = Vector2<float>(windowWidth * 0.5f, windowHeight * 0.5f);
+	_position = _spawnPosition;
 	_orientation = 0.f;
 	
 	_currentHealth = _maxHealth;
@@ -80,7 +86,7 @@ void PlayerCharacter::Respawn() {
 
 void PlayerCharacter::UpdateHealthRegen() {
 	if (_currentHealth < _maxHealth) {
-		if (_regenerationTimer->GetTimerFinished()) {
+		if (_regenerationTimer->GetIsFinished()) {
 			_currentHealth += 1;
 			if (_currentHealth > _maxHealth) {
 				_currentHealth = _maxHealth;

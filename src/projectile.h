@@ -18,6 +18,7 @@ public:
 	
 	void Init() override;
 	void Update() override;
+	void Render() override;
 
 	const std::shared_ptr<Collider> GetCollider() const override;
 	const std::shared_ptr<ObjectBase> GetOwner() const;

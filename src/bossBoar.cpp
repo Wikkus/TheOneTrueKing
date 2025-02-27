@@ -3,7 +3,7 @@
 #include "decisionTree.h"
 #include "playerCharacter.h"
 #include "projectileManager.h"
-#include "timerManager.h"
+#include "timerHandler.h"
 #include "weaponManager.h"
 
 #include <string>
@@ -36,14 +36,10 @@ BoarBoss::BoarBoss() : EnemyBase(EnemyType::Boss) {
 	_prioritySteering = std::make_shared<PrioritySteering>();
 	_blendSteering = std::make_shared<BlendSteering>();
 
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
-	_blendSteering->AddSteeringBehaviour(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f));
+	_blendSteering->AddSteeringBehavior(BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f));
+	_blendSteering->AddSteeringBehavior(BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f));
 	_prioritySteering->AddGroup(*_blendSteering);
 
-	_attackCooldownTimer = timerManager->CreateTimer(2.f);
-	_chargeAttackTimer = timerManager->CreateTimer(2.5f);
-	_attackCooldownTimer->DeactivateTimer();
-	_chargeAttackTimer->DeactivateTimer();
 	_healthTextSprite = std::make_shared<TextSprite>();
 
 
@@ -55,8 +51,6 @@ BoarBoss::BoarBoss() : EnemyBase(EnemyType::Boss) {
 
 BoarBoss::~BoarBoss() {}
 
-std::shared_ptr<Vector2<float>> temp = nullptr;
-
 void BoarBoss::Init() {
 	_targetPosition = _currentTarget->GetPosition();
 
@@ -67,7 +61,7 @@ void BoarBoss::Init() {
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.9f));
 	
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Tusks);
-	_weaponComponent->SetOwner(shared_from_this());
+	_weaponComponent->SetOwner(shared_from_this(), false);
 
 	MakeDecision();
 }
@@ -98,56 +92,6 @@ void BoarBoss::TakeDamage(const int& damageAmount) {
 	}
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 }
-
-/*void BoarBoss::HandleAttack() {
-	if (!_isAttacking && !_attackCooldownTimer->GetTimerActive()) {
-		_isAttacking = true;
-		_targetPosition = _currentTarget->GetPosition();
-		_dashDistance = (_targetPosition - _position).absolute() + 200.f;
-		_velocity = { 0.f, 0.f };
-		_chargeAttackTimer->ResetTimer();
-	}
-	if (_chargeAttackTimer->GetTimerActive() || _attackCooldownTimer->GetTimerActive()) {
-		_targetPosition = _currentTarget->GetPosition();
-
-		_orientation += _rotation * deltaTime;
-		_rotation = _rotation;
-
-		_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
-		_rotation += _steeringOutput.angularVelocity * deltaTime;
-
-	} else if (_chargeAttackTimer->GetTimerFinished()) {
-		_chargeAttackTimer->DeactivateTimer();
-		_dashDirection = (_targetPosition - _position).normalized();
-		_dashStartPosition = _position;
-
-	} else {
-		if (!_damagedPlayer) {
-			for (unsigned int i = 0; i < _queriedObjects.size(); i++) {
-				if (_queriedObjects[i]->GetObjectType() == _currentTarget->GetObjectType()) {
-					_queriedObjects[i]->TakeDamage(_attackDamage);
-					_damagedPlayer = true;	
-				}
-			}
-		}
-		if (!_damagedPlayer && universalFunctions->IsInDistance(_position, _currentTarget->GetPosition(), _behaviorData.characterRadius)) {
-			_currentTarget->TakeDamage(_attackDamage);
-			_damagedPlayer = true;
-		}
-		if (_isAttacking) {
-			_position += _dashDirection * _dashSpeed * deltaTime;
-			_collider->SetPosition(_position);
-			if ((_dashStartPosition - _position).absolute() > _dashDistance) {
-				_attackCooldownTimer->ResetTimer();
-				_isAttacking = false;
-				_damagedPlayer = false;
-			}
-		}
-		if (_attackCooldownTimer->GetTimerFinished()) {
-			_attackCooldownTimer->DeactivateTimer();
-		}
-	}
-}*/
 
 void BoarBoss::CreateDecisionTree() {
 	_decisionTree = std::make_shared<WithinRangeDecision>(75, 0);

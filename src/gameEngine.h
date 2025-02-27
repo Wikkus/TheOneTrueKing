@@ -26,7 +26,7 @@ class ProjectileManager;
 class SearchSortAlgorithms;
 class RayCast;
 class SteeringBehavior;
-class TimerManager;
+class TimerHandler;
 class UniversalFunctions;
 class WeaponManager;
 
@@ -56,7 +56,7 @@ extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree
 extern std::shared_ptr<SearchSortAlgorithms> searchSort;
 extern std::shared_ptr<RayCast> rayCast;
 extern std::shared_ptr<SteeringBehavior> separationBehavior;
-extern std::shared_ptr<TimerManager> timerManager;
+extern std::shared_ptr<TimerHandler> timerHandler;
 extern std::shared_ptr<UniversalFunctions> universalFunctions;
 extern std::shared_ptr<WeaponManager> weaponManager;
 

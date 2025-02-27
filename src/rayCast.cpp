@@ -5,18 +5,17 @@
 
 RayPoint RayCast::RayCastToAABB(std::shared_ptr<AABB> boxCollider, const Ray& ray) {
 	_rayDirection = ray.startPosition + ray.direction;
-	RayPoint rayPoint = ClosestPoint(ray, { 
+	_rayCastPoint = ClosestPoint(ray, {
 		FindPoint(boxCollider->GetMin(), {boxCollider->GetMin().x, boxCollider->GetMax().y}, ray, _rayDirection),
 		FindPoint({ boxCollider->GetMin().x, boxCollider->GetMax().y }, boxCollider->GetMax(), ray, _rayDirection),
 		FindPoint(boxCollider->GetMin(), { boxCollider->GetMax().x, boxCollider->GetMin().y }, ray, _rayDirection),
 		FindPoint({ boxCollider->GetMax().x, boxCollider->GetMin().y}, boxCollider->GetMax(), ray, _rayDirection)
 	});
 
-	if (ray.length < Vector2<float>::distanceBetweenVectors(ray.startPosition, rayPoint.position)) {
+	if (ray.length < Vector2<float>::distanceBetweenVectors(ray.startPosition, _rayCastPoint.position)) {
 		return RayPoint();
 	}
-
-	return rayPoint;
+	return _rayCastPoint;
 }
 
 RayPoint RayCast::FindPoint(const Vector2<float>& wallStart, const Vector2<float>& wallEnd, const Ray& ray, const Vector2<float>& rayDir) {

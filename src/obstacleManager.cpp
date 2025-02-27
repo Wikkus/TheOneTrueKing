@@ -14,22 +14,7 @@ void ObstacleManager::Init() {
 	}
 }
 
-void ObstacleManager::Update() {
-	for (auto& obstacle : _activeObjects) {
-		_currentObstacle = CastAsObstacle(obstacle.second);
-		_currentObstacle->Update();
-		_currentObstacle->QueryObjects();		
-	}
-}
-
-void ObstacleManager::Render() {
-	for (auto& obstacle : _activeObjects) {
-		_currentObstacle = CastAsObstacle(obstacle.second);
-		_currentObstacle->Render();
-	}
-}
-
-void ObstacleManager::CreateNewObstacle() {	
+void ObstacleManager::CreateNewObstacle() {
 	_obstaclePool->PoolObject(std::make_shared<Obstacle>());
 }
 

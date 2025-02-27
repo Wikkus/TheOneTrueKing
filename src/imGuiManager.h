@@ -24,5 +24,9 @@ public:
 	void Render();
 	void ShutDown();
 
+private:
+	const char* _formatV = ": %f, %f";
+	const char* _formatF = ": %f";
+
 };
 

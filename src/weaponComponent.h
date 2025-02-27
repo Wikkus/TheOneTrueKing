@@ -27,6 +27,7 @@ public:
 
 	virtual void Init() override;
 	void Update() override;
+	void Render() override;
 
 	virtual void Attack() {}
 
@@ -42,7 +43,7 @@ public:
 	void DeactivateTimers();
 	void ResetTimers();
 
-	void SetOwner(std::shared_ptr<ObjectBase> owner);
+	void SetOwner(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon);
 	
 	void DeactivateObject() override;
 
@@ -52,6 +53,7 @@ protected:
 	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
 	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
 
+	bool _renderWeapon = true;
 	bool _isAttacking = false;
 
 	float _attackRange = 0.f;
