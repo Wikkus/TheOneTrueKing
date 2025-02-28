@@ -13,7 +13,7 @@ Projectile::Projectile(const ProjectileType& projectileType, const char* spriteP
 	_position = deactivatedPosition;
 
 	_collider = std::make_shared<Circle>();
-	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetHeight() * 0.5f);
+	std::static_pointer_cast<Circle>(_collider)->Init(_position, _sprite->GetWidth() * 0.5f);
 }
 
 Projectile::~Projectile() {}
@@ -52,7 +52,7 @@ void Projectile::SetDirection(const Vector2<float>& direction) {
 
 void Projectile::SetPosition(const Vector2<float>& position) {
 	_position = position;
-	_collider->SetPosition(_position + _direction * (_sprite->GetHeight() * 0.25f));
+	_collider->SetPosition(_position + _direction * (_sprite->GetWidth() * 0.25f));
 }
 
 void Projectile::ActivateProjectile(std::shared_ptr<ObjectBase> owner, const float& orientation, const Vector2<float>& direction,
@@ -65,8 +65,8 @@ void Projectile::ActivateProjectile(std::shared_ptr<ObjectBase> owner, const flo
 	_velocity = _direction * _speed;
 
 	_position = position;
-	_collider->SetPosition(_position + _direction * (_sprite->GetHeight() * 0.25f));
-
+	_collider->SetPosition(_position + _direction * (_sprite->GetWidth() * 0.25f));
+	
 	_damage = damage;
 	_speed = speed;
 }

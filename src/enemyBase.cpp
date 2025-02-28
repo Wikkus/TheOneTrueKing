@@ -71,6 +71,10 @@ const std::shared_ptr<WeaponComponent> EnemyBase::GetWeaponComponent() const {
     return _weaponComponent;
 }
 
+void EnemyBase::SetWeaponComponent(std::shared_ptr<WeaponComponent> weaponComponent) {
+    _weaponComponent = weaponComponent;
+}
+
 void EnemyBase::UpdateMovement() {
     UpdateAngularMovement();
     UpdateLinearMovement();
@@ -100,8 +104,7 @@ void EnemyBase::ActivateEnemy(const float& orienation, const Vector2<float>& dir
     _collider->SetPosition(position);
 
     if (weaponType != WeaponType::Count) {
-        _weaponComponent = weaponManager->SpawnWeapon(weaponType);
-        _weaponComponent->SetOwner(shared_from_this(), true);
+        _weaponComponent = weaponManager->SpawnWeapon(weaponType, shared_from_this());
         _weaponComponent->ActivateObject(position, direction, orienation);
         _weaponComponent->Init();
     }

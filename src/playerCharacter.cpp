@@ -37,8 +37,9 @@ PlayerCharacter::~PlayerCharacter() {}
 void PlayerCharacter::Init() {
 	_regenerationTimer = timerHandler->SpawnTimer(_regenerationCooldown, true, false);
 
-	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff);
-	_weaponComponent->SetOwner(shared_from_this(), true);
+	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff, shared_from_this());
+	_weaponComponent->SetValuesToDefault();
+	std::static_pointer_cast<StaffComponent>(_weaponComponent)->SetProjectileValues(ProjectileType::PlayerFireball, true, 250.f);
 	_weaponComponent->Init();
 }
 
@@ -99,7 +100,7 @@ void PlayerCharacter::UpdateHealthRegen() {
 
 void PlayerCharacter::UpdateInput() {
 	if (GetMouseButton(SDL_BUTTON_LEFT)) {
-		_weaponComponent->Attack();
+		_weaponComponent->HandleAttack();
 	}
 	if (GetKeyPressed(SDL_SCANCODE_ESCAPE)) {
 		gameStateHandler->AddState(std::make_shared<PauseState>());

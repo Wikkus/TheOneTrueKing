@@ -42,11 +42,8 @@ BoarBoss::BoarBoss() : EnemyBase(EnemyType::Boss) {
 
 	_healthTextSprite = std::make_shared<TextSprite>();
 
-
 	_behaviorData.linearTargetRadius = 50.f;
 	_behaviorData.linearSlowDownRadius = 200.f;
-
-	CreateDecisionTree();
 }
 
 BoarBoss::~BoarBoss() {}
@@ -60,9 +57,9 @@ void BoarBoss::Init() {
 	_healthTextSprite->Init(fontType, 24, std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
 	_healthTextSprite->SetPosition(Vector2<float>(windowWidth * 0.5f, windowHeight * 0.9f));
 	
-	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Tusks);
-	_weaponComponent->SetOwner(shared_from_this(), false);
-
+	if (!_decisionTree) {
+		CreateDecisionTree();
+	}
 	MakeDecision();
 }
 
@@ -71,7 +68,7 @@ void BoarBoss::Update() {
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 
 	if (_decisionTreeAction) {
-		if (_decisionTreeAction->ExecuteAction(*this)) {
+		if (_decisionTreeAction->ExecuteAction()) {
 			MakeDecision();
 		}
 	}
@@ -94,18 +91,15 @@ void BoarBoss::TakeDamage(const int& damageAmount) {
 }
 
 void BoarBoss::CreateDecisionTree() {
-	_decisionTree = std::make_shared<WithinRangeDecision>(75, 0);
-		std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>();
+	_decisionTree = std::make_shared<WithinRangeDecision>(shared_from_this(), 0.f, 250.f);
+		std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>(shared_from_this());
 		_decisionTree->SetFalseNode(moveAction);
-		std::shared_ptr<MeleeAttackAction> attackAction = std::make_shared<MeleeAttackAction>(100.f, 1.f, 0.75f, _attackDamage);
+		std::shared_ptr<EnergyBlastAction> attackAction = std::make_shared<EnergyBlastAction>(shared_from_this());
 		_decisionTree->SetTrueNode(attackAction);
-	
 }
 void BoarBoss::MakeDecision() {
-	_decisionMade = _decisionTree->MakeDecision(*this);
+	_decisionMade = _decisionTree->MakeDecision();
 	if (_decisionMade->GetNodeType() == NodeType::ActionNode) {
-		_decisionTreeAction = std::static_pointer_cast<Action>(_decisionMade);
+		_decisionTreeAction = std::static_pointer_cast<Action>(_decisionMade);	
 	}
-	//Node is not an action, recursion failed
-
 }

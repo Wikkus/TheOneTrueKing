@@ -38,7 +38,8 @@ public:
 
 	virtual const BehaviorData GetBehaviorData() const;
 
-	virtual const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
+	const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
+	void SetWeaponComponent(std::shared_ptr<WeaponComponent> weaponComponent);
 
 	void UpdateMovement();
 	void UpdateAngularMovement();
@@ -55,7 +56,6 @@ public:
 	
 protected:
 	std::unordered_map<SteeringBehaviorType, BehaviorAndWeight> _steeringBehviors;
-
 	std::shared_ptr<SlotAssignment> _currentSlotAssignment = nullptr;
 
 	SteeringOutput _steeringOutput;

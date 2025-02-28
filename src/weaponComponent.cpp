@@ -21,8 +21,6 @@ WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
 	_collider = std::make_shared<Circle>();
 	_collider->SetIsActive(false);	
 	
-	_attackCooldownTimer = timerHandler->SpawnTimer(1.f, false, false);
-	_chargeAttackTimer = timerHandler->SpawnTimer(0.5f, false, false);
 	_isAttacking = false;
 }
 
@@ -65,9 +63,18 @@ void WeaponComponent::ResetTimers() {
 	_chargeAttackTimer->ResetTimer();
 }
 
-void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon) {
+void WeaponComponent::SetOwner(std::shared_ptr<ObjectBase> owner) {
 	_owner = owner;
+}
+
+void WeaponComponent::SetWeaponValues(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon, const int& attackDamage, const float& attackRange, const float& attackCooldown, const float& chargeAttackTime) {
+	_owner = owner;	
 	_renderWeapon = renderWeapon;
+
+	_attackDamage = attackDamage;
+	_attackRange = attackRange;
+	_attackCooldownTimer->SetTimeInSeconds(attackCooldown);
+	_attackCooldownTimer->SetTimeInSeconds(chargeAttackTime);
 }
 
 void WeaponComponent::DeactivateObject() {
@@ -82,23 +89,30 @@ ShieldComponent::ShieldComponent() {
 
 	_attackCooldownTimer = timerHandler->SpawnTimer(1.f, false, false);
 	_chargeAttackTimer = timerHandler->SpawnTimer(0.5f, false, false);
-
-	_attackRange = 25.f;
-
-	_attackDamage = 10;
-	_healthModifier = 125;
+	SetValuesToDefault();
 
 	_weaponType = WeaponType::Shield;
 }
 
 ShieldComponent::~ShieldComponent() {}
 
-void ShieldComponent::Attack() {
-	
+bool ShieldComponent::HandleAttack() {
+	return true;
+}
+
+void ShieldComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(1.f);
+	_chargeAttackTimer->SetTimeInSeconds(0.5f);
+	_attackRange = 25.f;
+	_attackDamage = 10;
+	_healthModifier = 125;
+	_renderWeapon = true;
 }
 
 StaffComponent::StaffComponent() {
 	_sprite->Load(_path);
+	_attackCooldownTimer = timerHandler->SpawnTimer(1.f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(0.5f, false, false);
 
 	_attackRange = 300.f;
 
@@ -130,9 +144,15 @@ void StaffComponent::Init() {
 }
 
 //If the weapon is a staff it shoots a fireball towards the player
-void StaffComponent::Attack() {
+bool StaffComponent::HandleAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
-		return;
+		return false;
+	}
+	if (_chargeAttackTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
+		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
 		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
@@ -140,6 +160,7 @@ void StaffComponent::Attack() {
 		
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
+		return true;
 
 	} else if (!_isAttacking) {	
 		if (_unlimitedRange) {
@@ -150,13 +171,31 @@ void StaffComponent::Attack() {
 			_chargeAttackTimer->ResetTimer();
 			_isAttacking = true;
 		}
-	}	
+	}
+	return false;
+}
+
+void StaffComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(1.f);
+	_chargeAttackTimer->SetTimeInSeconds(1.f);
+	_attackRange = 300.f;
+	_attackDamage = 10;
+	_healthModifier = -25;
+	_projectileType = ProjectileType::EnemyFireball;
+	_projectileSpeed = 200.f;
+	_renderWeapon = true;
+}
+
+void StaffComponent::SetProjectileValues(const ProjectileType& projectileType, const bool& unlimitedRange, const float& projectileSpeed) {
+	_projectileType = projectileType;
+	_unlimitedRange = unlimitedRange;
+	_projectileSpeed = projectileSpeed;
 }
 
 SuperStaffComponent::SuperStaffComponent() {
 	_sprite->Load(_path);
 
-	_attackCooldownTimer = timerHandler->SpawnTimer(0.25f, false, false);
+	_attackCooldownTimer->SetTimeInSeconds(0.25f);
 
 	_attackDamage = 150;
 	_healthModifier = 0;
@@ -167,9 +206,9 @@ SuperStaffComponent::SuperStaffComponent() {
 SuperStaffComponent::~SuperStaffComponent() {
 }
 
-void SuperStaffComponent::Attack() {
+bool SuperStaffComponent::HandleAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
-		return;
+		return false;
 	}
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
 	_multiShotAngle /= _multiShotAmount;
@@ -182,8 +221,16 @@ void SuperStaffComponent::Attack() {
 		_multiShotAngle += _angleOffset;
 	}
 	_attackCooldownTimer->ResetTimer();
+	return true;
 }
 
+void SuperStaffComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(0.25f);
+	_attackDamage = 150;
+	_healthModifier = 0;
+	_projectileSpeed = 200.f;
+	_renderWeapon = true;
+}
 
 SwordComponent::SwordComponent() {
 	_sprite->Load(_path);
@@ -198,12 +245,16 @@ SwordComponent::SwordComponent() {
 	_weaponType = WeaponType::Sword;
 }
 
-SwordComponent::~SwordComponent() {}
-
 //If the weapon is a sword it damages the player if its close enough
-void SwordComponent::Attack() {
+bool SwordComponent::HandleAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
-		return;
+		return false;
+	}
+	if (_chargeAttackTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
+		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
 		if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
@@ -211,11 +262,70 @@ void SwordComponent::Attack() {
 		}
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
+		return true;
 
 	} else if (!_isAttacking) {
 		_chargeAttackTimer->ResetTimer();
 		_isAttacking = true;
 	}
+	return false;
+}
+
+void SwordComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(0.75f);
+	_chargeAttackTimer->SetTimeInSeconds(0.25f);
+	_attackRange = 25.f;
+	_attackDamage = 15;
+	_healthModifier = 25;
+	_renderWeapon = true;
+}
+
+WarstompComponent::WarstompComponent() {
+	_sprite->Load(_path);
+	_attackCooldownTimer = timerHandler->SpawnTimer(2.f, false, false);
+	_chargeAttackTimer = timerHandler->SpawnTimer(1.f, false, false);
+
+	_attackRange = 200.f;
+
+	_attackDamage = 300;
+	_healthModifier = 0;
+
+	_weaponType = WeaponType::Warstomp;
+}
+
+bool WarstompComponent::HandleAttack() {
+	if (_attackCooldownTimer->GetIsActive()) {
+		return false;
+	}
+	if (_chargeAttackTimer->GetIsActive()) {
+		debugDrawer->AddDebugCircle(_owner->GetPosition(), _attackRange, { 255, 0, 0, 255 });
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
+		return false;
+	}
+	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
+		if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+			_owner->GetTargetObject()->TakeDamage(_attackDamage);
+		}
+		_isAttacking = false;
+		_attackCooldownTimer->ResetTimer();
+		return true;
+
+	} else if (!_isAttacking) {
+		_chargeAttackTimer->ResetTimer();
+		_isAttacking = true;
+	}
+	return false;
+}
+
+void WarstompComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(2.f);
+	_chargeAttackTimer->SetTimeInSeconds(2.f);
+	_attackRange = 200.f;
+	_attackDamage = 300;
+	_healthModifier = 0;
+	_renderWeapon = true;
 }
 
 TusksComponent::TusksComponent() {
@@ -224,25 +334,21 @@ TusksComponent::TusksComponent() {
 	_chargeAttackTimer = timerHandler->SpawnTimer(1.f, false, false);
 	_damageCooldown = timerHandler->SpawnTimer(0.5f, false, false);
 	_attackRange = 200.f;
-
 	_attackDamage = 20;
 	_healthModifier = 75;
 
 	_weaponType = WeaponType::Tusks;
 }
 
-TusksComponent::~TusksComponent() {}
-
-void TusksComponent::Attack() {
+bool TusksComponent::HandleAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
-		return;
+		return false;
 
 	} else if (_chargeAttackTimer->GetIsActive()) {
-		_dashDirection = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition());
-		_dashDistance = _dashDirection.absolute() + 100.f;
-		_dashDirection.normalize();
-		_dashStartPosition = _owner->GetPosition();
-		return;
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
+		return false;
 	}
 	if (_isAttacking) {
 		_owner->SetPosition(_owner->GetPosition() + _dashDirection * _dashSpeed * deltaTime);
@@ -258,9 +364,14 @@ void TusksComponent::Attack() {
 			_attackCooldownTimer->ResetTimer();
 			_chargeAttackTimer->SetTimer(false, false);
 			_isAttacking = false;
+			return true;
 		}
 	} else {
 		if(_chargeAttackTimer->GetIsFinished()) {
+			_dashDirection = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition());
+			_dashDistance = _dashDirection.absolute() + 100.f;
+			_dashDirection.normalize();
+			_dashStartPosition = _owner->GetPosition();
 			_isAttacking = true;	
 		
 		} else if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
@@ -269,4 +380,15 @@ void TusksComponent::Attack() {
 			_owner->SetRotation(0.f);
 		}
 	}
+	return false;
+}
+
+void TusksComponent::SetValuesToDefault() {
+	_attackCooldownTimer->SetTimeInSeconds(1.5f);
+	_chargeAttackTimer->SetTimeInSeconds(1.f);
+	_damageCooldown->SetTimeInSeconds(0.5f);
+	_attackDamage = 20.f;
+	_attackRange = 200.f;
+	_healthModifier = 75;
+	_renderWeapon = true;
 }

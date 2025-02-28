@@ -19,11 +19,13 @@ void WeaponManager::Init() {
 	}
 }
 
-std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(const WeaponType& weaponType) {
+std::shared_ptr<WeaponComponent> WeaponManager::SpawnWeapon(const WeaponType& weaponType, std::shared_ptr<ObjectBase> owner) {
 	if (_weaponPools[weaponType]->IsEmpty()) {
 		CreateWeapon(weaponType);
 	}
 	_currentWeapon = _weaponPools[weaponType]->SpawnObject();
+	_currentWeapon->SetOwner(owner);
+	_currentWeapon->SetValuesToDefault();
 	_activeObjects.insert(std::make_pair(_currentWeapon->GetObjectID(), _currentWeapon));
 	return _currentWeapon;
 }
@@ -44,6 +46,9 @@ void WeaponManager::CreateWeapon(const WeaponType& weaponType) {
 		break;
 	case WeaponType::Tusks:
 		_weaponPools[weaponType]->PoolObject(std::make_shared<TusksComponent>());
+		break;
+	case WeaponType::Warstomp:
+		_weaponPools[weaponType]->PoolObject(std::make_shared<WarstompComponent>());
 		break;
 	default:
 		break;

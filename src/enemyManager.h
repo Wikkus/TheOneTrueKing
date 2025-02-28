@@ -46,8 +46,9 @@ public:
 	std::shared_ptr<EnemyBase> SpawnEnemy(const EnemyType& enemyType, const float& orientation,
 		const Vector2<float>& direction, const Vector2<float>& position, const WeaponType& weaponType);
 
-private:
 	std::shared_ptr<EnemyBase> CastAsEnemy(std::shared_ptr<ObjectBase> currentObject);
+
+private:
 	std::shared_ptr<EnemyBase> _currentEnemy = nullptr;
 	WeaponType _currentWeaponType = WeaponType::Count;
 	unsigned int _weaponPicked = 0;

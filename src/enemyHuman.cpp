@@ -78,7 +78,7 @@ void EnemyHuman::Init() {
 void EnemyHuman::Update() {
 	UpdateTarget();
 	//Depending on the weapon, the attack works differently
-	_weaponComponent->Attack();
+	_weaponComponent->HandleAttack();
 
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	UpdateMovement();

@@ -18,7 +18,7 @@ public:
 	void RemoveObject(const unsigned int& objectID) override;
 	void Reset() override;
 
-	std::shared_ptr<WeaponComponent> SpawnWeapon(const WeaponType& weaponType);
+	std::shared_ptr<WeaponComponent> SpawnWeapon(const WeaponType& weaponTyp, std::shared_ptr<ObjectBase> owner);
 
 	void CreateWeapon(const WeaponType& weaponType);
 
@@ -28,6 +28,6 @@ private:
 	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
 	
 	unsigned int _numberOfWeaponTypes = 0;
-	unsigned int _weaponAmountLimit = 2000;
+	unsigned int _weaponAmountLimit = 3000;
 };
 

@@ -48,12 +48,12 @@ void EnemyBoar::Init() {
 }
 
 void EnemyBoar::Update() {
+	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	if(!_weaponComponent->GetIsAttacking()) {
 		_targetPosition = _currentTarget->GetPosition();
-		_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 		UpdateMovement();
 	}
 	_weaponComponent->Update();
-	_weaponComponent->Attack();
+	_weaponComponent->HandleAttack();
 	_collider->SetPosition(_position);
 }

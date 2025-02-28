@@ -17,6 +17,7 @@ enum class WeaponType {
 	SuperStaff,
 	Sword,
 	Tusks,
+	Warstomp,
 	Count
 };
 
@@ -29,7 +30,7 @@ public:
 	void Update() override;
 	void Render() override;
 
-	virtual void Attack() {}
+	virtual bool HandleAttack() { return false; }
 
 	const virtual bool GetIsAttacking() const;
 
@@ -40,11 +41,14 @@ public:
 
 	const virtual WeaponType GetWeaponType() const;
 
+	virtual void SetValuesToDefault() {}
+
 	void DeactivateTimers();
 	void ResetTimers();
 
-	void SetOwner(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon);
-	
+	void SetOwner(std::shared_ptr<ObjectBase> owner);
+	void SetWeaponValues(std::shared_ptr<ObjectBase> owner, const bool& renderWeapon, const int& attackDamage, const float& attackRange, const float& attackCooldown, const float& chargeAttackTime);
+
 	void DeactivateObject() override;
 
 protected:
@@ -58,7 +62,6 @@ protected:
 
 	float _attackRange = 0.f;
 	float _attackTime = 1.f;
-	float _attackDelay = 0.5f;
 
 	int _attackDamage = 0;
 	int _healthModifier = 0;
@@ -71,7 +74,9 @@ public:
 	ShieldComponent();
 	~ShieldComponent();
 
-	void Attack() override;
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
 
 private:
 	const char* _path = "res/sprites/Shield.png";
@@ -83,7 +88,11 @@ public:
 	~StaffComponent();
 
 	void Init() override;
-	void Attack() override;
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
+
+	void SetProjectileValues(const ProjectileType& projectileType, const bool& unlimitedRange, const float& projectileSpeed);
 
 protected:
 	const char* _path = "res/sprites/Staff.png";
@@ -97,7 +106,9 @@ public:
 	SuperStaffComponent();
 	~SuperStaffComponent();
 
-	void Attack() override;
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
 
 private:
 	unsigned int _multiShotAmount = 3;
@@ -111,9 +122,23 @@ private:
 class SwordComponent : public WeaponComponent {
 public:
 	SwordComponent();
-	~SwordComponent();
+	~SwordComponent() {}
 
-	void Attack() override;	
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
+
+private:
+	const char* _path = "res/sprites/Sword.png";
+};
+class WarstompComponent : public SwordComponent {
+public:
+	WarstompComponent();
+	~WarstompComponent() {}
+
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
 
 private:
 	const char* _path = "res/sprites/Sword.png";
@@ -122,9 +147,11 @@ private:
 class TusksComponent : public WeaponComponent {
 public:
 	TusksComponent();
-	~TusksComponent();
+	~TusksComponent() {}
 
-	void Attack() override;
+	bool HandleAttack() override;
+
+	void SetValuesToDefault() override;
 
 private:
 	const char* _path = "res/sprites/Tusks.png";

@@ -1,11 +1,13 @@
 #pragma once
-#include <memory>
-#include <vector>
-
 #include "timerHandler.h"
 #include "vector2.h"
 
+#include <memory>
+#include <vector>
+
 class EnemyBase;
+class ObjectBase;
+class WeaponComponent;
 
 enum class NodeType {
 	DecisionNode,
@@ -15,67 +17,81 @@ enum class NodeType {
 
 class DecisionTreeNode : public std::enable_shared_from_this<DecisionTreeNode> {
 public:
-	DecisionTreeNode();
+	DecisionTreeNode(std::shared_ptr<ObjectBase> owner);
 	~DecisionTreeNode() {}
 
-	virtual std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner);
-	virtual std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner);
+	virtual std::shared_ptr<DecisionTreeNode> MakeDecision();
+	virtual std::shared_ptr<DecisionTreeNode> GetBranch();
 
 	const NodeType GetNodeType() const;
 
 protected:
 	NodeType _nodeType = NodeType::Count;
-
+	std::shared_ptr<EnemyBase> _owner;
 };
 
 #pragma region Actions
 class Action : public DecisionTreeNode {
 public:
-	Action();
+	Action(std::shared_ptr<ObjectBase> owner);
 	~Action() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 
-	virtual bool ExecuteAction(EnemyBase& owner) { return false; }
+	virtual bool ExecuteAction() { return false; }
 
 
 };
 
-class MeleeAttackAction : public Action {
+class AttackAction : public Action {
 public:
-	MeleeAttackAction(const float& attackRange, const float& attackCooldown, const float& attackChargeTime, const int& attackDamage);
-	~MeleeAttackAction() {}
+	AttackAction(std::shared_ptr<ObjectBase> owner) : Action(owner) {}
+	~AttackAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
+	virtual bool ExecuteAction() override { return false; }
 
-	bool ExecuteAction(EnemyBase& owner) override; 
-private:
-	std::shared_ptr<Timer> _attackCooldownTimer = nullptr;
-	std::shared_ptr<Timer> _chargeAttackTimer = nullptr;
-
-	bool _isAttacking = false;
-	float _attackRange = 0.f;
-	int _attackDamage = 0;
+protected:
+	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
 };
-
-class DashAction : public Action {
+class DashAction : public AttackAction {
 public:
-	DashAction();
+	DashAction(std::shared_ptr<ObjectBase> owner);
 	~DashAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
+	bool ExecuteAction() override;
 
-	bool ExecuteAction(EnemyBase& owner) override;
+private:
+	std::shared_ptr<WeaponComponent> _tuskComponent = nullptr;
+
+}; 
+class EnergyBlastAction : public AttackAction {
+public:
+	EnergyBlastAction(std::shared_ptr<ObjectBase> owner);
+	~EnergyBlastAction() {}
+
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
+	bool ExecuteAction() override;
+
+};
+class WarstompAction : public AttackAction {
+public:
+	WarstompAction(std::shared_ptr<ObjectBase> owner);
+	~WarstompAction() {}
+
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
+	bool ExecuteAction() override;
+
 };
 
 class MoveAction : public Action {
 public:
-	MoveAction();
+	MoveAction(std::shared_ptr<ObjectBase> owner) : Action(owner) {}
 	~MoveAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
-
-	bool ExecuteAction(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
+	bool ExecuteAction() override;
 };
 
 #pragma endregion
@@ -83,11 +99,11 @@ public:
 #pragma region Decisions
 class Decision : public DecisionTreeNode {
 public:
-	Decision();
+	Decision(std::shared_ptr<ObjectBase> owner);
 	~Decision() {}
 
-	virtual std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
-	virtual std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+	virtual std::shared_ptr<DecisionTreeNode> GetBranch() override;
+	virtual std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 
 	void SetFalseNode(std::shared_ptr<DecisionTreeNode> falseNode);
 	void SetTrueNode(std::shared_ptr<DecisionTreeNode> trueNode);
@@ -101,10 +117,10 @@ protected:
 
 class WithinRangeDecision : public Decision {
 public:
-	WithinRangeDecision(float maxRange, float minRange);
+	WithinRangeDecision(std::shared_ptr<ObjectBase> owner, const float& minRange, const float& maxRange);
 	~WithinRangeDecision() {}
 
-	std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> GetBranch() override;
 
 	float TestValue(const Vector2<float>& position, const Vector2<float>& targetPosition);
 
@@ -116,7 +132,7 @@ private:
 
 class RandomDecision : public Decision {
 public:
-	RandomDecision(const float& timeOut);
+	RandomDecision(std::shared_ptr<ObjectBase> owner, const float& timeOut);
 	~RandomDecision() {}
 
 	bool TestValue();
@@ -132,11 +148,11 @@ private:
 #pragma region MultiDecisions
 class MultiDecision : public DecisionTreeNode {
 public:
-	MultiDecision();
+	MultiDecision(std::shared_ptr<ObjectBase> owner) : DecisionTreeNode(owner) {}
 	~MultiDecision() {}
 
-	std::shared_ptr<DecisionTreeNode> GetBranch(EnemyBase& owner) override;
-	std::shared_ptr<DecisionTreeNode> MakeDecision(EnemyBase& owner) override;
+	std::shared_ptr<DecisionTreeNode> GetBranch() override;
+	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 
 	void AddNode(std::shared_ptr<DecisionTreeNode> node);
 
@@ -149,7 +165,7 @@ protected:
 
 class RandomMultiDecision : public MultiDecision {
 public:
-	RandomMultiDecision();
+	RandomMultiDecision(std::shared_ptr<ObjectBase> owner) : MultiDecision(owner) {}
 	~RandomMultiDecision() {}
 
 	int TestValue() override;
