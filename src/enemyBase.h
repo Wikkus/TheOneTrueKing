@@ -23,13 +23,13 @@ public:
 
 	void Render() override;
 
+	void TakeDamage(const int& damageAmount) override;
+
 	const std::shared_ptr<Collider> GetCollider() const override;
 	const int GetDamage() const override;
 
 	virtual const EnemyType GetEnemyType() const;
 	 
-	void TakeDamage(const int& damageAmount) override;
-
 	virtual const float GetRotation() const;
 
 	virtual const int GetCurrentHealth() const;

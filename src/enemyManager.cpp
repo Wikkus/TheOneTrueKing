@@ -207,7 +207,7 @@ std::shared_ptr<EnemyBase> EnemyManager::SpawnEnemy(const EnemyType& enemyType, 
 	if (_enemyPools[enemyType]->IsEmpty()) {
 		CreateNewEnemy(enemyType);
 	}
-	//Then add the enemy to the active enemies vector which is called in Update
+	//Then add the enemy to the active enemies map which is called in Update
 	_currentEnemy = _enemyPools[enemyType]->SpawnObject();			
 	_currentEnemy->ActivateEnemy(orientation, direction, position, weaponType);
 	_activeObjects.insert(std::make_pair(_currentEnemy->GetObjectID(), _currentEnemy));
