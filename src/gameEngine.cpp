@@ -27,6 +27,7 @@ std::shared_ptr<DebugDrawer> debugDrawer;
 std::shared_ptr<GameStateHandler> gameStateHandler;
 std::shared_ptr<ImGuiHandler> imGuiHandler;
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> projectileQuadTree;
 std::shared_ptr<SearchSortAlgorithms> searchSort;
 std::shared_ptr<UniversalFunctions> universalFunctions;
 
@@ -41,8 +42,8 @@ std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 
 bool runningGame = false;
 
-float windowHeight = 600.f;
-float windowWidth = 800.f;
+float windowHeight = 1080.f;
+float windowWidth = 1920.f;
 
 MouseButtonState mouseButtons[6];
 

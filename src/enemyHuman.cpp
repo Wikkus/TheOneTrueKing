@@ -52,6 +52,7 @@ void EnemyHuman::Init() {
 	if (gameStateHandler->GetGameMode() == GameMode::Formation) {
 		_behaviorData.linearTargetRadius = 5.f;
 		_behaviorData.linearSlowDownRadius = 25.f;
+		_weaponComponent->SetWeaponValues(shared_from_this(), true, 10, 500.f, 0.75f, 0.f);
 
 	} else {
 		std::uniform_real_distribution dist{ _weaponComponent->GetAttackRange() * 0.5f, _weaponComponent->GetAttackRange() };
@@ -79,7 +80,6 @@ void EnemyHuman::Update() {
 	UpdateTarget();
 	//Depending on the weapon, the attack works differently
 	_weaponComponent->HandleAttack();
-
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 	UpdateMovement();
 }

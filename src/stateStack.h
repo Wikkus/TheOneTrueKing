@@ -90,6 +90,8 @@ private:
 	const char* _resumeText = "Resume";
 	const char* _survivalText = "Survival";
 
+	float _buttonHeight = 0.f;
+	float _buttonWidth = 0.f;
 };
 
 class GameOverState : public State {

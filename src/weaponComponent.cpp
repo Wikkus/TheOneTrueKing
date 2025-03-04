@@ -24,7 +24,9 @@ WeaponComponent::WeaponComponent() : ObjectBase(ObjectType::Weapon) {
 	_isAttacking = false;
 }
 
-void WeaponComponent::Init() {}
+void WeaponComponent::Init() {
+	_isAttacking = false;
+}
 
 void WeaponComponent::Update() {
 	_position = _owner->GetPosition();
@@ -74,12 +76,13 @@ void WeaponComponent::SetWeaponValues(std::shared_ptr<ObjectBase> owner, const b
 	_attackDamage = attackDamage;
 	_attackRange = attackRange;
 	_attackCooldownTimer->SetTimeInSeconds(attackCooldown);
-	_attackCooldownTimer->SetTimeInSeconds(chargeAttackTime);
+	_chargeAttackTimer->SetTimeInSeconds(chargeAttackTime);
 }
 
 void WeaponComponent::DeactivateObject() {
 	_position = deactivatedPosition;
 	_collider->SetPosition(_position);
+	SetValuesToDefault();
 	DeactivateTimers();
 	_owner = nullptr;
 }
@@ -141,6 +144,7 @@ void StaffComponent::Init() {
 	default:
 		break;
 	}
+	_isAttacking = false;
 }
 
 //If the weapon is a staff it shoots a fireball towards the player
@@ -155,6 +159,7 @@ bool StaffComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
+		_direction = (_owner->GetTargetPosition() - _owner->GetPosition()).normalized();
 		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
 			_direction, _position, _attackDamage, _projectileSpeed);
 		
@@ -200,7 +205,7 @@ SuperStaffComponent::SuperStaffComponent() {
 	_attackDamage = 150;
 	_healthModifier = 0;
 
-	_weaponType = WeaponType::Staff;
+	_weaponType = WeaponType::SuperStaff;
 }
 
 SuperStaffComponent::~SuperStaffComponent() {
@@ -213,6 +218,7 @@ bool SuperStaffComponent::HandleAttack() {
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
 	_multiShotAngle /= _multiShotAmount;
 
+	_direction = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition()).normalized();
 	for (unsigned int i = 0; i < _multiShotAmount; i++) {
 		_multiShotDirection = _direction.rotated(_multiShotAngle);
 
@@ -293,6 +299,7 @@ WarstompComponent::WarstompComponent() {
 	_weaponType = WeaponType::Warstomp;
 }
 
+//If weaponComponent is a warstomp, it will damage the player if it is in range of the AOE
 bool WarstompComponent::HandleAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;

@@ -53,13 +53,16 @@ void Button::SetPosition(const Vector2<float>& position) {
 	_text->SetPosition(_position);
 }
 GameStateHandler::GameStateHandler() {
-	_buttons[ButtonType::BossRush] = std::make_shared<Button>(_bossRushText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), 64, 128);
-	_buttons[ButtonType::FormationGame] = std::make_shared<Button>(_formationText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), 64, 128);
-	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f), 64, 128);
-	_buttons[ButtonType::Quit] = std::make_shared<Button>(_quitText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f), 64, 128);
-	_buttons[ButtonType::Restart] = std::make_shared<Button>(_restartText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f), 64, 128);
-	_buttons[ButtonType::Resume] = std::make_shared<Button>(_resumeText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f), 64, 128);
-	_buttons[ButtonType::SurvivalGame] = std::make_shared<Button>(_survivalText, Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f), 64, 128);
+	_buttonHeight = windowHeight * 0.1f;
+	_buttonWidth = windowWidth * 0.1f;
+
+	_buttons[ButtonType::BossRush] = std::make_shared<Button>(_bossRushText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::FormationGame] = std::make_shared<Button>(_formationText, Vector2<float>(windowWidth * 0.33f, windowHeight * 0.3f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::MainMenu] = std::make_shared<Button>(_mainMenuText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.6f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::Quit] = std::make_shared<Button>(_quitText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.8f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::Restart] = std::make_shared<Button>(_restartText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.4f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::Resume] = std::make_shared<Button>(_resumeText, Vector2<float>(windowWidth * 0.5f, windowHeight * 0.2f), _buttonHeight, _buttonWidth);
+	_buttons[ButtonType::SurvivalGame] = std::make_shared<Button>(_survivalText, Vector2<float>(windowWidth * 0.66f, windowHeight * 0.3f), _buttonHeight, _buttonWidth);
 }
 
 GameStateHandler::~GameStateHandler() {}

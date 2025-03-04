@@ -71,9 +71,9 @@ private:
 	Vector2<float> _currentSpawnDirection;
 
 	unsigned int _formationsSpawned = 1;
-	unsigned int _minCountSpawn = 9;
+	unsigned int _minCountSpawn = 15;
 	unsigned int _minRowSpawn = 1;
-	std::array<unsigned int, 2> _spawnCountPerRow = { 6, 1 };
+	std::array<unsigned int, 2> _spawnCountPerRow = { 9, 1 };
 
 	unsigned int _enemyAmountLimit = 3000;
 	unsigned int _numberOfEnemyTypes = 0;

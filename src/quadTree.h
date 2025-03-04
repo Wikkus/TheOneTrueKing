@@ -25,7 +25,7 @@ public:
 	std::vector<T> Query(std::shared_ptr<Collider> range);
 
 	void Clear();
-	void Subdevide();
+	void Subdivide();
 	void Render();
 
 private:
@@ -80,7 +80,7 @@ inline bool QuadTree<T>::Insert(T object, std::shared_ptr<Collider> collider) {
 		return true;
 	} else {
 		if (!_divided) {
-			Subdevide();
+			Subdivide();
 		}
 		//After subdividing it checks if it can insert the object in one of the children nodes
 		if (_quadTreeChildren[0]->Insert(object, collider)) {
@@ -100,6 +100,7 @@ inline std::vector<T> QuadTree<T>::Query(std::shared_ptr<Collider> range) {
 	_objectsFound.clear();
 	//Checks if the collider is inside the quadtree node
 	if (_quadTreeNode.Intersect(range)) {
+		//Comparing the collider types, this makes the quadtree compadible with both AABB and circle colliders
 		switch (range->GetColliderType()) {
 		case ColliderType::AABB:
 			_boxCollider = std::static_pointer_cast<AABB>(range);
@@ -177,10 +178,10 @@ inline void QuadTree<T>::Clear() {
 	_quadTreeChildren[3] = nullptr;
 	_divided = false;
 }
-/*When deviding, I create 4 children that is a quarter of the size of the current node
+/*When dividing, I create 4 children that is a quarter of the size of the current node
 and sets devided to true to prevent the node from calling Subdevide more than once*/
 template<typename T>
-inline void QuadTree<T>::Subdevide() {
+inline void QuadTree<T>::Subdivide() {
 	_upperLeft.rectangle = std::make_shared<AABB>();
 	_upperLeft.rectangle->Init({ _quadTreeNode.rectangle->GetPosition().x - (_quadTreeNode.rectangle->GetWidth() * 0.25f),
 		_quadTreeNode.rectangle->GetPosition().y - (_quadTreeNode.rectangle->GetHeight() * 0.25f) },

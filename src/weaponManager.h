@@ -19,11 +19,11 @@ public:
 	void Reset() override;
 
 	std::shared_ptr<WeaponComponent> SpawnWeapon(const WeaponType& weaponTyp, std::shared_ptr<ObjectBase> owner);
+	std::shared_ptr<WeaponComponent> CastAsWeapon(std::shared_ptr<ObjectBase> currentObject);
 
 	void CreateWeapon(const WeaponType& weaponType);
 
 private:
-	std::shared_ptr<WeaponComponent> CastAsWeapon(std::shared_ptr<ObjectBase> currentObject);
 	std::shared_ptr<WeaponComponent> _currentWeapon = nullptr;
 	std::unordered_map<WeaponType, std::shared_ptr<ObjectPool<std::shared_ptr<WeaponComponent>>>> _weaponPools;
 	

@@ -38,7 +38,6 @@ void PlayerCharacter::Init() {
 	_regenerationTimer = timerHandler->SpawnTimer(_regenerationCooldown, true, false);
 
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff, shared_from_this());
-	_weaponComponent->SetValuesToDefault();
 	std::static_pointer_cast<StaffComponent>(_weaponComponent)->SetProjectileValues(ProjectileType::PlayerFireball, true, 250.f);
 	_weaponComponent->Init();
 }

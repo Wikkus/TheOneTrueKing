@@ -1,6 +1,7 @@
 #include "enemyBase.h"
 #include "playerCharacter.h"
 #include "weaponManager.h"
+#include "stateStack.h"
 
 EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy), _enemyType(enemyType) {
     _sprite = std::make_shared<Sprite>();

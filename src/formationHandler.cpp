@@ -193,8 +193,6 @@ void DefensiveCirclePattern::CreateSlots(const std::array<unsigned int, 2>& spaw
 				CreateSlotsOfType(anchorPoint, (spawnCountPerRow[0] * 2) - _amountSlots, _characterRadius,
 					SlotAttackType::Mage, false);
 			}
-			//When a layer has been created, I subtract a characterRadius from the distanceBetweenSlots,
-			// which creates the next layer of slots in a smaller circle
 		}
 	} else {
 		//If there are an odd amount of layers(at least 3) the outer layers are defenders, 
@@ -385,6 +383,18 @@ const float FormationPattern::GetSlotCost(const WeaponType& weaponType, const un
 		}
 		break;
 	case WeaponType::Staff:
+		switch (_slotPositionAndType[index].slotAttackType) {
+		case SlotAttackType::Defender:
+			return 2000.f;
+		case SlotAttackType::Mage:
+			return 0.f;
+		case SlotAttackType::Swordsman:
+			return 1000.f;
+		default:
+			break;
+		}
+		break;
+	case WeaponType::SuperStaff:
 		switch (_slotPositionAndType[index].slotAttackType) {
 		case SlotAttackType::Defender:
 			return 2000.f;

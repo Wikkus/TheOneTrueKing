@@ -133,7 +133,7 @@ void EnemyManager::SpawnFormation(const std::array<unsigned int, 2>& spawnCountP
 			break;
  
 		case SlotAttackType::Mage:
-			_currentWeaponType = WeaponType::Staff;
+			_currentWeaponType = WeaponType::SuperStaff;
 			break;
 		
 		case SlotAttackType::Swordsman:
@@ -145,7 +145,7 @@ void EnemyManager::SpawnFormation(const std::array<unsigned int, 2>& spawnCountP
 		}
 		_currentSpawnAmount = _formationManagers.back()->GetFormationPattern()->GetSlotsPerType()[_currentAttackType];
 		for (unsigned int k = 0; k < _currentSpawnAmount; k++) {
-			enemyManager->SpawnEnemy(EnemyType::Human, 0, Vector2<float>(0.f, 0.f), _latestAnchorPoint->position, _currentWeaponType);	
+			enemyManager->SpawnEnemy(EnemyType::Human, 0, { 0.f, 0.f }, _latestAnchorPoint->position, _currentWeaponType);
 			_currentEnemy->SetFormationIndex(_formationManagers.size() - 1);
 			_formationManagers.back()->AddCharacter(_currentEnemy);
 		}

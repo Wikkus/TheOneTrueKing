@@ -82,6 +82,10 @@ void ObjectBase::SetVelocity(const Vector2<float>& velocity) {
 
 void ObjectBase::QueryObjects() {
     _queriedObjects = objectBaseQuadTree->Query(_collider);
+    if (_objectType != ObjectType::Projectile) {
+        _queriedProjectiles = projectileQuadTree->Query(_collider);
+        _queriedObjects.insert(_queriedObjects.end(), _queriedProjectiles.begin(), _queriedProjectiles.end());
+    }
 }
 
 void ObjectBase::TakeDamage(const int& damageAmount) {}

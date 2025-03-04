@@ -52,6 +52,7 @@ extern std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 extern std::shared_ptr<ProjectileManager> projectileManager;
 
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> projectileQuadTree;
 
 extern std::shared_ptr<SearchSortAlgorithms> searchSort;
 extern std::shared_ptr<RayCast> rayCast;

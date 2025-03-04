@@ -63,6 +63,11 @@ int main(int argc, char* argv[]) {
 	quadTreeNode.rectangle->Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
 	objectBaseQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 100);
 
+	QuadTreeNode quadTreeNode2;
+	quadTreeNode2.rectangle = std::make_shared<AABB>();
+	quadTreeNode2.rectangle->Init(Vector2(windowWidth * 0.5f, windowHeight * 0.5f), windowHeight, windowWidth);
+	projectileQuadTree = std::make_shared<QuadTree<std::shared_ptr<ObjectBase>>>(quadTreeNode, 100);
+
 	//Init here
 	enemyManager->Init();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
@@ -147,6 +152,7 @@ int main(int argc, char* argv[]) {
 
 		//objectBaseQuadTree->Render();
 		objectBaseQuadTree->Clear();
+		projectileQuadTree->Clear();
 		
 		imGuiHandler->Render();
 

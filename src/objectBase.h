@@ -62,6 +62,7 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<ObjectBase>> _queriedObjects;
+	std::vector<std::shared_ptr<ObjectBase>> _queriedProjectiles;
 
 	std::shared_ptr<Collider> _collider = nullptr;
 
