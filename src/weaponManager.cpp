@@ -2,6 +2,7 @@
 
 #include "objectBase.h"
 #include "objectPool.h"
+#include "quadTree.h"
 #include "weaponComponent.h"
 
 WeaponManager::WeaponManager() {
@@ -16,6 +17,12 @@ void WeaponManager::Init() {
 		for (unsigned int k = 0; k < _numberOfWeaponTypes; k++) {
 			CreateWeapon((WeaponType)k);
 		}
+	}
+}
+
+void WeaponManager::Update() {
+	for (auto& obstacle : _activeObjects) {
+		obstacle.second->Update();
 	}
 }
 
@@ -52,6 +59,15 @@ void WeaponManager::CreateWeapon(const WeaponType& weaponType) {
 		break;
 	default:
 		break;
+	}
+}
+
+void WeaponManager::InsertObjectsQuadtree() {
+	for (auto& object : _activeObjects) {
+		if (!object.second->GetCollider()->GetIsActive()) {
+			continue;
+		}
+		objectBaseQuadTree->Insert(object.second, object.second->GetCollider());
 	}
 }
 

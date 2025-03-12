@@ -13,7 +13,9 @@ public:
 	~WeaponManager() {}
 
 	void Init() override;
+	void Update() override;
 
+	void InsertObjectsQuadtree() override;
 	void RemoveAllObjects() override;
 	void RemoveObject(const unsigned int& objectID) override;
 	void Reset() override;

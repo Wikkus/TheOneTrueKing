@@ -36,10 +36,6 @@ PlayerCharacter::~PlayerCharacter() {}
 
 void PlayerCharacter::Init() {
 	_regenerationTimer = timerHandler->SpawnTimer(_regenerationCooldown, true, false);
-
-	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff, shared_from_this());
-	std::static_pointer_cast<StaffComponent>(_weaponComponent)->SetProjectileValues(ProjectileType::PlayerFireball, true, 250.f);
-	_weaponComponent->Init();
 }
 
 void PlayerCharacter::Update() {
@@ -81,7 +77,10 @@ void PlayerCharacter::Respawn() {
 	
 	_currentHealth = _maxHealth;
 	_healthTextSprite->ChangeText(std::to_string(_currentHealth).c_str(), { 255, 255, 255, 255 });
-	_weaponComponent->ResetTimers();
+
+	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::SuperStaff, shared_from_this());
+	std::static_pointer_cast<SuperStaffComponent>(_weaponComponent)->SetProjectileValues(ProjectileType::PlayerFireball, true, 250.f);
+	_weaponComponent->Init();
 }
 
 void PlayerCharacter::UpdateHealthRegen() {
@@ -135,10 +134,9 @@ void PlayerCharacter::UpdateMovement() {
 }
 
 void PlayerCharacter::UpdateTarget() {
-	_targetPosition = universalFunctions->GetCursorPosition();
+	_targetPosition = cursorPosition;
 	_dummyTarget->SetPosition(_targetPosition);
 	_currentTarget = _dummyTarget;
-
 	_direction = (_targetPosition - _position).normalized();
 	_orientation = universalFunctions->VectorAsOrientation(_direction);
 }

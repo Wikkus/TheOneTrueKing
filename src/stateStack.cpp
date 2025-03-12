@@ -30,7 +30,7 @@ Button::Button(const char* buttonText, const Vector2<float>& position, const int
 }
 
 bool Button::ClickedOn() {
-	_cursorCollider->SetPosition(universalFunctions->GetCursorPosition());
+	_cursorCollider->SetPosition(cursorPosition);
 	if (GetMouseButtonPressed(SDL_BUTTON_LEFT)) {
 		if (collisionCheck->AABBCircleIntersect(*_boxCollider, *_cursorCollider)) {
 			return true;
@@ -113,22 +113,21 @@ const GameMode GameStateHandler::GetGameMode() const {
 InGameState::InGameState() {
 	enemyManager->Reset();
 	projectileManager->Reset();
+	weaponManager->RemoveAllObjects();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		playerCharacters[i]->Respawn();
 	}
 }
 
-void InGameState::SetButtonPositions() {}
-
 void InGameState::Update() {
 	enemyManager->InsertObjectsQuadtree();
-	projectileManager->InsertObjectsQuadtree();
+	obstacleManager->InsertObjectsQuadtree();
+	projectileManager->InsertObjectsQuadtree();	
 	weaponManager->InsertObjectsQuadtree();
 	for (unsigned int i = 0; i < playerCharacters.size(); i++) {
 		objectBaseQuadTree->Insert(playerCharacters[i], playerCharacters[i]->GetCollider());
 		playerCharacters[i]->Update();
 	}
-
 	enemyManager->Update();
 	obstacleManager->Update();
 	projectileManager->Update();
@@ -155,9 +154,6 @@ BossRushGameState::BossRushGameState() {
 	enemyManager->BossSpawner();
 }
 
-void BossRushGameState::SetButtonPositions() {
-	InGameState::SetButtonPositions();
-}
 void BossRushGameState::Update() {
 	InGameState::Update();
 	enemyManager->UpdateBossRush();
@@ -172,9 +168,6 @@ void BossRushGameState::RenderText() {
 
 FormationGameState::FormationGameState() {}
 
-void FormationGameState::SetButtonPositions() {
-	InGameState::SetButtonPositions();
-}
 void FormationGameState::Update() {
 	InGameState::Update();
 	enemyManager->UpdateFormation();
@@ -188,9 +181,6 @@ void FormationGameState::RenderText() {
 
 SurvivalGameState::SurvivalGameState() {}
 
-void SurvivalGameState::SetButtonPositions() {
-	InGameState::SetButtonPositions();
-}
 void SurvivalGameState::Update() {
 	InGameState::Update();
 	enemyManager->UpdateSurvival();
@@ -199,6 +189,23 @@ void SurvivalGameState::Render() {
 	InGameState::Render();
 }
 void SurvivalGameState::RenderText() {
+	InGameState::RenderText();
+}
+
+TestingGameState::TestingGameState() {
+	enemyManager->TestEnemySpawner();
+}
+
+void TestingGameState::Update() {
+	InGameState::Update();
+	enemyManager->UpdateTestState();
+}
+
+void TestingGameState::Render() {
+	InGameState::Render();
+}
+
+void TestingGameState::RenderText() {
 	InGameState::RenderText();
 }
 
@@ -229,6 +236,9 @@ void GameOverState::Update() {
 			break;
 		case GameMode::Survival:
 			gameStateHandler->ReplaceCurrentState(std::make_shared<SurvivalGameState>());
+			break;
+		case GameMode::TestState:
+			gameStateHandler->ReplaceCurrentState(std::make_shared<TestingGameState>());
 			break;
 		default:
 			break;
@@ -328,6 +338,9 @@ void PauseState::Update() {
 			break;
 		case GameMode::Survival:
 			gameStateHandler->AddState(std::make_shared<SurvivalGameState>());
+			break;
+		case GameMode::TestState:
+			gameStateHandler->AddState(std::make_shared<TestingGameState>());
 			break;
 		default:
 			break;

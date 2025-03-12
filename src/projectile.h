@@ -34,6 +34,8 @@ public:
 		const Vector2<float>& position, const int& damage, const float& speed);
 	void DeactivateObject() override;
 
+	void QueryObjects() override;
+
 private:
 	std::shared_ptr<ObjectBase> _owner = nullptr;
 

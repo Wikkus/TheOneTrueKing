@@ -48,6 +48,15 @@ void ProjectileManager::Update() {
 	_currentProjectile = nullptr;
 }
 
+void ProjectileManager::InsertObjectsQuadtree() {
+	for (auto& object : _activeObjects) {
+		if (!object.second->GetCollider()->GetIsActive()) {
+			continue;
+		}
+		projectileQuadTree->Insert(object.second, object.second->GetCollider());
+	}
+}
+
 void ProjectileManager::CreateNewProjectile(const ProjectileType& projectileType) {
 	_projectilePools[projectileType]->PoolObject(std::make_shared<Projectile>(projectileType, _spritePaths[projectileType]));
 }

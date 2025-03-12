@@ -58,11 +58,12 @@ public:
 	void SetTargetPosition(const Vector2<float>& targetPosition);
 	void SetVelocity(const Vector2<float>& velocity);
 
-	void QueryObjects();
+	virtual void QueryObjects();
 
 protected:
 	std::vector<std::shared_ptr<ObjectBase>> _queriedObjects;
 	std::vector<std::shared_ptr<ObjectBase>> _queriedProjectiles;
+	std::vector<std::shared_ptr<ObjectBase>> _queriedObstacles;
 
 	std::shared_ptr<Collider> _collider = nullptr;
 

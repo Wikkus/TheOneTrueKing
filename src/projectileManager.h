@@ -14,6 +14,8 @@ public:
 	void Init() override;
 	void Update() override;
 
+	void InsertObjectsQuadtree() override;
+
 	bool CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID);
 
 	void CreateNewProjectile(const ProjectileType& projectileType);

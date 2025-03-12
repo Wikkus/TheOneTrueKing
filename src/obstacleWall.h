@@ -20,8 +20,10 @@ public:
 	
 	const std::shared_ptr<Collider> GetCollider() const override;
 
+	void QueryObjects() override;
+
 private:	
-	SDL_Rect _rect;
+	SDL_FRect _rect;
 
 	float _height = 0.f;
 	float _width = 0.f;

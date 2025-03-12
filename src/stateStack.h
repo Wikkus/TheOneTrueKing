@@ -14,6 +14,7 @@ enum class GameMode {
 	BossRush,
 	Formation,
 	Survival,
+	TestState,
 	Count
 };
 
@@ -54,10 +55,10 @@ public:
 	State() {}
 	~State() {}
 
-	virtual void SetButtonPositions() = 0;
-	virtual void Update() = 0;
-	virtual void Render() = 0;
-	virtual void RenderText() = 0;
+	virtual void SetButtonPositions() {}
+	virtual void Update() {}
+	virtual void Render() {}
+	virtual void RenderText() {}
 };
 
 class GameStateHandler {
@@ -116,7 +117,6 @@ public:
 	InGameState();
 	~InGameState() {}
 
-	void SetButtonPositions() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
@@ -126,7 +126,6 @@ public:
 	BossRushGameState();
 	~BossRushGameState() {}
 
-	void SetButtonPositions() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
@@ -136,7 +135,6 @@ public:
 	FormationGameState();
 	~FormationGameState() {}
 
-	void SetButtonPositions() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
@@ -147,13 +145,20 @@ public:
 	SurvivalGameState();
 	~SurvivalGameState() {}
 
-	void SetButtonPositions() override;
 	void Update() override;
 	void Render() override;
 	void RenderText() override;
 
 };
+class TestingGameState : public InGameState {
+public:
+	TestingGameState();
+	~TestingGameState() {}
 
+	void Update() override;
+	void Render() override;
+	void RenderText() override;
+};
 class MenuState : public State {
 public:
 	MenuState();

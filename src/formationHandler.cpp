@@ -55,6 +55,7 @@ void FormationHandler::UpdateAnchorPoint() {
 	}
 	_anchorPoint->direction.normalize();
 	_anchorPoint->position += _anchorPoint->direction * deltaTime * _anchorPoint->movementSpeed;
+	debugDrawer->AddDebugCross(_anchorPoint->position, 25.f, { 255, 0, 0 });
 }
 
 void FormationHandler::UpdateSlots() {
@@ -79,6 +80,9 @@ void FormationHandler::UpdateSlots() {
 
 		_slotAssignments[i].enemyCharacter->SetTargetPosition(_location.position);
 		_slotAssignments[i].enemyCharacter->SetTargetOrientation(_location.orientation);
+
+		debugDrawer->AddDebugCross(_location.position, 25.f, { 0, 255, 0 });
+
 		if (!_slotAssignments[i].isOnScreen) {
 			if (!universalFunctions->OutsideBorderX(_location.position.x, 25.f) && !universalFunctions->OutsideBorderY(_location.position.y, 25.f)) {
 				_slotAssignments[i].isOnScreen = true;
@@ -177,38 +181,44 @@ const unsigned int FormationHandler::GetNumberOfSlots() const {
 void DefensiveCirclePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {
 	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
 
-	//When there is only one layer, every other slot roles created are mages and the others are swordsmen
 	if (spawnCountPerRow[1] == 1) {
 		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _characterRadius,
-			SlotAttackType::Count, false);
+			SlotAttackType::Mage, false);
 
-	} else if (spawnCountPerRow[1] % 2 == 0) {
-		//If there are an even amout of layers, the outer slot roles are swordsmen and the inner are mages
-		_amountSlots = std::round(spawnCountPerRow[0] * 1.25f);
+	} else {
+		_rowInverse = 1.f / spawnCountPerRow[1];
+		_countMultiplier = 1.5f;
+		_slotCount = 0.f;
+
 		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
-			if (i < std::round(spawnCountPerRow[1] * 0.5f)) {
-				CreateSlotsOfType(anchorPoint, _amountSlots, _characterRadius,
+			_amountSlots = std::round(spawnCountPerRow[0] * _countMultiplier);
+			_slotCount += _amountSlots;
+
+			if (_slotCount > _numberOfSlots) {
+				_difference = _slotCount - _numberOfSlots;
+				_amountSlots -= _difference;
+				_slotCount -= _difference;
+			
+			} else if (i == spawnCountPerRow[1] - 1) {
+				if (_slotCount < _numberOfSlots) {
+					_difference = _numberOfSlots - _slotCount;
+					_amountSlots += _difference;
+					_slotCount += _difference;
+				}
+			}
+
+			if (i < std::round(spawnCountPerRow[1] / 2)) {
+				CreateSlotsOfType(anchorPoint, _amountSlots, _characterRadius * _countMultiplier,
 					SlotAttackType::Defender, true);
 			} else {
-				CreateSlotsOfType(anchorPoint, (spawnCountPerRow[0] * 2) - _amountSlots, _characterRadius,
+				CreateSlotsOfType(anchorPoint, _amountSlots, _characterRadius * _countMultiplier,
 					SlotAttackType::Mage, false);
 			}
-		}
-	} else {
-		//If there are an odd amount of layers(at least 3) the outer layers are defenders, 
-		// middle are swordsmen and inner are mages
-		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
-			if (i < std::round(spawnCountPerRow[1] * 0.33f)) {
-				CreateSlotsOfType(anchorPoint, std::round(spawnCountPerRow[0] * 1.5f), _characterRadius,
-					SlotAttackType::Defender, true);
-
-			} else if (i < std::round(spawnCountPerRow[1] * 0.66f)) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _characterRadius,
-					SlotAttackType::Swordsman, true);
-
-			} else {
-				CreateSlotsOfType(anchorPoint, std::round(spawnCountPerRow[0] * 0.5f), _characterRadius,
-					SlotAttackType::Mage, false);
+			_countMultiplier -= _rowInverse;
+			if (spawnCountPerRow[0] % 2 == 0) {
+				if (std::fabs(_countMultiplier - 1.f) <= 0.1f) {
+					_countMultiplier -= _rowInverse;
+				}
 			}
 		}
 	}
@@ -231,23 +241,10 @@ void DefensiveCirclePattern::CreateSlotsOfType(const std::shared_ptr<AnchorPoint
 			//If the orientation is not locked, I set the angleAroundCircle based on the slots position compared to the anchorPoints
 			_angleAroundCircle = universalFunctions->VectorAsOrientation(anchorPoint->position - _result.position) - PI * 0.5f;
 		}
-		_result.orientation = universalFunctions->WrapMinMax(_angleAroundCircle, -PI, PI);
-		if (attackType == SlotAttackType::Count) {
-			if (i % 2 == 0) {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-					_result.orientation, _result.position, SlotAttackType::Swordsman));
-				_amountSlotsPerType[SlotAttackType::Swordsman] += 1;
-			} else {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-					_result.orientation, _result.position, SlotAttackType::Mage));
-				_amountSlotsPerType[SlotAttackType::Mage] += 1;
-			}
-
-		} else {
-			_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-				_result.orientation, _result.position, attackType));
-			_amountSlotsPerType[attackType] += 1;
-		}
+		_result.orientation = universalFunctions->WrapMinMax(_angleAroundCircle, -PI, PI);	
+		_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
+			_result.orientation, _result.position, attackType));
+		_amountSlotsPerType[attackType] += 1;
 	}
 }
 
@@ -263,35 +260,13 @@ std::vector<CharacterAndSlots> SortByAssignmentEase(std::vector<CharacterAndSlot
 
 void VShapePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPerRow, const std::shared_ptr<AnchorPoint>& anchorPoint) {
 	_numberOfSlots = spawnCountPerRow[0] * spawnCountPerRow[1];
-
-	//Creates the slots with a role based on the amounts of rows the circle will have
-	//At one row, every other slot role will be for a swordsman and mages
 	if (spawnCountPerRow[1] == 1) {
-		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Count, false);
+		CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, false);
 
-	} else if (spawnCountPerRow[1] % 2 == 0) {
-		//If there are an even amount of rows, the slot roles in rows further out will be defenders, 
-		// the inner rows roles will be meages
-		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
-			if (i < spawnCountPerRow[1] / 2) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, false);
-				_frontPosition.y += _rowDistance;
-
-			} else {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Mage, false);
-				_frontPosition.y += _rowDistance;
-			}
-		}
 	} else {
-		//Otherwise all three roles will be created with defenders at the outer rows, 
-		// swordsmen in the middle row and mages in the inner row
 		for (unsigned int i = 0; i < spawnCountPerRow[1]; ++i) {
-			if (i < std::round(spawnCountPerRow[1] * 0.33f)) {
+			if (i < spawnCountPerRow[1] * 0.5f) {
 				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Defender, false);
-				_frontPosition.y += _rowDistance;
-
-			} else if (i < std::round(spawnCountPerRow[1] * 0.66f)) {
-				CreateSlotsOfType(anchorPoint, spawnCountPerRow[0], _frontPosition, SlotAttackType::Swordsman, false);
 				_frontPosition.y += _rowDistance;
 
 			} else {
@@ -299,7 +274,7 @@ void VShapePattern::CreateSlots(const std::array<unsigned int, 2>& spawnCountPer
 				_frontPosition.y += _rowDistance;
 			}
 		}
-	}
+	} 
 	_frontPosition.y = 0.f;
 }
 
@@ -319,22 +294,9 @@ void VShapePattern::CreateSlotsOfType(const std::shared_ptr<AnchorPoint>& anchor
 		_currentPosition = (anchorPoint->position + _currentPosition) - anchorPoint->position;
 		_currentPosition.rotate(anchorPoint->orientation);
 
-		if (attackType == SlotAttackType::Count) {
-			if (_multiplier % 2 == 0) {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-					anchorPoint->orientation, _currentPosition, SlotAttackType::Mage));
-				_amountSlotsPerType[SlotAttackType::Mage]++;
-
-			} else {
-				_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-					anchorPoint->orientation, _currentPosition, SlotAttackType::Swordsman));
-				_amountSlotsPerType[SlotAttackType::Swordsman]++;
-			}
-		} else {
-			_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
-				anchorPoint->orientation, _currentPosition, attackType));
-			_amountSlotsPerType[attackType]++;
-		}
+		_slotPositionAndType.emplace_back(SlotPositionAndType(_slotPositionAndType.size(), lockOrientation,
+			anchorPoint->orientation, _currentPosition, attackType));
+		_amountSlotsPerType[attackType]++;
 	}
 	_multiplier = 0;
 }
@@ -376,8 +338,6 @@ const float FormationPattern::GetSlotCost(const WeaponType& weaponType, const un
 			return 0.f;
 		case SlotAttackType::Mage:
 			return 2000.f;
-		case SlotAttackType::Swordsman:
-			return 500.f;
 		default:
 			break;
 		}
@@ -388,8 +348,6 @@ const float FormationPattern::GetSlotCost(const WeaponType& weaponType, const un
 			return 2000.f;
 		case SlotAttackType::Mage:
 			return 0.f;
-		case SlotAttackType::Swordsman:
-			return 1000.f;
 		default:
 			break;
 		}
@@ -400,8 +358,6 @@ const float FormationPattern::GetSlotCost(const WeaponType& weaponType, const un
 			return 2000.f;
 		case SlotAttackType::Mage:
 			return 0.f;
-		case SlotAttackType::Swordsman:
-			return 1000.f;
 		default:
 			break;
 		}
@@ -412,8 +368,6 @@ const float FormationPattern::GetSlotCost(const WeaponType& weaponType, const un
 			return 500.f;
 		case SlotAttackType::Mage:
 			return 1500.f;
-		case SlotAttackType::Swordsman:
-			return 0.f;
 		default:
 			break;
 		}

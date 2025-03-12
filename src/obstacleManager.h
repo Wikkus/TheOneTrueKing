@@ -1,13 +1,14 @@
 #pragma once
 #include "collision.h"
 #include "managerBase.h"
-#include "objectPool.h"
 #include "vector2.h"
 
 #include <SDL2/SDL.h>
 #include <vector>
 
 class Obstacle;
+
+template<typename T> class ObjectPool;
 
 class ObstacleManager : public ManagerBase {
 public:
@@ -20,6 +21,7 @@ public:
 	void SpawnObstacle(const Vector2<float>& position,
 		const float& width, const float& height, const SDL_Color& color);
 
+	void InsertObjectsQuadtree() override;
 	void RemoveAllObjects() override;
 	void RemoveObject(const unsigned int& objectID) override;
 

@@ -7,6 +7,7 @@
 #include "objectBase.h"
 #include "obstacleManager.h"
 #include "obstacleWall.h"
+#include "quadTree.h"
 #include "rayCast.h"
 #include "universalFunctions.h"
 
@@ -15,7 +16,7 @@ AlignBehavior::AlignBehavior() {
 }
 
 SteeringOutput AlignBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
-	if (!fabs(_targetOrientation) > FLT_EPSILON) {
+	if (fabs(_targetOrientation) <= FLT_EPSILON) {
 		_targetOrientation = behaviorData.targetOrientation;
 	}
 	//Calculates the speed that the enemy will rotate and clamps it between -PI, PI radians(-180, 180 degree)
@@ -67,7 +68,7 @@ SteeringOutput FaceBehavior::Steering(const BehaviorData& behaviorData, ObjectBa
 	}
 	//Sets the targetOrientation based on the direction using atan2f
 	_targetOrientation = universalFunctions->VectorAsOrientation(_direction);
-
+	
 	//returns the steering function from alignBehavior which aligns the character with the targetOrientation
 	return AlignBehavior::Steering(behaviorData, objectBase);
 }
@@ -79,7 +80,7 @@ SteeringOutput LookAtDirectionBehavior::Steering(const BehaviorData& behaviorDat
 		return SteeringOutput();
 	}
 	//Sets the targetOrientation to the velocity as orientation using atan2f
-	_targetOrientation = universalFunctions->VectorAsOrientation(objectBase.GetVelocity().absolute());
+	_targetOrientation = universalFunctions->VectorAsOrientation(objectBase.GetVelocity());
 	return AlignBehavior::Steering(behaviorData, objectBase);
 }
 
@@ -147,7 +148,7 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behavior
 
 		/*If minSeparation is larger than colliders diameter,
 		then the enemies won't collide and collisionAvoidance is not need*/
-		if (_minSeparation > 2 * _currentCollider->GetRadius()) {
+		if (_minSeparation > _currentCollider->GetRadius() * 5.f) {
 			continue;
 		}
 		//If the current timeToCollision is the shortest, set the targetEnemy as the first target
@@ -158,6 +159,7 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behavior
 			_firstDistance = _distance;
 			_firstRelativePos = _relativePos;
 			_firstRelativeVel = _relativeVel;
+			debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _firstRelativeVel, { 255, 0, 0, 255 });
 			_gotTarget = true;
 		}
 	}
@@ -175,9 +177,12 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behavior
 	}
 	_relativePos.normalize();
 	_gotTarget = false;
+	_shortestTime = FLT_MAX;
 
 	//Avoid the target by returning acceleration beased on the relativePosition
 	_result.linearVelocity = _relativePos * behaviorData.maxLinearAcceleration;
+	debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _result.linearVelocity, { 0, 255, 0, 255 });
+
 	_result.angularVelocity = 0.f;
 	return _result;
 }
@@ -214,6 +219,7 @@ SteeringOutput SeekBehavior::Steering(const BehaviorData& behaviorData, ObjectBa
 
 ObstacleAvoidanceBehavior::ObstacleAvoidanceBehavior() : SeekBehavior(SteeringBehaviorType::Seek) {
 	_behaviorType = SteeringBehaviorType::ObstacleAvoidance;
+	_circleCollider = std::make_shared<Circle>();
 }
 
 SteeringOutput ObstacleAvoidanceBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
@@ -224,24 +230,27 @@ SteeringOutput ObstacleAvoidanceBehavior::Steering(const BehaviorData& behaviorD
 	_ray.startPosition = objectBase.GetPosition();
 
 	_whiskerA = _ray;
-	_whiskerA.length = _ray.length * 0.75f;
-	_whiskerA.direction = _ray.direction.rotated(-PI * 0.25);
+	_whiskerA.length = _ray.length * 0.5f;
+	_whiskerA.direction = _ray.direction.rotated(-PI * 0.125f);
 
 	_whiskerB = _ray;
-	_whiskerB.length = _ray.length * 0.75f;
-	_whiskerB.direction = _ray.direction.rotated(PI * 0.25);
+	_whiskerB.length = _ray.length * 0.5f;
+	_whiskerB.direction = _ray.direction.rotated(PI * 0.125f);
 
-	//debugDrawer->AddDebugLine(enemy->GetPosition(), enemy->GetPosition() + _ray.direction * _ray.length, {0, 255, 0, 255 });
-	//debugDrawer->AddDebugLine(enemy->GetPosition(), enemy->GetPosition() + _whiskerA.direction * _whiskerA.length, { 0, 255, 0, 255 });
-	//debugDrawer->AddDebugLine(enemy->GetPosition(), enemy->GetPosition() + _whiskerB.direction * _whiskerB.length, { 0, 255, 0, 255 });
+	//debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _ray.direction * _ray.length, { 0, 255, 0, 255 });
+	//debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _whiskerA.direction * _whiskerA.length, { 0, 255, 0, 255 });
+	//debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _whiskerB.direction * _whiskerB.length, { 0, 255, 0, 255 });
+
+	_circleCollider->Init(objectBase.GetPosition(), behaviorData.lookAhead);
+	_queriedObstacles = obstacleQuadTree->Query(_circleCollider);
 
 	//Goes through the obstacles and see if any of the rays intersects with the obstacle
-	for (unsigned int i = 0; i < objectBase.GetQueriedObjects().size(); i++) {
-		if (objectBase.GetQueriedObjects()[i]->GetObjectType() != ObjectType::Obstacle) {
+	for (std::shared_ptr<ObjectBase> object : _queriedObstacles) {
+		if (object->GetCollider()->GetColliderType() != ColliderType::AABB) {
 			//Makes sure the object is an obstacle and has an AABB collider
 			continue;
 		}
-		_currentCollider = std::static_pointer_cast<AABB>(std::static_pointer_cast<AABB>(objectBase.GetQueriedObjects()[i]->GetCollider()));
+		_currentCollider = std::static_pointer_cast<AABB>(std::static_pointer_cast<AABB>(object->GetCollider()));
 		//If any of the rays hit, break the loop
 		_rayPoint = rayCast->RayCastToAABB(_currentCollider, _ray);
 		if (_rayPoint.pointHit) {
@@ -255,9 +264,10 @@ SteeringOutput ObstacleAvoidanceBehavior::Steering(const BehaviorData& behaviorD
 		if (_rayPoint.pointHit) {
 			break;
 		}
+
 	}
 	//If no object is intersecting, return 0
-	if (!_rayPoint.pointHit) {		
+	if (!_rayPoint.pointHit) {
 		return SteeringOutput();
 	}
 	//When the raypoint intersects, set the targetPosition based on the rayPoint position, its normal combined with the avoidanceDistance 
@@ -285,7 +295,7 @@ SteeringOutput PursueBehavior::Steering(const BehaviorData& behaviorData, Object
 	}
 	//Sets the targetPosition to the targets position added with the targets velocity multiplied with the calculated prediction
 	objectBase.SetTargetPosition(objectBase.GetTargetPosition() + (behaviorData.targetsVelocity * _prediction));
-
+	debugDrawer->AddDebugCross(objectBase.GetTargetPosition(), 10.f, { 0, 255, 0, 255 });
 	//Runs the seek steering behavior with the new calculated targetPosition
 	return SeekBehavior::Steering(behaviorData, objectBase);
 }

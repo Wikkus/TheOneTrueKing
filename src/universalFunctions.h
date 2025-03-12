@@ -34,5 +34,8 @@ private:
 	int _currentIndex = -1;
 
 	Vector2<float> _floatPosition;
+
+	Vector2<int> _cursorPosition;
 	Vector2<int> _intPosition;
+
 };

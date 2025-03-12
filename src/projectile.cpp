@@ -76,3 +76,9 @@ void Projectile::DeactivateObject() {
 	_position = deactivatedPosition;
 	_collider->SetPosition(_position);
 }
+
+void Projectile::QueryObjects() {
+	_queriedObjects = objectBaseQuadTree->Query(_collider);
+	_queriedObstacles = obstacleQuadTree->Query(_collider);
+	_queriedObjects.insert(_queriedObjects.end(), _queriedObstacles.begin(), _queriedObstacles.end());
+}

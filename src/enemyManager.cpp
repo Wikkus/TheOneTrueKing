@@ -6,6 +6,7 @@
 #include "enemyHuman.h"
 #include "gameEngine.h"
 #include "objectPool.h"
+#include "obstacleManager.h"
 #include "playerCharacter.h"
 #include "quadTree.h"
 #include "searchSortAlgorithms.h"
@@ -65,6 +66,12 @@ void EnemyManager::UpdateFormation() {
 		_formationManagers[i]->UpdateSlots();
 	}
 }
+void EnemyManager::UpdateTestState() {
+	for (unsigned int i = 0; i < _formationManagers.size(); i++) {
+		_formationManagers[i]->UpdateSlots();
+	}
+}
+
 void EnemyManager::UpdateSurvival() {
 	if (_spawnEnemy) {
 		SurvivalEnemySpawner();
@@ -108,6 +115,7 @@ void EnemyManager::FormationEnemySpawner() {
 		_formationsSpawned += 1;
 		_spawnCountPerRow = { _minCountSpawn, _minRowSpawn };
 	}
+
 	for (unsigned int i = 0; i < _formationsSpawned; i++) {
 		std::uniform_int_distribution dist{ 0, (int)FormationType::Count - 1 };
 		_latestAnchorPoint = std::make_shared<AnchorPoint>();
@@ -115,7 +123,7 @@ void EnemyManager::FormationEnemySpawner() {
 		_latestAnchorPoint->targetPosition = { windowWidth * 0.5f, windowHeight * 0.5f };
 		_latestAnchorPoint->direction = _latestAnchorPoint->targetPosition - _latestAnchorPoint->position;
 		_latestAnchorPoint->orientation = universalFunctions->VectorAsOrientation(_latestAnchorPoint->direction);
-		SpawnFormation(_spawnCountPerRow, (FormationType)dist(randomEngine));
+		SpawnFormation(_spawnCountPerRow, FormationType::VShape);
 	}
 	_spawnCountPerRow[0] += 2;
 	_spawnTimer->SetTimer(false, false);
@@ -133,14 +141,11 @@ void EnemyManager::SpawnFormation(const std::array<unsigned int, 2>& spawnCountP
 			break;
  
 		case SlotAttackType::Mage:
-			_currentWeaponType = WeaponType::SuperStaff;
+			_currentWeaponType = WeaponType::Staff;
 			break;
 		
-		case SlotAttackType::Swordsman:
-			_currentWeaponType = WeaponType::Sword;
-			break;
-
 		default:
+			_currentWeaponType = WeaponType::Staff;
 			break;
 		}
 		_currentSpawnAmount = _formationManagers.back()->GetFormationPattern()->GetSlotsPerType()[_currentAttackType];
@@ -199,6 +204,17 @@ void EnemyManager::SurvivalEnemySpawner() {
 	}
 	_waveNumber++;
 	_spawnTimer->ResetTimer();
+}
+
+void EnemyManager::TestEnemySpawner() {
+	_spawnCountPerRow = { 15, 3 };	
+	_latestAnchorPoint = std::make_shared<AnchorPoint>();
+	_latestAnchorPoint->position = _spawnPositions[0];
+	_latestAnchorPoint->targetPosition = { windowWidth * 0.5f, windowHeight * 0.5f };
+	_latestAnchorPoint->direction = _latestAnchorPoint->targetPosition - _latestAnchorPoint->position;
+	_latestAnchorPoint->orientation = universalFunctions->VectorAsOrientation(_latestAnchorPoint->direction);
+	SpawnFormation(_spawnCountPerRow, FormationType::VShape);
+
 }
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type

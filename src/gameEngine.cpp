@@ -27,6 +27,7 @@ std::shared_ptr<DebugDrawer> debugDrawer;
 std::shared_ptr<GameStateHandler> gameStateHandler;
 std::shared_ptr<ImGuiHandler> imGuiHandler;
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> obstacleQuadTree;
 std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> projectileQuadTree;
 std::shared_ptr<SearchSortAlgorithms> searchSort;
 std::shared_ptr<UniversalFunctions> universalFunctions;
@@ -42,8 +43,8 @@ std::unordered_map<ButtonType, std::shared_ptr<Button>> _buttons;
 
 bool runningGame = false;
 
-float windowHeight = 1080.f;
-float windowWidth = 1920.f;
+float windowWidth = 1280;
+float windowHeight = 720;
 
 MouseButtonState mouseButtons[6];
 
@@ -92,4 +93,5 @@ unsigned int lastObjectID = 0;
 std::random_device randomDevice;
 std::mt19937 randomEngine(randomDevice());
 
-const Vector2<float>& deactivatedPosition = { -10000.f, -10000.f };
+const Vector2<float> deactivatedPosition = { -10000.f, -10000.f };
+Vector2<float> cursorPosition = { 0.f, 0.f };

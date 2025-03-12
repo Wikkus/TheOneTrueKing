@@ -66,6 +66,6 @@ protected:
 	std::unordered_map<unsigned int, std::shared_ptr<ObjectBase>> _activeObjects;
 	std::vector<std::shared_ptr<ObjectBase>> _removeObjects;
 
-	const unsigned int _objectAmountLimit = 3000;
+	unsigned int _objectAmountLimit = 3000;
 };
 

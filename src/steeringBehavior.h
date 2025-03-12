@@ -143,6 +143,9 @@ public:
 
 private:
 	std::shared_ptr<AABB> _currentCollider = nullptr;
+	std::shared_ptr<Circle> _circleCollider = nullptr;
+	std::vector<std::shared_ptr<ObjectBase>> _queriedObstacles;
+
 	Ray _ray;
 	Ray _whiskerA;
 	Ray _whiskerB;

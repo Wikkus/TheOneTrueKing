@@ -26,6 +26,7 @@ public:
 	void UpdateBossRush();
 	void UpdateSurvival();
 	void UpdateFormation();
+	void UpdateTestState();
 
 	void RemoveAllObjects() override;
 	void RemoveObject(const unsigned int& objectID) override;
@@ -43,6 +44,8 @@ public:
 	
 	void SurvivalEnemySpawner();
 
+	void TestEnemySpawner();
+	
 	std::shared_ptr<EnemyBase> SpawnEnemy(const EnemyType& enemyType, const float& orientation,
 		const Vector2<float>& direction, const Vector2<float>& position, const WeaponType& weaponType);
 
@@ -71,9 +74,9 @@ private:
 	Vector2<float> _currentSpawnDirection;
 
 	unsigned int _formationsSpawned = 1;
-	unsigned int _minCountSpawn = 15;
-	unsigned int _minRowSpawn = 1;
-	std::array<unsigned int, 2> _spawnCountPerRow = { 9, 1 };
+	unsigned int _minCountSpawn = 9;
+	unsigned int _minRowSpawn = 3;
+	std::array<unsigned int, 2> _spawnCountPerRow = { 9, 3 };
 
 	unsigned int _enemyAmountLimit = 3000;
 	unsigned int _numberOfEnemyTypes = 0;

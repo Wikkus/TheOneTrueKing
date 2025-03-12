@@ -159,7 +159,7 @@ bool StaffComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
-		_direction = (_owner->GetTargetPosition() - _owner->GetPosition()).normalized();
+		_direction = ((_owner->GetTargetObject()->GetPosition() + _owner->GetTargetObject()->GetVelocity()) - _owner->GetPosition()).normalized();	
 		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
 			_direction, _position, _attackDamage, _projectileSpeed);
 		
@@ -270,7 +270,7 @@ bool SwordComponent::HandleAttack() {
 		_attackCooldownTimer->ResetTimer();
 		return true;
 
-	} else if (!_isAttacking) {
+	} else if (!_isAttacking && universalFunctions->IsInDistance(_owner->GetPosition(), playerCharacters.back()->GetPosition(), _attackRange)) {
 		_chargeAttackTimer->ResetTimer();
 		_isAttacking = true;
 	}

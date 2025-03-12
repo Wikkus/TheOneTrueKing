@@ -2,9 +2,12 @@
 
 #include "debugDrawer.h"
 #include "gameEngine.h"
+#include "objectPool.h"
 #include "obstacleWall.h"
+#include "quadTree.h"
 
 ObstacleManager::ObstacleManager() {
+	_objectAmountLimit = 200;
 	_obstaclePool = std::make_shared<ObjectPool<std::shared_ptr<Obstacle>>>(_objectAmountLimit);
 }
 
@@ -19,8 +22,21 @@ void ObstacleManager::CreateNewObstacle() {
 }
 
 void ObstacleManager::SpawnObstacle(const Vector2<float>& position, const float& width, const float& height, const SDL_Color& color) {
+	if (_obstaclePool->IsEmpty()) {
+		CreateNewObstacle();
+	}
+	_currentObstacle = _obstaclePool->SpawnObject();
 	_currentObstacle->ActivateObstacle(position, width, height, color);
 	_activeObjects.insert(std::make_pair(_currentObstacle->GetObjectID(), _currentObstacle));
+}
+
+void ObstacleManager::InsertObjectsQuadtree() {
+	for (auto& object : _activeObjects) {
+		if (!object.second->GetCollider()->GetIsActive()) {
+			continue;
+		}
+		obstacleQuadTree->Insert(object.second, object.second->GetCollider());
+	}
 }
 
 void ObstacleManager::RemoveAllObjects() {

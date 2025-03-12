@@ -69,10 +69,8 @@ void AABB::SetWidth(const float& width) {
 
 void AABB::SetPosition(const Vector2<float>& position) {
 	_position = position;
-	_min.x = _position.x - (_width * 0.5f);
-	_min.y = _position.y - (_height * 0.5f);
-	_max.x = _position.x + (_width * 0.5f);
-	_max.y = _position.y + (_height * 0.5f);
+	_min = { _position.x - (_width * 0.5f),  _position.y - (_height * 0.5f) };
+	_max = { _position.x + (_width * 0.5f), _position.y + (_height * 0.5f) };
 }
 
 Circle::Circle() {
@@ -107,4 +105,11 @@ bool CollisionCheck::AABBCircleIntersect(const AABB& box, const Circle& circle) 
 bool CollisionCheck::CircleIntersect(const Circle& circleA, const Circle& circleB) {
 	_delta = circleB.GetPosition() - circleA.GetPosition();
 	return _delta.absolute() < (circleA.GetRadius() + circleB.GetRadius());
+}
+
+bool CollisionCheck::RayAABBIntersect(const Ray& line, const AABB& box) {
+
+
+
+	return false;
 }

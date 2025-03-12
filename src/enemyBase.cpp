@@ -17,15 +17,26 @@ EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy)
     _blendSteering = std::make_shared<BlendSteering>();
 
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Align, BehaviorAndWeight(std::make_shared<AlignBehavior>(), 1.f)));
-    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Arrive, BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f)));
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Face, BehaviorAndWeight(std::make_shared<FaceBehavior>(), 1.f)));
-    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Separation, BehaviorAndWeight(std::make_shared<SeparationBehavior>(SteeringBehaviorType::Separation), 1.5f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::LookAtDirection, BehaviorAndWeight(std::make_shared<LookAtDirectionBehavior>(), 1.f)));
+    
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Separation, BehaviorAndWeight(std::make_shared<SeparationBehavior>(SteeringBehaviorType::Separation), 1.5f))); 
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Attraction, BehaviorAndWeight(std::make_shared<SeparationBehavior>(SteeringBehaviorType::Attraction), 1.5f)));
 
-    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Arrive]);
-    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Face]);
-    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Separation]);
-    _prioritySteering->AddGroup(*_blendSteering);
-    _blendSteering->ClearBehaviors();
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::CollisionAbvoidance, BehaviorAndWeight(std::make_shared<CollisionAvoidanceBehavior>(), 2.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::ObstacleAvoidance, BehaviorAndWeight(std::make_shared<ObstacleAvoidanceBehavior>(), 1.f)));
+
+    
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Arrive, BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Seek, BehaviorAndWeight(std::make_shared<SeekBehavior>(SteeringBehaviorType::Seek), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Flee, BehaviorAndWeight(std::make_shared<SeekBehavior>(SteeringBehaviorType::Flee), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Pursue, BehaviorAndWeight(std::make_shared<PursueBehavior>(SteeringBehaviorType::Pursue), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Evade, BehaviorAndWeight(std::make_shared<PursueBehavior>(SteeringBehaviorType::Evade), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::VelocityMatch, BehaviorAndWeight(std::make_shared<VelocityMatchBehavior>(), 1.f)));
+
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Wander, BehaviorAndWeight(std::make_shared<WanderBehavior>(), 1.f)));
+
+    SetDefaultBehaviors();
 }
 
 void EnemyBase::Render() {
@@ -76,6 +87,18 @@ void EnemyBase::SetWeaponComponent(std::shared_ptr<WeaponComponent> weaponCompon
     _weaponComponent = weaponComponent;
 }
 
+const std::shared_ptr<BlendSteering> EnemyBase::GetBlendSteering() const {
+    return _blendSteering;
+}
+
+const std::shared_ptr<PrioritySteering> EnemyBase::GetPrioritySteering() const {
+    return _prioritySteering;
+}
+
+std::unordered_map<SteeringBehaviorType, BehaviorAndWeight> EnemyBase::GetSteeringBehviors() const {
+    return _steeringBehviors;
+}
+
 void EnemyBase::UpdateMovement() {
     UpdateAngularMovement();
     UpdateLinearMovement();
@@ -116,8 +139,18 @@ void EnemyBase::DeactivateObject() {
     _position = deactivatedPosition;
     _collider->SetPosition(_position);
     _formationIndex = -1;
+    SetDefaultBehaviors();
     weaponManager->RemoveObject(_weaponComponent->GetObjectID());
     _weaponComponent = nullptr;
+}
+
+void EnemyBase::SetDefaultBehaviors() {
+    _prioritySteering->ClearGroups();
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Arrive]);
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Face]);
+    _blendSteering->AddSteeringBehavior(_steeringBehviors[SteeringBehaviorType::Separation]);
+    _prioritySteering->AddGroup(*_blendSteering);
+    _blendSteering->ClearBehaviors();
 }
 
 void EnemyBase::SetFormationIndex(const int& formationIndex) {

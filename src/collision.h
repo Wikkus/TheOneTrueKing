@@ -23,7 +23,6 @@ public:
 	virtual void SetIsActive(const bool& isActive);
 
 protected:
-	std::shared_ptr<ObjectBase> _owner = nullptr;
 	ColliderType _colliderType = ColliderType::Count;
 	bool _isActive = true;
 	Vector2<float> _position = { 0.f, 0.f };
@@ -87,6 +86,8 @@ public:
 	bool AABBCircleIntersect(const AABB& box, const Circle& circle);
 
 	bool CircleIntersect(const Circle& circleA, const Circle& circleB);
+
+	bool RayAABBIntersect(const Ray& line, const AABB& box);
 
 private:
 	Vector2<float> _clamped = { 0.f, 0.f };

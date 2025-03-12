@@ -28,12 +28,7 @@ void ManagerBase::InsertObjectsQuadtree() {
 		if (!object.second->GetCollider()->GetIsActive()) {
 			continue;
 		}
-		if (object.second->GetObjectType() == ObjectType::Projectile) {
-			projectileQuadTree->Insert(object.second, object.second->GetCollider());
-
-		} else {
-			objectBaseQuadTree->Insert(object.second, object.second->GetCollider());
-		}
+		objectBaseQuadTree->Insert(object.second, object.second->GetCollider());
 	}
 }
 

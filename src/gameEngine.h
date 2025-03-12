@@ -52,6 +52,7 @@ extern std::vector<std::shared_ptr<PlayerCharacter>> playerCharacters;
 extern std::shared_ptr<ProjectileManager> projectileManager;
 
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> objectBaseQuadTree;
+extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> obstacleQuadTree;
 extern std::shared_ptr<QuadTree<std::shared_ptr<ObjectBase>>> projectileQuadTree;
 
 extern std::shared_ptr<SearchSortAlgorithms> searchSort;
@@ -101,4 +102,5 @@ extern unsigned int lastObjectID;
 extern std::random_device randomDevice;
 extern std::mt19937 randomEngine;
 
-extern const Vector2<float>& deactivatedPosition;
+extern const Vector2<float> deactivatedPosition;
+extern Vector2<float> cursorPosition;

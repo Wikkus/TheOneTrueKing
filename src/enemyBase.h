@@ -40,6 +40,10 @@ public:
 
 	const std::shared_ptr<WeaponComponent> GetWeaponComponent() const;
 	void SetWeaponComponent(std::shared_ptr<WeaponComponent> weaponComponent);
+	
+	const std::shared_ptr<BlendSteering> GetBlendSteering() const;
+	const std::shared_ptr<PrioritySteering> GetPrioritySteering() const;
+	std::unordered_map<SteeringBehaviorType, BehaviorAndWeight> GetSteeringBehviors() const;
 
 	void UpdateMovement();
 	void UpdateAngularMovement();
@@ -48,6 +52,8 @@ public:
 	virtual void ActivateEnemy(const float& orienation, const Vector2<float>& direction, 
 		const Vector2<float>& position, const WeaponType& weaponType);
 	void DeactivateObject() override;
+
+	void SetDefaultBehaviors();
 
 	virtual void SetFormationIndex(const int& formationIndex);
 	virtual void SetTargetOrientation(const float& targetOrientation);

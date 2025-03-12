@@ -19,7 +19,6 @@ enum class FormationType {
 enum class SlotAttackType {
 	Defender,
 	Mage,
-	Swordsman,
 	Count
 };
 
@@ -115,10 +114,14 @@ private:
 	
 	float _angleAroundCircle = 0.f;
 	float _radius = 0.f;
-	float _characterRadius = 16.f;
+	float _characterRadius = 25.f;
 
 	unsigned int _filledSlots = 0;
 
+	float _rowInverse = 0.f;
+	float _countMultiplier = 0.f;
+	float _slotCount = 0.f;
+	float _difference = 0.f;
 };
 
 class VShapePattern : public FormationPattern {
