@@ -46,7 +46,7 @@ std::shared_ptr<DecisionTreeNode> DashAction::MakeDecision() {
 }
 
 bool DashAction::ExecuteAction() {
-	return _weaponComponent->HandleAttack();
+	return _weaponComponent->UpdateAttack();
 }
 
 EnergyBlastAction::EnergyBlastAction(std::shared_ptr<ObjectBase> owner) : AttackAction(owner) {
@@ -61,7 +61,7 @@ std::shared_ptr<DecisionTreeNode> EnergyBlastAction::MakeDecision() {
 }
 
 bool EnergyBlastAction::ExecuteAction() {
-	return _weaponComponent->HandleAttack();
+	return _weaponComponent->UpdateAttack();
 }
 
 WarstompAction::WarstompAction(std::shared_ptr<ObjectBase> owner) : AttackAction(owner) {
@@ -75,7 +75,7 @@ std::shared_ptr<DecisionTreeNode> WarstompAction::MakeDecision() {
 }
 
 bool WarstompAction::ExecuteAction() {
-	return _weaponComponent->HandleAttack();
+	return _weaponComponent->UpdateAttack();
 }
 
 

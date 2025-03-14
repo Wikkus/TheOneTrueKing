@@ -99,7 +99,12 @@ ShieldComponent::ShieldComponent() {
 
 ShieldComponent::~ShieldComponent() {}
 
-bool ShieldComponent::HandleAttack() {
+bool ShieldComponent::UpdateAttack() {
+	ExecuteAttack();
+	return true;
+}
+
+bool ShieldComponent::ExecuteAttack() {
 	return true;
 }
 
@@ -148,7 +153,7 @@ void StaffComponent::Init() {
 }
 
 //If the weapon is a staff it shoots a fireball towards the player
-bool StaffComponent::HandleAttack() {
+bool StaffComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 	}
@@ -159,10 +164,7 @@ bool StaffComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
-		_direction = ((_owner->GetTargetObject()->GetPosition() + _owner->GetTargetObject()->GetVelocity()) - _owner->GetPosition()).normalized();	
-		projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction), 
-			_direction, _position, _attackDamage, _projectileSpeed);
-		
+		ExecuteAttack();
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
 		return true;
@@ -178,6 +180,13 @@ bool StaffComponent::HandleAttack() {
 		}
 	}
 	return false;
+}
+
+bool StaffComponent::ExecuteAttack() {
+	_direction = ((_owner->GetTargetObject()->GetPosition() - _owner->GetPosition()).normalized());
+	projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction),
+		_direction, _position, _attackDamage, _projectileSpeed);
+	return true;
 }
 
 void StaffComponent::SetValuesToDefault() {
@@ -211,10 +220,16 @@ SuperStaffComponent::SuperStaffComponent() {
 SuperStaffComponent::~SuperStaffComponent() {
 }
 
-bool SuperStaffComponent::HandleAttack() {
+bool SuperStaffComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 	}
+	ExecuteAttack();
+	_attackCooldownTimer->ResetTimer();
+	return true;
+}
+
+bool SuperStaffComponent::ExecuteAttack() {
 	_multiShotAngle = (-_angleOffset * _multiShotAmount);
 	_multiShotAngle /= _multiShotAmount;
 
@@ -226,7 +241,6 @@ bool SuperStaffComponent::HandleAttack() {
 			_multiShotDirection, _position, _attackDamage, _projectileSpeed);
 		_multiShotAngle += _angleOffset;
 	}
-	_attackCooldownTimer->ResetTimer();
 	return true;
 }
 
@@ -252,7 +266,7 @@ SwordComponent::SwordComponent() {
 }
 
 //If the weapon is a sword it damages the player if its close enough
-bool SwordComponent::HandleAttack() {
+bool SwordComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 	}
@@ -263,9 +277,7 @@ bool SwordComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
-		if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
-			_owner->GetTargetObject()->TakeDamage(_attackDamage);
-		}
+		ExecuteAttack();
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
 		return true;
@@ -275,6 +287,13 @@ bool SwordComponent::HandleAttack() {
 		_isAttacking = true;
 	}
 	return false;
+}
+
+bool SwordComponent::ExecuteAttack() {
+	if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		_owner->GetTargetObject()->TakeDamage(_attackDamage);
+	}
+	return true;
 }
 
 void SwordComponent::SetValuesToDefault() {
@@ -300,7 +319,7 @@ WarstompComponent::WarstompComponent() {
 }
 
 //If weaponComponent is a warstomp, it will damage the player if it is in range of the AOE
-bool WarstompComponent::HandleAttack() {
+bool WarstompComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 	}
@@ -312,18 +331,23 @@ bool WarstompComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking && _chargeAttackTimer->GetIsFinished()) {
-		if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
-			_owner->GetTargetObject()->TakeDamage(_attackDamage);
-		}
+		ExecuteAttack();
 		_isAttacking = false;
 		_attackCooldownTimer->ResetTimer();
-		return true;
+		return true;		
 
 	} else if (!_isAttacking) {
 		_chargeAttackTimer->ResetTimer();
 		_isAttacking = true;
 	}
 	return false;
+}
+
+bool WarstompComponent::ExecuteAttack() {
+	if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
+		_owner->GetTargetObject()->TakeDamage(_attackDamage);
+	}
+	return true;
 }
 
 void WarstompComponent::SetValuesToDefault() {
@@ -347,7 +371,7 @@ TusksComponent::TusksComponent() {
 	_weaponType = WeaponType::Tusks;
 }
 
-bool TusksComponent::HandleAttack() {
+bool TusksComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
 		return false;
 
@@ -358,16 +382,7 @@ bool TusksComponent::HandleAttack() {
 		return false;
 	}
 	if (_isAttacking) {
-		_owner->SetPosition(_owner->GetPosition() + _dashDirection * _dashSpeed * deltaTime);
-		if (!_damageCooldown->GetIsActive()) {
-			for (unsigned int i = 0; i < _owner->GetQueriedObjects().size(); i++) {
-				if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetTargetObject()->GetObjectType()) {
-					_owner->GetQueriedObjects()[i]->TakeDamage(_attackDamage);
-					_damageCooldown->ResetTimer();
-				}
-			}
-		}
-		if ((_dashStartPosition - _owner->GetPosition()).absolute() > _dashDistance) {
+		if (ExecuteAttack()) {
 			_attackCooldownTimer->ResetTimer();
 			_chargeAttackTimer->SetTimer(false, false);
 			_isAttacking = false;
@@ -386,6 +401,22 @@ bool TusksComponent::HandleAttack() {
 			_owner->SetVelocity({ 0.f, 0.f });
 			_owner->SetRotation(0.f);
 		}
+	}
+	return false;
+}
+
+bool TusksComponent::ExecuteAttack() {
+	_owner->SetPosition(_owner->GetPosition() + _dashDirection * _dashSpeed * deltaTime);
+	if (!_damageCooldown->GetIsActive()) {
+		for (unsigned int i = 0; i < _owner->GetQueriedObjects().size(); i++) {
+			if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetTargetObject()->GetObjectType()) {
+				_owner->GetQueriedObjects()[i]->TakeDamage(_attackDamage);
+				_damageCooldown->ResetTimer();
+			}
+		}
+	}
+	if ((_dashStartPosition - _owner->GetPosition()).absolute() > _dashDistance) {		
+		return true;
 	}
 	return false;
 }

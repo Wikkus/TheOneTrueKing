@@ -98,7 +98,7 @@ void PlayerCharacter::UpdateHealthRegen() {
 
 void PlayerCharacter::UpdateInput() {
 	if (GetMouseButton(SDL_BUTTON_LEFT)) {
-		_weaponComponent->HandleAttack();
+		_weaponComponent->UpdateAttack();
 	}
 	if (GetKeyPressed(SDL_SCANCODE_ESCAPE)) {
 		gameStateHandler->AddState(std::make_shared<PauseState>());

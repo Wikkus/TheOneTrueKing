@@ -30,7 +30,8 @@ public:
 	void Update() override;
 	void Render() override;
 
-	virtual bool HandleAttack() { return false; }
+	virtual bool UpdateAttack() { return false; }
+	virtual bool ExecuteAttack() { return false; }
 
 	const virtual bool GetIsAttacking() const;
 
@@ -74,7 +75,8 @@ public:
 	ShieldComponent();
 	~ShieldComponent();
 
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 
@@ -88,7 +90,8 @@ public:
 	~StaffComponent();
 
 	void Init() override;
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 
@@ -106,7 +109,8 @@ public:
 	SuperStaffComponent();
 	~SuperStaffComponent();
 
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 
@@ -124,7 +128,8 @@ public:
 	SwordComponent();
 	~SwordComponent() {}
 
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 
@@ -136,7 +141,8 @@ public:
 	WarstompComponent();
 	~WarstompComponent() {}
 
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 
@@ -149,7 +155,8 @@ public:
 	TusksComponent();
 	~TusksComponent() {}
 
-	bool HandleAttack() override;
+	bool UpdateAttack() override;
+	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
 

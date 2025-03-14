@@ -54,6 +54,6 @@ void EnemyBoar::Update() {
 		UpdateMovement();
 	}
 	_weaponComponent->Update();
-	_weaponComponent->HandleAttack();
+	_weaponComponent->UpdateAttack();
 	_collider->SetPosition(_position);
 }
