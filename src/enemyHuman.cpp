@@ -40,6 +40,12 @@ EnemyHuman::EnemyHuman() : EnemyBase(EnemyType::Human) {
 
 	_behaviorData.lookAhead = _behaviorData.maxSpeed;
 	_behaviorData.avoidDistance = _behaviorData.maxSpeed;
+
+
+	_behaviorData.wanderOffset = 100.f;
+	_behaviorData.wanderRadius = 10.f;
+	_behaviorData.wanderRate = PI * 0.1f;
+
 }
 
 EnemyHuman::~EnemyHuman() {}
@@ -88,31 +94,6 @@ void EnemyHuman::Update() {
 }
 
 void EnemyHuman::UpdateTarget() {
-	//if (gameStateHandler->GetGameMode() == GameMode::Formation) {
-	//	if (_weaponComponent->GetWeaponType() == WeaponType::Sword) {
-	//		//When the formation is at the target position, the swordfighters will change target and run to the player
-	//		switch (_currentTargetState) {
-	//		case CurrentTarget::Player:
-	//			_targetPosition = _currentTarget->GetPosition();
-	//			break;
-	//		case CurrentTarget::SlotFormation:
-	//			if (enemyManager->GetFormationManagers()[_formationIndex]->GetInPosition()) {
-	//				if (!_prioritySteering->ReplaceSteeringBehavior(SteeringBehaviorType::Align, _steeringBehviors[SteeringBehaviorType::Face])) {
-	//					_prioritySteering->AddBehaviorInGroup(_steeringBehviors[SteeringBehaviorType::Face], 0);
-	//				}
-	//				_currentTargetState = CurrentTarget::Player;
-	//			}
-	//			break;
-	//		case CurrentTarget::Count:
-	//			break;
-	//		default:
-	//			break;
-	//		}
-	//	}
-	//} else {	
-	//	//_targetPosition = cursorPosition;
-	//	//_targetPosition = _currentTarget->GetPosition();
-	//	//_behaviorData.targetsVelocity = _currentTarget->GetVelocity();
-	//}
 	_currentTarget = playerCharacters.back();
+	_targetPosition = _currentTarget->GetPosition();
 }

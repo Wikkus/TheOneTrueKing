@@ -24,7 +24,7 @@ EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy)
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Attraction, BehaviorAndWeight(std::make_shared<SeparationBehavior>(SteeringBehaviorType::Attraction), 1.5f)));
 
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::CollisionAbvoidance, BehaviorAndWeight(std::make_shared<CollisionAvoidanceBehavior>(), 2.f)));
-    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::ObstacleAvoidance, BehaviorAndWeight(std::make_shared<ObstacleAvoidanceBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::ObstacleAvoidance, BehaviorAndWeight(std::make_shared<ObstacleAvoidanceBehavior>(), 5.f)));
 
     
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Arrive, BehaviorAndWeight(std::make_shared<ArriveBehavior>(), 1.f)));
@@ -33,8 +33,7 @@ EnemyBase::EnemyBase(const EnemyType& enemyType) : ObjectBase(ObjectType::Enemy)
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Pursue, BehaviorAndWeight(std::make_shared<PursueBehavior>(SteeringBehaviorType::Pursue), 1.f)));
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Evade, BehaviorAndWeight(std::make_shared<PursueBehavior>(SteeringBehaviorType::Evade), 1.f)));
     _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::VelocityMatch, BehaviorAndWeight(std::make_shared<VelocityMatchBehavior>(), 1.f)));
-
-    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Wander, BehaviorAndWeight(std::make_shared<WanderBehavior>(), 1.f)));
+    _steeringBehviors.insert(std::make_pair(SteeringBehaviorType::Wander, BehaviorAndWeight(std::static_pointer_cast<FaceBehavior>(std::make_shared<WanderBehavior>()), 1.f)));
 
     SetDefaultBehaviors();
 }

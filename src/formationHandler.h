@@ -135,7 +135,7 @@ private:
 	void CreateSlotsOfType(const std::shared_ptr<AnchorPoint>& anchorPoint, const unsigned int& amountSlots,
 		const Vector2<float>& frontSlotPosition, const SlotAttackType& attackType, const bool& lockOrientation);
 
-	float _offset = 15.f;
+	float _outOfBorderOffset = 15.f;
 	float _rowDistance = 32.f;
 	unsigned int _multiplier = 0;
 	

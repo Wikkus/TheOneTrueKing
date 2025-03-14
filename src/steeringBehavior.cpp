@@ -68,7 +68,7 @@ SteeringOutput FaceBehavior::Steering(const BehaviorData& behaviorData, ObjectBa
 	}
 	//Sets the targetOrientation based on the direction using atan2f
 	_targetOrientation = universalFunctions->VectorAsOrientation(_direction);
-	
+
 	//returns the steering function from alignBehavior which aligns the character with the targetOrientation
 	return AlignBehavior::Steering(behaviorData, objectBase);
 }
@@ -159,7 +159,6 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behavior
 			_firstDistance = _distance;
 			_firstRelativePos = _relativePos;
 			_firstRelativeVel = _relativeVel;
-			debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _firstRelativeVel, { 255, 0, 0, 255 });
 			_gotTarget = true;
 		}
 	}
@@ -181,7 +180,6 @@ SteeringOutput CollisionAvoidanceBehavior::Steering(const BehaviorData& behavior
 
 	//Avoid the target by returning acceleration beased on the relativePosition
 	_result.linearVelocity = _relativePos * behaviorData.maxLinearAcceleration;
-	debugDrawer->AddDebugLine(objectBase.GetPosition(), objectBase.GetPosition() + _result.linearVelocity, { 0, 255, 0, 255 });
 
 	_result.angularVelocity = 0.f;
 	return _result;
@@ -295,7 +293,6 @@ SteeringOutput PursueBehavior::Steering(const BehaviorData& behaviorData, Object
 	}
 	//Sets the targetPosition to the targets position added with the targets velocity multiplied with the calculated prediction
 	objectBase.SetTargetPosition(objectBase.GetTargetPosition() + (behaviorData.targetsVelocity * _prediction));
-	debugDrawer->AddDebugCross(objectBase.GetTargetPosition(), 10.f, { 0, 255, 0, 255 });
 	//Runs the seek steering behavior with the new calculated targetPosition
 	return SeekBehavior::Steering(behaviorData, objectBase);
 }
@@ -361,33 +358,38 @@ SteeringOutput VelocityMatchBehavior::Steering(const BehaviorData& behaviorData,
 	return _result;
 }
 
-WanderBehavior::WanderBehavior() {
-	_behaviorType = SteeringBehaviorType::Wander;
+WanderBehavior::WanderBehavior() : SeekBehavior(SteeringBehaviorType::Seek) {
+	SteeringBehavior::_behaviorType = SteeringBehaviorType::Wander;
 }
 
 SteeringOutput WanderBehavior::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {
+	_randomNumber = universalFunctions->RandomBinomialFloat(-1, 1) * behaviorData.wanderRate;
 	//Set the current wander orientation based on a random value combined with the wander rate
-	_wanderOrientation += universalFunctions->RandomBinomialFloat(-1, 1) * behaviorData.wanderRate;
+	_wanderOrientation += _randomNumber;
 
 	//Calculates the combined orientation between the enemy and the current wanderOrientation
 	_targetOrientation = _wanderOrientation + objectBase.GetOrientation();
-	
+
 	//Calculates the center position of the target
-	_targetPosition = objectBase.GetPosition() + 
-		(universalFunctions->OrientationAsVector(objectBase.GetOrientation()) * behaviorData.wanderOffset);
+	_targetPosition = objectBase.GetPosition() - (universalFunctions->OrientationAsVector(objectBase.GetOrientation()) * behaviorData.wanderOffset);
+
+	//If the target is near the border, add rotation based to prevent it from going outside
+	if (universalFunctions->OutsideBorderX(_targetPosition.x, _outOfBorderOffset) || universalFunctions->OutsideBorderY(_targetPosition.y, _outOfBorderOffset)) {
+		if (objectBase.GetRotation() >= 0) {
+			objectBase.SetRotation(objectBase.GetRotation() + behaviorData.maxRotation * deltaTime);
+
+		} else {
+			objectBase.SetRotation(objectBase.GetRotation() - behaviorData.maxRotation * deltaTime);
+		}
+	}
 
 	//Adds the orientation and wanderRadius as an offset to the targetPosition
-	objectBase.SetTargetPosition(_targetPosition +
-		universalFunctions->OrientationAsVector(behaviorData.targetOrientation) * behaviorData.wanderRadius);
+	objectBase.SetTargetPosition(_targetPosition - (universalFunctions->OrientationAsVector(_targetOrientation) * behaviorData.wanderRadius));
+	
+	debugDrawer->AddDebugCross(objectBase.GetTargetPosition(), 15.f, { 0, 255, 0, 255 });
+	debugDrawer->AddDebugCircle(_targetPosition, behaviorData.wanderRadius, { 0, 255,0,255 });
 
-	debugDrawer->AddDebugCross(objectBase.GetTargetPosition(), 25.f, { 0, 255, 0, 255 });
-
-	//Use the faceBehavior to make the enemy look at the new targetPosition
-	_result = FaceBehavior::Steering(behaviorData, objectBase);
-
-	//Set the linearVelocity based on the enemies current orientation
-	_result.linearVelocity = universalFunctions->OrientationAsVector(objectBase.GetOrientation()) * behaviorData.maxLinearAcceleration;
-	return _result;
+	return { SeekBehavior::Steering(behaviorData, objectBase).linearVelocity, FaceBehavior::Steering(behaviorData, objectBase).angularVelocity };
 }
 
 SteeringOutput BlendSteering::Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) {

@@ -12,11 +12,11 @@ bool UniversalFunctions::IsInDistance(const Vector2<float>& positionA, const Vec
 }
 
 bool UniversalFunctions::OutsideBorderX(const float& positionX, const float& offset) {
-	return positionX + offset < 0.f || positionX - offset > windowWidth;
+	return positionX < offset || positionX > windowWidth - offset;
 }
 
 bool UniversalFunctions::OutsideBorderY(const float& positionY, const float& offset) {
-	return positionY + offset < 0.f || positionY - offset > windowHeight;
+	return positionY < offset || positionY > windowHeight - offset;
 }
 
 float UniversalFunctions::Clamp(const float& a, const float& min, const float& max) {

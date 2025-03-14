@@ -207,14 +207,18 @@ void EnemyManager::SurvivalEnemySpawner() {
 }
 
 void EnemyManager::TestEnemySpawner() {
-	_spawnCountPerRow = { 15, 3 };	
-	_latestAnchorPoint = std::make_shared<AnchorPoint>();
-	_latestAnchorPoint->position = _spawnPositions[0];
-	_latestAnchorPoint->targetPosition = { windowWidth * 0.5f, windowHeight * 0.5f };
-	_latestAnchorPoint->direction = _latestAnchorPoint->targetPosition - _latestAnchorPoint->position;
-	_latestAnchorPoint->orientation = universalFunctions->VectorAsOrientation(_latestAnchorPoint->direction);
-	SpawnFormation(_spawnCountPerRow, FormationType::VShape);
+	obstacleManager->SpawnObstacle({ 5.f, windowHeight * 0.5f }, 10.f, windowHeight, { 175, 0, 125, 255});
+	obstacleManager->SpawnObstacle({ windowWidth - 5.f, windowHeight * 0.5f }, 10.f, windowHeight, { 175, 0, 125, 255});
 
+	obstacleManager->SpawnObstacle({ windowWidth * 0.5f, 5.f }, windowWidth, 10.f, { 175, 0, 125, 255});
+	obstacleManager->SpawnObstacle({ windowWidth * 0.5f, windowHeight - 5.f }, windowWidth, 10.f, { 175, 0, 125, 255});
+
+	_currentEnemy = SpawnEnemy(EnemyType::Human, 0, { 0.f, 0.f }, { 300.f, 200.f }, WeaponType::Sword);
+	_currentEnemy->GetBlendSteering()->ClearBehaviors();
+	_currentEnemy->GetPrioritySteering()->ClearGroups();	
+	_currentEnemy->GetBlendSteering()->AddSteeringBehavior(_currentEnemy->GetSteeringBehviors()[SteeringBehaviorType::ObstacleAvoidance]);
+	_currentEnemy->GetBlendSteering()->AddSteeringBehavior(_currentEnemy->GetSteeringBehviors()[SteeringBehaviorType::Wander]);
+	_currentEnemy->GetPrioritySteering()->AddGroup(*_currentEnemy->GetBlendSteering());
 }
 
 //Spawn a specific enemy from the object pool. If the pool is empty, create a new enemy of that type

@@ -30,7 +30,7 @@ enum class SteeringBehaviorType {
 };
 
 struct SteeringOutput {
-	Vector2<float> linearVelocity = Vector2<float>(0, 0);
+	Vector2<float> linearVelocity = { 0, 0 };
 	float angularVelocity = 0.f;
 };
 
@@ -40,7 +40,6 @@ public:
 	~SteeringBehavior() {}
 	virtual SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase);
 	virtual const SteeringBehaviorType GetBehaviorType() const;
-
 
 protected:
 	SteeringBehaviorType _behaviorType = SteeringBehaviorType::Count;
@@ -186,7 +185,7 @@ public:
 	SteeringOutput Steering(const BehaviorData& behaviorData, ObjectBase& objectBase) override;
 };
 
-class WanderBehavior : public FaceBehavior {
+class WanderBehavior : public FaceBehavior, public SeekBehavior {
 public:
 	WanderBehavior();
 	~WanderBehavior() {}
@@ -195,8 +194,10 @@ public:
 
 private:
 	Vector2<float> _targetPosition = { 0.f, 0.f };
-	float _wanderOrientation = 0;
 
+	float _outOfBorderOffset = 25.f;
+	float _randomNumber = 0.f;
+	float _wanderOrientation = 0.f;
 };
 
 struct BehaviorAndWeight {

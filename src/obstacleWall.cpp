@@ -31,7 +31,7 @@ void Obstacle::Render() {
 	_rect.w = _width;
 	_rect.h = _height;
 
-	debugDrawer->AddDebugRectangle(_boxCollider->GetPosition(), _boxCollider->GetMin(), _boxCollider->GetMax(), { 0, 255, 0, 255}, false);
+	//debugDrawer->AddDebugRectangle(_boxCollider->GetPosition(), _boxCollider->GetMin(), _boxCollider->GetMax(), { 0, 255, 0, 255}, false);
 
 	SDL_SetRenderDrawColor(renderer, _color.r, _color.g, _color.b, _color.a);
 	SDL_RenderFillRectF(renderer, &_rect);
