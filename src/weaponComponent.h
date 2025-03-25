@@ -159,14 +159,22 @@ public:
 	bool ExecuteAttack() override;
 
 	void SetValuesToDefault() override;
+	void SetIsJumpback(bool isJumpback);
 
 private:
 	const char* _path = "res/sprites/Tusks.png";
 	std::shared_ptr<Timer> _damageCooldown = nullptr;
 
+	bool _isJumpback = false;
+
 	float _dashDistance = 0.f;
+	float _jumpBackDistance = 200.f;
 	float _dashSpeed = 300.f;
+	float _distanceTraveled = 0.f;
 
 	Vector2<float> _dashDirection;
 	Vector2<float> _dashStartPosition;
+
+	Vector2<float> _formerPosition;
+	Vector2<float> _oldPosition;
 };

@@ -13,10 +13,10 @@ DecisionTreeNode::DecisionTreeNode(std::shared_ptr<ObjectBase> owner) {
 }
 
 std::shared_ptr<DecisionTreeNode> DecisionTreeNode::MakeDecision() {
-	return std::shared_ptr<DecisionTreeNode>();
+	return GetBranch()->MakeDecision();
 }
 std::shared_ptr<DecisionTreeNode> DecisionTreeNode::GetBranch() {
-	return std::shared_ptr<DecisionTreeNode>();
+	return shared_from_this();
 }
 
 const NodeType DecisionTreeNode::GetNodeType() const {
@@ -27,22 +27,20 @@ Action::Action(std::shared_ptr<ObjectBase> owner) : DecisionTreeNode(owner) {
 	_nodeType = NodeType::ActionNode;
 }
 
-std::shared_ptr<DecisionTreeNode> Action::MakeDecision() {	
+std::shared_ptr<DecisionTreeNode> Action::MakeDecision() {
 	return shared_from_this();
 }
 
-std::shared_ptr<DecisionTreeNode> AttackAction::MakeDecision() {
-	return shared_from_this();
-}
 
-DashAction::DashAction(std::shared_ptr<ObjectBase> owner) : AttackAction(owner) {
+DashAction::DashAction(std::shared_ptr<ObjectBase> owner, bool isJumpback) : AttackAction(owner) {
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Tusks, _owner);
-	_weaponComponent->SetWeaponValues(_owner, false, 300, 300.f, 2.f, 1.f);
+	if (isJumpback) {
+		_weaponComponent->SetWeaponValues(_owner, false, 0, FLT_MAX, 0.5f, 1.f);
+		std::static_pointer_cast<TusksComponent>(_weaponComponent)->SetIsJumpback(isJumpback);
+	} else {
+		_weaponComponent->SetWeaponValues(_owner, false, 300, FLT_MAX, 2.f, 1.f);
+	}
 	_owner->SetWeaponComponent(_weaponComponent);
-}
-
-std::shared_ptr<DecisionTreeNode> DashAction::MakeDecision() {
-	return std::shared_ptr<DecisionTreeNode>();
 }
 
 bool DashAction::ExecuteAction() {
@@ -51,13 +49,9 @@ bool DashAction::ExecuteAction() {
 
 EnergyBlastAction::EnergyBlastAction(std::shared_ptr<ObjectBase> owner) : AttackAction(owner) {
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Staff, _owner);
-	_weaponComponent->SetWeaponValues(_owner, false, 300, 500.f, 2.f, 1.f);
+	_weaponComponent->SetWeaponValues(_owner, false, 300, 500.f, 0.75f, 0.25f);
 	std::static_pointer_cast<StaffComponent>(_weaponComponent)->SetProjectileValues(ProjectileType::Energyblast, true, 350.f);
 	_owner->SetWeaponComponent(_weaponComponent);
-}
-
-std::shared_ptr<DecisionTreeNode> EnergyBlastAction::MakeDecision() {
-	return shared_from_this();
 }
 
 bool EnergyBlastAction::ExecuteAction() {
@@ -66,21 +60,12 @@ bool EnergyBlastAction::ExecuteAction() {
 
 WarstompAction::WarstompAction(std::shared_ptr<ObjectBase> owner) : AttackAction(owner) {
 	_weaponComponent = weaponManager->SpawnWeapon(WeaponType::Warstomp, _owner);
-	_weaponComponent->SetWeaponValues(_owner, false, 300, 300.f, 2.f, 1.f);
+	_weaponComponent->SetWeaponValues(_owner, false, 300, 250.f, 2.f, 1.f);
 	_owner->SetWeaponComponent(_weaponComponent);
-}
-
-std::shared_ptr<DecisionTreeNode> WarstompAction::MakeDecision() {
-	return shared_from_this();
 }
 
 bool WarstompAction::ExecuteAction() {
 	return _weaponComponent->UpdateAttack();
-}
-
-
-std::shared_ptr<DecisionTreeNode> MoveAction::MakeDecision() {
-	return shared_from_this();
 }
 
 bool MoveAction::ExecuteAction() {
@@ -90,14 +75,6 @@ bool MoveAction::ExecuteAction() {
 
 Decision::Decision(std::shared_ptr<ObjectBase> owner)  : DecisionTreeNode(owner) {
 	_nodeType = NodeType::DecisionNode;
-}
-
-std::shared_ptr<DecisionTreeNode> Decision::GetBranch() {
-	return std::shared_ptr<DecisionTreeNode>();
-}
-
-std::shared_ptr<DecisionTreeNode> Decision::MakeDecision() {
-	return GetBranch()->MakeDecision();
 }
 
 void Decision::SetFalseNode(std::shared_ptr<DecisionTreeNode> falseNode) {
@@ -129,7 +106,14 @@ RandomDecision::RandomDecision(std::shared_ptr<ObjectBase> owner, const float& t
 	_timer = timerHandler->SpawnTimer(timeOut, false, false);
 }
 
-bool RandomDecision::TestValue() {
+std::shared_ptr<DecisionTreeNode> RandomDecision::GetBranch() {
+	if (TestValue() == 0) {
+		return _trueNode->GetBranch();
+	}
+	return _falseNode->GetBranch();
+}
+
+int RandomDecision::TestValue() {
 	if (_timer->GetIsActive()) {
 		return _currentDecision;
 	} else {
@@ -143,18 +127,18 @@ std::shared_ptr<DecisionTreeNode> MultiDecision::GetBranch() {
 	return _daughterNodes[TestValue()];
 }
 
-std::shared_ptr<DecisionTreeNode> MultiDecision::MakeDecision() {
-	return GetBranch()->MakeDecision();
-}
-
 void MultiDecision::AddNode(std::shared_ptr<DecisionTreeNode> node) {
 	_daughterNodes.emplace_back(node);
 }
 
-int MultiDecision::TestValue() { 
+int MultiDecision::TestValue() {
 	return 0;
 }
 
 int RandomMultiDecision::TestValue() {
-	return universalFunctions->RandomBinomialInt(0, _daughterNodes.size() - 1);
+	while (_currentNodeIndex < 0 || _currentNodeIndex == _latestNodeIndex) {
+		_currentNodeIndex = universalFunctions->RandomBinomialInt(0, _daughterNodes.size() - 1);
+	}
+	_latestNodeIndex = _currentNodeIndex;
+	return _currentNodeIndex;
 }

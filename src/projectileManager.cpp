@@ -74,8 +74,8 @@ std::shared_ptr<Projectile> ProjectileManager::SpawnProjectile(std::shared_ptr<O
 
 bool ProjectileManager::CheckCollision(const ProjectileType& projectileType, const unsigned int& objectID) {
 	_projectileHit = false;
-	if (universalFunctions->OutsideBorderX(_activeObjects[objectID]->GetPosition().x, _activeObjects[objectID]->GetSprite()->GetHeight()) ||
-		universalFunctions->OutsideBorderY(_activeObjects[objectID]->GetPosition().y, _activeObjects[objectID]->GetSprite()->GetHeight())) {
+	if (universalFunctions->OutsideBorderX(_activeObjects[objectID]->GetPosition().x, -_activeObjects[objectID]->GetSprite()->GetHeight()) ||
+		universalFunctions->OutsideBorderY(_activeObjects[objectID]->GetPosition().y, -_activeObjects[objectID]->GetSprite()->GetHeight())) {
 		_projectileHit = true;
 		return _projectileHit;
 	}

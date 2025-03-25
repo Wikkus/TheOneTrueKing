@@ -64,6 +64,7 @@ void BoarBoss::Init() {
 }
 
 void BoarBoss::Update() {
+	_oldPosition = _position;
 	_targetPosition = playerCharacters.back()->GetPosition();
 	_steeringOutput = _prioritySteering->Steering(_behaviorData, *this);
 
@@ -92,10 +93,15 @@ void BoarBoss::TakeDamage(const int& damageAmount) {
 
 void BoarBoss::CreateDecisionTree() {
 	_decisionTree = std::make_shared<WithinRangeDecision>(shared_from_this(), 0.f, 250.f);
-		std::shared_ptr<MoveAction> moveAction = std::make_shared<MoveAction>(shared_from_this());
-		_decisionTree->SetFalseNode(moveAction);
-		std::shared_ptr<EnergyBlastAction> attackAction = std::make_shared<EnergyBlastAction>(shared_from_this());
-		_decisionTree->SetTrueNode(attackAction);
+		_randomDecision = std::make_shared<RandomDecision>(shared_from_this(), 2.f);
+			_randomDecision->SetFalseNode(std::make_shared<MoveAction>(shared_from_this()));
+			_randomDecision->SetTrueNode(std::make_shared<EnergyBlastAction>(shared_from_this()));
+		_decisionTree->SetFalseNode(_randomDecision);
+		_randomMultiDecision = std::make_shared<RandomMultiDecision>(shared_from_this());
+			_randomMultiDecision->AddNode(std::make_shared<DashAction>(shared_from_this(), false));
+			_randomMultiDecision->AddNode(std::make_shared<DashAction>(shared_from_this(), true));
+			_randomMultiDecision->AddNode(std::make_shared<WarstompAction>(shared_from_this()));
+		_decisionTree->SetTrueNode(_randomMultiDecision);
 }
 void BoarBoss::MakeDecision() {
 	_decisionMade = _decisionTree->MakeDecision();

@@ -31,11 +31,14 @@ private:
 
 	std::shared_ptr<TextSprite> _healthTextSprite = nullptr;
 	
+	Vector2<float> _oldPosition;
 	Vector2<float> _dashDirection;
 	Vector2<float> _dashStartPosition;
 
 	std::shared_ptr<Action> _decisionTreeAction = nullptr;
 	std::shared_ptr<Decision> _decisionTree = nullptr;
+	std::shared_ptr<RandomMultiDecision> _randomMultiDecision = nullptr;
+	std::shared_ptr<RandomDecision> _randomDecision = nullptr;
 	std::shared_ptr<DecisionTreeNode> _decisionMade = nullptr;
 };
 

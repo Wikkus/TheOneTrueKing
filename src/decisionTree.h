@@ -28,6 +28,7 @@ public:
 protected:
 	NodeType _nodeType = NodeType::Count;
 	std::shared_ptr<EnemyBase> _owner;
+	std::shared_ptr<DecisionTreeNode> _currentDecision;
 };
 
 #pragma region Actions
@@ -37,10 +38,7 @@ public:
 	~Action() {}
 
 	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
-
 	virtual bool ExecuteAction() { return false; }
-
-
 };
 
 class AttackAction : public Action {
@@ -48,41 +46,31 @@ public:
 	AttackAction(std::shared_ptr<ObjectBase> owner) : Action(owner) {}
 	~AttackAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
-	virtual bool ExecuteAction() override { return false; }
-
 protected:
 	std::shared_ptr<WeaponComponent> _weaponComponent = nullptr;
+
 };
 class DashAction : public AttackAction {
 public:
-	DashAction(std::shared_ptr<ObjectBase> owner);
+	DashAction(std::shared_ptr<ObjectBase> owner, bool isJumpback);
 	~DashAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 	bool ExecuteAction() override;
+};
 
-private:
-	std::shared_ptr<WeaponComponent> _tuskComponent = nullptr;
-
-}; 
 class EnergyBlastAction : public AttackAction {
 public:
 	EnergyBlastAction(std::shared_ptr<ObjectBase> owner);
 	~EnergyBlastAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 	bool ExecuteAction() override;
-
 };
 class WarstompAction : public AttackAction {
 public:
 	WarstompAction(std::shared_ptr<ObjectBase> owner);
 	~WarstompAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 	bool ExecuteAction() override;
-
 };
 
 class MoveAction : public Action {
@@ -90,7 +78,6 @@ public:
 	MoveAction(std::shared_ptr<ObjectBase> owner) : Action(owner) {}
 	~MoveAction() {}
 
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 	bool ExecuteAction() override;
 };
 
@@ -102,9 +89,6 @@ public:
 	Decision(std::shared_ptr<ObjectBase> owner);
 	~Decision() {}
 
-	virtual std::shared_ptr<DecisionTreeNode> GetBranch() override;
-	virtual std::shared_ptr<DecisionTreeNode> MakeDecision() override;
-
 	void SetFalseNode(std::shared_ptr<DecisionTreeNode> falseNode);
 	void SetTrueNode(std::shared_ptr<DecisionTreeNode> trueNode);
 
@@ -113,7 +97,6 @@ protected:
 	std::shared_ptr<DecisionTreeNode> _trueNode;
 	
 };
-
 
 class WithinRangeDecision : public Decision {
 public:
@@ -135,12 +118,14 @@ public:
 	RandomDecision(std::shared_ptr<ObjectBase> owner, const float& timeOut);
 	~RandomDecision() {}
 
-	bool TestValue();
+	std::shared_ptr<DecisionTreeNode> GetBranch() override;
+
+	int TestValue();
 
 private:
 	std::shared_ptr<Timer> _timer;
 
-	bool _currentDecision = false;
+	int _currentDecision = false;
 
 };
 #pragma endregion
@@ -152,7 +137,6 @@ public:
 	~MultiDecision() {}
 
 	std::shared_ptr<DecisionTreeNode> GetBranch() override;
-	std::shared_ptr<DecisionTreeNode> MakeDecision() override;
 
 	void AddNode(std::shared_ptr<DecisionTreeNode> node);
 
@@ -160,6 +144,9 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<DecisionTreeNode>> _daughterNodes;
+
+	int _currentNodeIndex = -1;
+	int _latestNodeIndex = -1;
 
 };
 

@@ -155,6 +155,9 @@ void StaffComponent::Init() {
 //If the weapon is a staff it shoots a fireball towards the player
 bool StaffComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
 		return false;
 	}
 	if (_chargeAttackTimer->GetIsActive()) {
@@ -186,6 +189,7 @@ bool StaffComponent::ExecuteAttack() {
 	_direction = ((_owner->GetTargetObject()->GetPosition() - _owner->GetPosition()).normalized());
 	projectileManager->SpawnProjectile(_owner, _projectileType, universalFunctions->VectorAsOrientation(_direction),
 		_direction, _position, _attackDamage, _projectileSpeed);
+	_owner->SetVelocity({ 0.f, 0.f });
 	return true;
 }
 
@@ -222,6 +226,9 @@ SuperStaffComponent::~SuperStaffComponent() {
 
 bool SuperStaffComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
 		return false;
 	}
 	ExecuteAttack();
@@ -268,6 +275,9 @@ SwordComponent::SwordComponent() {
 //If the weapon is a sword it damages the player if its close enough
 bool SwordComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
 		return false;
 	}
 	if (_chargeAttackTimer->GetIsActive()) {
@@ -293,6 +303,8 @@ bool SwordComponent::ExecuteAttack() {
 	if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 		_owner->GetTargetObject()->TakeDamage(_attackDamage);
 	}
+	_owner->SetVelocity({ 0.f, 0.f });
+	_owner->SetRotation(0.f);
 	return true;
 }
 
@@ -321,6 +333,9 @@ WarstompComponent::WarstompComponent() {
 //If weaponComponent is a warstomp, it will damage the player if it is in range of the AOE
 bool WarstompComponent::UpdateAttack() {
 	if (_attackCooldownTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
 		return false;
 	}
 	if (_chargeAttackTimer->GetIsActive()) {
@@ -347,6 +362,8 @@ bool WarstompComponent::ExecuteAttack() {
 	if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
 		_owner->GetTargetObject()->TakeDamage(_attackDamage);
 	}
+	_owner->SetVelocity({ 0.f, 0.f });
+	_owner->SetRotation(0.f);
 	return true;
 }
 
@@ -372,7 +389,11 @@ TusksComponent::TusksComponent() {
 }
 
 bool TusksComponent::UpdateAttack() {
+	_oldPosition = _owner->GetPosition();
 	if (_attackCooldownTimer->GetIsActive()) {
+		if (_owner->GetObjectType() == ObjectType::Enemy) {
+			enemyManager->CastAsEnemy(_owner)->UpdateAngularMovement();
+		}
 		return false;
 
 	} else if (_chargeAttackTimer->GetIsActive()) {
@@ -386,14 +407,23 @@ bool TusksComponent::UpdateAttack() {
 			_attackCooldownTimer->ResetTimer();
 			_chargeAttackTimer->SetTimer(false, false);
 			_isAttacking = false;
+			_owner->SetVelocity({ 0.f, 0.f });
+			_owner->SetRotation(0.f);
 			return true;
 		}
 	} else {
 		if(_chargeAttackTimer->GetIsFinished()) {
-			_dashDirection = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition());
-			_dashDistance = _dashDirection.absolute() + 100.f;
+			if (_isJumpback) {
+				_dashDirection = (_owner->GetPosition() - _owner->GetTargetObject()->GetPosition());
+				_dashDistance = _jumpBackDistance;
+
+			} else {
+				_dashDirection = (_owner->GetTargetObject()->GetPosition() - _owner->GetPosition());
+				_dashDistance = _dashDirection.absolute() + 100.f;
+			}
 			_dashDirection.normalize();
 			_dashStartPosition = _owner->GetPosition();
+			_distanceTraveled = 0.f;
 			_isAttacking = true;	
 		
 		} else if (universalFunctions->IsInDistance(_owner->GetTargetObject()->GetPosition(), _owner->GetPosition(), _attackRange)) {
@@ -407,17 +437,31 @@ bool TusksComponent::UpdateAttack() {
 
 bool TusksComponent::ExecuteAttack() {
 	_owner->SetPosition(_owner->GetPosition() + _dashDirection * _dashSpeed * deltaTime);
-	if (!_damageCooldown->GetIsActive()) {
-		for (unsigned int i = 0; i < _owner->GetQueriedObjects().size(); i++) {
-			if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetTargetObject()->GetObjectType()) {
-				_owner->GetQueriedObjects()[i]->TakeDamage(_attackDamage);
-				_damageCooldown->ResetTimer();
+	_distanceTraveled += _dashSpeed * deltaTime;
+	_formerPosition = _owner->GetPosition();
+	if (universalFunctions->OutsideBorderX(_owner->GetPosition().x, _owner->GetSprite()->GetHeight() * 0.25f)) {
+		_formerPosition.x = _oldPosition.x;
+		_owner->SetPosition(_formerPosition);
+	}
+	if (universalFunctions->OutsideBorderY(_owner->GetPosition().y, _owner->GetSprite()->GetHeight() * 0.25f)) {
+		_formerPosition.y = _oldPosition.y;
+		_owner->SetPosition(_formerPosition);
+	}
+	if (!_isJumpback) {
+		if (!_damageCooldown->GetIsActive()) {
+			for (unsigned int i = 0; i < _owner->GetQueriedObjects().size(); i++) {
+				if (_owner->GetQueriedObjects()[i]->GetObjectType() == _owner->GetTargetObject()->GetObjectType()) {
+					_owner->GetQueriedObjects()[i]->TakeDamage(_attackDamage);
+					_damageCooldown->ResetTimer();
+				}
 			}
 		}
 	}
-	if ((_dashStartPosition - _owner->GetPosition()).absolute() > _dashDistance) {		
+	if (_distanceTraveled > _dashDistance) {
 		return true;
-	}
+
+	} 
+
 	return false;
 }
 
@@ -428,5 +472,10 @@ void TusksComponent::SetValuesToDefault() {
 	_attackDamage = 20.f;
 	_attackRange = 200.f;
 	_healthModifier = 75;
+	_isJumpback = false;
 	_renderWeapon = true;
+}
+
+void TusksComponent::SetIsJumpback(bool isJumpback) {
+	_isJumpback = isJumpback;
 }
